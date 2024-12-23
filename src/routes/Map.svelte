@@ -11,7 +11,7 @@
 		const map = new maplibregl.Map({
 			container: 'map',
 			center: [138.75, 36],
-			zoom: 5,
+			zoom: 4,
 			hash: true,
 			style: 'https://gsi-cyberjapan.github.io/gsivectortile-mapbox-gl-js/blank.json'
 		});
