@@ -1,10 +1,16 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
 	// maplibre-gl
 	import maplibregl from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	// maplibre-gl-geocoder
 	import MaplibreGeocoder from '@maplibre/maplibre-gl-geocoder';
+	import type {
+		CarmenGeojsonFeature,
+		MaplibreGeocoderApi,
+		MaplibreGeocoderApiConfig,
+		MaplibreGeocoderFeatureResults
+	} from '@maplibre/maplibre-gl-geocoder';
 	import '@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css';
 
 	const initMap = () => {
@@ -36,45 +42,50 @@
 
 		// Geocoder control
 		// https://maplibre.org/maplibre-gl-js/docs/examples/geocoder/
-		const geocoderApi = {
-			forwardGeocode: async (config) => {
-				const features = [];
+		const geocoderApi: MaplibreGeocoderApi = {
+			forwardGeocode: async (
+				config: MaplibreGeocoderApiConfig
+			): Promise<MaplibreGeocoderFeatureResults> => {
+				const results: MaplibreGeocoderFeatureResults = { type: 'FeatureCollection', features: [] };
 				try {
 					const request = `https://nominatim.openstreetmap.org/search?q=${
 						config.query
 					}&format=geojson&polygon_geojson=1&addressdetails=1`;
 					const response = await fetch(request);
 					const geojson = await response.json();
+					console.debug(geojson);
 					for (const feature of geojson.features) {
-						const center = [
-							feature.bbox[0] + (feature.bbox[2] - feature.bbox[0]) / 2,
-							feature.bbox[1] + (feature.bbox[3] - feature.bbox[1]) / 2
-						];
-						const point = {
+						const center = new maplibregl.LatLngBounds(feature.bbox).getCenter();
+						const point: CarmenGeojsonFeature = {
 							type: 'Feature',
 							geometry: {
 								type: 'Point',
-								coordinates: center
+								coordinate: center.toArray()
 							},
-							place_name: feature.properties.display_name,
+							bbox: feature.bbox as [number, number, number, number],
+							id: feature.properties.display_name as string,
+							place_name: feature.properties.display_name as string,
 							properties: feature.properties,
-							text: feature.properties.display_name,
 							place_type: ['place'],
-							center
+							text: feature.properties.display_name as string
 						};
-						features.push(point);
+						results.features.push(point);
 					}
 				} catch (e) {
 					console.error(`Failed to forwardGeocode with error: ${e}`);
 				}
 
-				return {
-					features
-				};
+				return results;
+			},
+			reverseGeocode: async (
+				_config: MaplibreGeocoderApiConfig
+			): Promise<MaplibreGeocoderFeatureResults> => {
+				return Promise.reject();
 			}
 		};
 		map.addControl(
 			new MaplibreGeocoder(geocoderApi, {
+				maplibregl,
 				zoom: 14
 			})
 		);
