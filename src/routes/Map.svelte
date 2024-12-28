@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	// maplibre-gl
-	import maplibregl from 'maplibre-gl';
+	import * as maplibregl from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	// maplibre-gl-geocoder
 	import MaplibreGeocoder from '@maplibre/maplibre-gl-geocoder';
@@ -13,13 +13,51 @@
 	} from '@maplibre/maplibre-gl-geocoder';
 	import '@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css';
 
+	import { GSIMapLayers } from '../lib/gsimaplayers';
+	import * as MaplibreCompondLayerUI from '../lib/maplibre-compound-layer-ui';
+
+	//export type LayerConfigEntry<L extends ILayer> = LayerGroup<L> | L;
+	const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry<MaplibreCompondLayerUI.LayerConfig.BaseLayer>[] =
+		[
+			{
+				type: 'Layer',
+				id: 'base-osm-bright',
+				title: 'OSM Bright',
+				url: 'https://tile.openstreetmap.jp/styles/osm-bright-ja/style.json'
+			},
+			{
+				type: 'Layer',
+				id: 'base-osm-vector',
+				title: 'OSM Vector',
+				url: 'https://tile.openstreetmap.jp/styles/openmaptiles/style.json'
+			},
+			{
+				type: 'Layer',
+				id: 'base-osm-maptiler-basic-ja',
+				title: 'OSM Maptiler Basic JA',
+				url: 'https://tile.openstreetmap.jp/styles/maptiler-basic-ja/style.json'
+			},
+			{
+				type: 'Layer',
+				id: 'base-std',
+				title: '地理院地図標準地図',
+				url: 'https://gsi-cyberjapan.github.io/gsivectortile-mapbox-gl-js/std.json'
+			},
+			{
+				type: 'Layer',
+				id: 'base-std',
+				title: '地理院地図白地図',
+				url: 'https://gsi-cyberjapan.github.io/gsivectortile-mapbox-gl-js/blank.json'
+			}
+		];
+
 	const initMap = () => {
 		const map = new maplibregl.Map({
 			container: 'map',
 			center: [138.75, 36],
 			zoom: 4,
 			hash: true,
-			style: 'https://gsi-cyberjapan.github.io/gsivectortile-mapbox-gl-js/blank.json'
+			style: BASE_LAYER_DEFAULT[0].url as string
 		});
 
 		// Navigation (Zoom) control
@@ -55,12 +93,13 @@
 					const geojson = await response.json();
 					console.debug(geojson);
 					for (const feature of geojson.features) {
-						const center = new maplibregl.LatLngBounds(feature.bbox).getCenter();
+						const bbox = feature.bbox as [number, number, number, number];
+						const center = new maplibregl.LngLatBounds(bbox).getCenter();
 						const point: CarmenGeojsonFeature = {
 							type: 'Feature',
 							geometry: {
 								type: 'Point',
-								coordinate: center.toArray()
+								coordinates: center.toArray()
 							},
 							bbox: feature.bbox as [number, number, number, number],
 							id: feature.properties.display_name as string,
@@ -100,6 +139,15 @@
 				showUserLocation: true
 			})
 		);
+
+		map.on('load', async () => {
+			const gsimaplayers = new GSIMapLayers();
+			await gsimaplayers.load();
+
+			const layerswitcher = new MaplibreCompondLayerUI.MapLibreCompondLayerSwitcherControl();
+			layerswitcher.addBase(BASE_LAYER_DEFAULT);
+			map.addControl(layerswitcher);
+		});
 	};
 	onMount(initMap);
 </script>
