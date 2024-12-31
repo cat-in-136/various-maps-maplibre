@@ -108,12 +108,17 @@
 		);
 
 		map.on('load', async () => {
-			const gsimaplayers = new GSIMapLayers();
-			await gsimaplayers.load();
-
 			const layerswitcher = new MaplibreCompondLayerUI.MapLibreCompondLayerSwitcherControl();
 			layerswitcher.addBase(BASE_LAYER_DEFAULT);
 			map.addControl(layerswitcher);
+			for (const layer of layerswitcher.baseLayerEntriesAll()) {
+				layerswitcher.setBaseLayerEntriesSelected(layer, true);
+				break;
+			}
+
+			const gsimaplayers = new GSIMapLayers();
+			await gsimaplayers.load();
+			layerswitcher.addOverlay(gsimaplayers.getGroup());
 		});
 	};
 	onMount(initMap);

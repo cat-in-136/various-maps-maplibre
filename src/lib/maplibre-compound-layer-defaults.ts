@@ -58,19 +58,22 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 					type: 'Layer',
 					id: 'base-std',
 					title: '標準地図',
-					url: 'https://gsi-cyberjapan.github.io/gsivectortile-mapbox-gl-js/std.json'
+					url: 'https://gsi-cyberjapan.github.io/gsivectortile-mapbox-gl-js/std.json',
+					maxNativeZoom: 17.9
 				},
 				{
 					type: 'Layer',
 					id: 'base-pale',
 					title: '淡色地図',
-					url: 'https://gsi-cyberjapan.github.io/gsivectortile-mapbox-gl-js/pale.json'
+					url: 'https://gsi-cyberjapan.github.io/gsivectortile-mapbox-gl-js/pale.json',
+					maxNativeZoom: 17.9
 				},
 				{
 					type: 'Layer',
 					id: 'base-std',
 					title: '白地図',
-					url: 'https://gsi-cyberjapan.github.io/gsivectortile-mapbox-gl-js/blank.json'
+					url: 'https://gsi-cyberjapan.github.io/gsivectortile-mapbox-gl-js/blank.json',
+					maxNativeZoom: 17.9
 				}
 			]
 		},

@@ -1,5 +1,6 @@
 import Encoding from 'encoding-japanese';
 //import type Encoding from '@types/encoding-japanese';
+import * as MaplibreCompondLayerUI from '../lib/maplibre-compound-layer-ui';
 
 interface GSIMapLayerConfig {
 	url: string;
@@ -31,29 +32,39 @@ const GSIMAPLAYERS: GSIMapLayerConfig[] = [
 ];
 
 export class GSIMapLayers {
-	#data: any[];
+	#data: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry<MaplibreCompondLayerUI.LayerConfig.OverlayLayer>[];
 	constructor() {
 		this.#data = [];
 	}
-	async load(layers: GSIMapLayerConfig[] = GSIMAPLAYERS): Promise<any> {
-		const data = await Promise.all(
-			layers.map(async (config) => {
-				const url = config.url;
-				const response = await fetch(url);
-				if (response.ok) {
-					const respBuff = await response.bytes();
-					return JSON.parse(
-						Encoding.convert(respBuff, {
-							to: 'UNICODE',
-							type: 'string'
-						})
-					);
-				} else {
-					return undefined;
-				}
-			})
-		);
-		this.#data.push(...data.filter(Boolean));
-		console.debug({ data: this.#data });
+
+	getGroup(): MaplibreCompondLayerUI.LayerConfig.LayerGroup<MaplibreCompondLayerUI.LayerConfig.OverlayLayer> {
+		return {
+			type: 'LayerGroup',
+			title: '国土地理院レイヤー',
+			entries: this.#data
+		};
+	}
+
+	async load(layers: GSIMapLayerConfig[] = GSIMAPLAYERS): Promise<void> {
+		const data = (
+			await Promise.all(
+				layers.map(async (config) => {
+					const url = config.url;
+					const response = await fetch(url);
+					if (response.ok) {
+						const respBuff = await response.bytes();
+						return JSON.parse(
+							Encoding.convert(respBuff, {
+								to: 'UNICODE',
+								type: 'string'
+							})
+						);
+					} else {
+						return undefined;
+					}
+				})
+			)
+		).flatMap((v) => v?.layers);
+		this.#data.push(...data);
 	}
 }

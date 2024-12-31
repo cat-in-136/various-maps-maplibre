@@ -1,9 +1,20 @@
 .maplibregl-ctrl-compound-layer-switcher {
 	padding: 5px;
-}
+	overflow-y: auto;
+	max-height: calc(90cqh - 100px);
 
-.maplibregl-ctrl-compound-layer-switcher details > div {
-	margin-left: 0.25em;
-	border-left: solid 0.125em #aaa;
-	padding-left: 0.25em;
+	details > div {
+		margin-left: 0.25em;
+		border-left: solid 0.125em #aaa;
+		padding-left: 0.25em;
+	}
+
+	.maplibregl-ctrl-compound-layer-layer-entry {
+		dialog[popover]::backdrop {
+			background-color: rgba(0, 0, 0, 0.25);
+		}
+		& > button[popovertarget] {
+			display: inline-block;
+		}
+	}
 }

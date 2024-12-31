@@ -18,7 +18,7 @@ export namespace LayerConfig {
 		[propName: string]: unknown;
 	}
 
-	export interface Layer extends ILayer {
+	export interface OverlayLayer extends ILayer {
 		maxZoom?: number;
 		minZoom?: number;
 		[propName: string]: unknown;
@@ -48,7 +48,47 @@ namespace LayerTreeView {
 		T extends keyof LayerTreeEventType<L>
 	> = (ev: LayerTreeEventType<L>[T] & Object) => void;
 
-	export class LayerTreeView<L extends LayerConfig.ILayer> {
+	type LayerTreeViewEntry<L extends LayerConfig.ILayer> = LayerEntry<L> | LayerGroupEntry<L>;
+
+	interface LayerGroup<L extends LayerConfig.ILayer> {
+		entries(): Generator<LayerTreeViewEntry<L>>;
+		layerEntriesAll(): Generator<LayerEntry<L>>;
+		layerEntriesSelected(): Generator<LayerEntry<L>>;
+	}
+
+	namespace LayerGroupCommonProcedure {
+		export function* layerEntriesAll<L extends LayerConfig.ILayer>(
+			lg: LayerGroup<L>
+		): Generator<LayerEntry<L>> {
+			for (const entry of lg.entries()) {
+				if ((entry as LayerEntry<L>).type === 'LayerEntry') {
+					yield entry as LayerEntry<L>;
+				} else if ((entry as LayerGroupEntry<L>).type === 'LayerGroupEntry') {
+					yield* (entry as LayerGroupEntry<L>).layerEntriesAll();
+				} else {
+					throw new Error(`Not implemented type`);
+				}
+			}
+		}
+
+		export function* layerEntriesSelected<L extends LayerConfig.ILayer>(
+			lg: LayerGroup<L>
+		): Generator<LayerEntry<L>> {
+			for (const entry of lg.entries()) {
+				if ((entry as LayerEntry<L>).type === 'LayerEntry') {
+					if ((entry as LayerEntry<L>).selected) {
+						yield entry as LayerEntry<L>;
+					}
+				} else if ((entry as LayerGroupEntry<L>).type === 'LayerGroupEntry') {
+					yield* (entry as LayerGroupEntry<L>).layerEntriesAll();
+				} else {
+					throw new Error(`Not implemented type`);
+				}
+			}
+		}
+	}
+
+	export class LayerTreeView<L extends LayerConfig.ILayer> implements LayerGroup<L> {
 		readonly #switchToggle: boolean;
 		#entries: LayerTreeViewEntry<L>[];
 		#control?: MapLibreCompondLayerSwitcherControl;
@@ -108,16 +148,14 @@ namespace LayerTreeView {
 			return this.#element;
 		}
 
+		*entries(): Generator<LayerTreeViewEntry<L>> {
+			yield* this.#entries;
+		}
 		*layerEntriesAll(): Generator<LayerEntry<L>> {
-			for (const entry of this.#entries) {
-				if ((entry as LayerEntry<L>).type === 'LayerEntry') {
-					yield entry as LayerEntry<L>;
-				} else if ((entry as LayerGroupEntry<L>).type === 'LayerGroupEntry') {
-					yield* (entry as LayerGroupEntry<L>).layerEntriesAll();
-				} else {
-					throw new Error(`Not implemented type`);
-				}
-			}
+			yield* LayerGroupCommonProcedure.layerEntriesAll(this);
+		}
+		*layerEntriesSelected(): Generator<LayerEntry<L>> {
+			yield* LayerGroupCommonProcedure.layerEntriesSelected(this);
 		}
 
 		on<T extends keyof LayerTreeEventType<L>>(
@@ -182,6 +220,24 @@ namespace LayerTreeView {
 			label.appendChild(span);
 			this.#element.appendChild(label);
 
+			if (this.#config.html) {
+				const popover = document.createElement('dialog');
+				popover.id = `popover-dialog-${this.#config.id}`;
+				popover.setAttribute('popover', 'popover');
+				popover.innerHTML = `<button popovertarget="${popover.id}" popovertargetaction="hide">
+          <span aria-hidden=”true”>❌</span>
+          <span class="sr-only">Close</span>
+        </button>
+        <hr />
+        ${this.#config.html}`;
+				this.#element.appendChild(popover);
+
+				const infoBtn = document.createElement('button');
+				infoBtn.innerHTML = 'ℹ️';
+				infoBtn.setAttribute('popovertarget', popover.id);
+				this.#element.appendChild(infoBtn);
+			}
+
 			checkbox.addEventListener(
 				'change',
 				(e) => {
@@ -207,7 +263,7 @@ namespace LayerTreeView {
 		}
 	}
 
-	class LayerGroupEntry<L extends LayerConfig.ILayer> {
+	class LayerGroupEntry<L extends LayerConfig.ILayer> implements LayerGroup<L> {
 		readonly type: string = 'LayerGroupEntry';
 		readonly #config: LayerConfig.LayerGroup<L>;
 		readonly #owner: LayerTreeView<L>;
@@ -218,7 +274,7 @@ namespace LayerTreeView {
 			this.#owner = owner;
 
 			const entries: LayerTreeViewEntry<L>[] = [];
-			for (const entry of config.entries) {
+			for (const entry of config.entries || []) {
 				if (entry.type == 'LayerGroup') {
 					entries.push(new LayerGroupEntry(entry as LayerConfig.LayerGroup<L>, owner));
 				} else if (entry.type == 'Layer') {
@@ -252,31 +308,66 @@ namespace LayerTreeView {
 			this.#element.appendChild(entriesDiv);
 		}
 
+		*entries(): Generator<LayerTreeViewEntry<L>> {
+			yield* this.#entries;
+		}
 		*layerEntriesAll(): Generator<LayerEntry<L>> {
-			for (const entry of this.#entries) {
-				if ((entry as LayerEntry<L>).type === 'LayerEntry') {
-					yield entry as LayerEntry<L>;
-				} else if ((entry as LayerGroupEntry<L>).type === 'LayerGroupEntry') {
-					yield* (entry as LayerGroupEntry<L>).layerEntriesAll();
-				} else {
-					throw new Error(`Not implemented type`);
-				}
-			}
+			yield* LayerGroupCommonProcedure.layerEntriesAll(this);
+		}
+		*layerEntriesSelected(): Generator<LayerEntry<L>> {
+			yield* LayerGroupCommonProcedure.layerEntriesSelected(this);
 		}
 	}
-
-	type LayerTreeViewEntry<L extends LayerConfig.ILayer> = LayerEntry<L> | LayerGroupEntry<L>;
 }
 
 export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl {
 	#map?: maplibregl.Map;
 	#element: HTMLElement;
 	#base: LayerTreeView.LayerTreeView<LayerConfig.BaseLayer>;
+	#overlay: LayerTreeView.LayerTreeView<LayerConfig.OverlayLayer>;
 
 	constructor() {
 		this.#base = new LayerTreeView.LayerTreeView(this, true);
 		this.#base.on('LayerChanged', (e) => {
-			this.#map?.setStyle(e.detail.layerEntry.config.url);
+			if (this.#map) {
+				const layer = e.detail.layerEntry.config;
+				this.#map.setStyle(layer.url);
+				this.#map.setMaxZoom(layer.maxNativeZoom);
+			}
+		});
+		this.#overlay = new LayerTreeView.LayerTreeView(this, false);
+		this.#overlay.on('LayerChanged', (e) => {
+			if (this.#map) {
+				const layer = e.detail.layerEntry.config;
+				const selected = e.detail.layerEntry.selected;
+				const id = layer.id;
+
+				if (selected) {
+					if (/\.(png|jpg|gif|svg)$/.test(layer.url)) {
+						let source: maplibregl.RasterSourceSpecification = {
+							type: 'raster',
+							tiles: [layer.url]
+						};
+						if (layer.maxZoom) {
+							source.maxzoom = layer.maxZoom;
+						}
+						if (layer.minZoom) {
+							source.minzoom = layer.minZoom;
+						}
+						this.#map.addSource(`source-#{id}`, source);
+						this.#map.addLayer({
+							id,
+							type: 'raster',
+							source: `source-#{id}`
+						} as maplibregl.RasterLayerSpecification);
+					} else {
+						console.debug(`Not implemented yet`, e); // TODO
+					}
+				} else {
+					this.#map.removeLayer(id);
+					this.#map.removeSource(`source-#{id}`);
+				}
+			}
 		});
 
 		// Create the main div element
@@ -290,6 +381,32 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 			| LayerConfig.LayerConfigEntry<LayerConfig.BaseLayer>[]
 	): this {
 		this.#base.addConfig(config);
+		return this;
+	}
+	*baseLayerEntriesAll(): Generator<LayerConfig.BaseLayer> {
+		for (const entry of this.#base.layerEntriesAll()) {
+			yield entry.config;
+		}
+	}
+	*baseLayerEntriesSelected(): Generator<LayerConfig.BaseLayer> {
+		for (const entry of this.#base.layerEntriesSelected()) {
+			yield entry.config;
+		}
+	}
+	setBaseLayerEntriesSelected(layer: LayerConfig.BaseLayer, selected: boolean) {
+		for (const entry of this.#base.layerEntriesAll()) {
+			if (entry.config === layer) {
+				entry.selected = selected;
+			}
+		}
+	}
+
+	addOverlay(
+		config:
+			| LayerConfig.LayerConfigEntry<LayerConfig.OverlayLayer>
+			| LayerConfig.LayerConfigEntry<LayerConfig.OverlayLayer>[]
+	): this {
+		this.#overlay.addConfig(config);
 		return this;
 	}
 
@@ -317,6 +434,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 		summaryOverlay.textContent = 'Overlay layers';
 		const divOverlayEntries = document.createElement('div');
 		divOverlayEntries.className = `${ELEMENT_CLASS_PREFIX}-switcher-overlay-entries`;
+		divOverlayEntries.appendChild(this.#overlay.element);
 
 		// Append elements for the overlay layers
 		detailsOverlay.appendChild(summaryOverlay);
