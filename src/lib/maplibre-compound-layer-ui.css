@@ -1,0 +1,9 @@
+.maplibregl-ctrl-compound-layer-switcher {
+	padding: 5px;
+}
+
+.maplibregl-ctrl-compound-layer-switcher details > div {
+	margin-left: 0.25em;
+	border-left: solid 0.125em #aaa;
+	padding-left: 0.25em;
+}

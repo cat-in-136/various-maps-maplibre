@@ -202,7 +202,7 @@ namespace LayerTreeView {
 			}
 			this.#entries = entries;
 
-			this.#element = document.createElement('div');
+			this.#element = document.createElement('details');
 			this.#createElement();
 		}
 		get config(): LayerConfig.LayerGroup<L> {
@@ -219,7 +219,7 @@ namespace LayerTreeView {
 			const entriesDiv = document.createElement('div');
 			entriesDiv.className = 'entries';
 			for (const entry of this.#entries) {
-				entriesDiv.appendChild((entry as any).element());
+				entriesDiv.appendChild((entry as any).element);
 			}
 			this.#element.appendChild(summary);
 			this.#element.appendChild(entriesDiv);
