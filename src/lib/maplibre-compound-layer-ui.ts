@@ -36,15 +36,31 @@ export namespace LayerConfig {
 }
 
 namespace LayerTreeView {
+	type LayerTreeEventType<L extends LayerConfig.ILayer> = {
+		LayerChanged: CustomEvent<{
+			type: 'LayerChanged';
+			layerEntry: LayerEntry<L>;
+			sourceEvent: Event;
+		}>;
+	};
+	type LayerTreeEventListener<
+		L extends LayerConfig.ILayer,
+		T extends keyof LayerTreeEventType<L>
+	> = (ev: LayerTreeEventType<L>[T] & Object) => void;
+
 	export class LayerTreeView<L extends LayerConfig.ILayer> {
 		readonly #switchToggle: boolean;
 		#entries: LayerTreeViewEntry<L>[];
 		#control?: MapLibreCompondLayerSwitcherControl;
 		readonly #element: HTMLElement;
+		#listeners: { [T in keyof LayerTreeEventType<L>]: Set<LayerTreeEventListener<L, T>> };
 
 		constructor(control: MapLibreCompondLayerSwitcherControl, switchToggle: boolean = true) {
 			this.#switchToggle = switchToggle;
 			this.#entries = [];
+			this.#listeners = {
+				LayerChanged: new Set<LayerTreeEventListener<L, 'LayerChanged'>>()
+			};
 			this.#control = control;
 			this.#element = document.createElement('div');
 			this.#createElement();
@@ -104,22 +120,35 @@ namespace LayerTreeView {
 			}
 		}
 
-		handleLayerChange(
-			e: CustomEvent<{
-				layerEntry: LayerEntry<L>;
-				sourceEvent: Event;
-			}>
-		) {
+		on<T extends keyof LayerTreeEventType<L>>(
+			type: T,
+			listener: LayerTreeEventListener<L, T>
+		): this {
+			this.#listeners[type].add(listener);
+			return this;
+		}
+		off<T extends keyof LayerTreeEventType<L>>(
+			type: T,
+			listener: LayerTreeEventListener<L, T>
+		): this {
+			this.#listeners[type].delete(listener);
+			return this;
+		}
+
+		handleLayerChange(e: LayerTreeEventType<L>['LayerChanged']) {
 			if (this.#switchToggle) {
 				for (const entry of this.layerEntriesAll()) {
 					entry.selected = entry === e.detail.layerEntry;
 					if (entry.selected) {
-						const map = this.#control?.map;
-						map?.setStyle(entry.config.url);
+						for (const listener of this.#listeners['LayerChanged']) {
+							listener.call(this, e);
+						}
 					}
 				}
 			} else {
-				throw new Error('Not Implemented'); // TODO Not Implement
+				for (const listener of this.#listeners['LayerChanged']) {
+					listener.call(this, e);
+				}
 			}
 		}
 	}
@@ -156,20 +185,18 @@ namespace LayerTreeView {
 			checkbox.addEventListener(
 				'change',
 				(e) => {
-					this.#handleChange(e);
+					this.#owner.handleLayerChange(
+						new CustomEvent('LayerChanged', {
+							detail: {
+								type: 'LayerChanged',
+								layerEntry: this,
+								sourceEvent: e
+							}
+						})
+					);
 				},
 				false
 			);
-		}
-
-		#handleChange(e: Event) {
-			const event = new CustomEvent('LayerChanged', {
-				detail: {
-					layerEntry: this,
-					sourceEvent: e
-				}
-			});
-			this.#owner.handleLayerChange(event);
 		}
 
 		set selected(value: boolean) {
@@ -248,6 +275,9 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 
 	constructor() {
 		this.#base = new LayerTreeView.LayerTreeView(this, true);
+		this.#base.on('LayerChanged', (e) => {
+			this.#map?.setStyle(e.detail.layerEntry.config.url);
+		});
 
 		// Create the main div element
 		this.#element = document.createElement('div');
