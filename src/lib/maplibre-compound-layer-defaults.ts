@@ -193,6 +193,95 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 		},
 		{
 			type: 'LayerGroup',
+			title: 'OSM Raster',
+			entries: [
+				{
+					type: 'Layer',
+					id: 'base-osm-raster-mapnik',
+					title: 'OSM mapnik',
+					url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+					maxZoom: 19,
+					attribution:
+						'Map data &copy; <a href="https://www.openstreetmap.org">OpenStreetMap</a> contributors.'
+				},
+				{
+					type: 'Layer',
+					id: 'base-osm-raster-opentopomap',
+					title: 'Open Topo Map',
+					url: 'https://tile.opentopomap.org/{z}/{x}/{y}.png',
+					maxZoom: 17,
+					attribution:
+						'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+				}
+			]
+		},
+		{
+			type: 'LayerGroup',
+			title: 'Esri Raster',
+			entries: [
+				{
+					type: 'Layer',
+					id: 'base-enri-raster-topograph',
+					title: 'Esri Topograph',
+					url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+					maxZoom: 19,
+					minZoom: 1,
+					attribution:
+						'Tiles &copy; <a href="https://static.arcgis.com/attribution/World_Topo_Map" target="_blank">Esri</a>'
+				},
+				{
+					type: 'Layer',
+					id: 'base-enri-raster-streets',
+					title: 'Esri Streets',
+					url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+					maxZoom: 19,
+					minZoom: 1,
+					attribution:
+						'Tiles &copy; <a href="https://static.arcgis.com/attribution/World_Street_Map" target="_blank">Esri</a>'
+				},
+				{
+					type: 'Layer',
+					id: 'base-enri-raster-natgeo',
+					title: 'Esri National Geographic',
+					url: 'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',
+					maxZoom: 19,
+					minZoom: 1,
+					attribution:
+						'Tiles &copy; <a href="https://static.arcgis.com/attribution/NatGeo_World_Map" target="_blank">Esri</a>'
+				},
+				{
+					type: 'Layer',
+					id: 'base-enri-raster-ocean',
+					title: 'Esri Ocean',
+					url: 'https://server.arcgisonline.com/arcgis/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}',
+					maxZoom: 19,
+					minZoom: 1,
+					attribution:
+						'Tiles &copy; <a href="https://static.arcgis.com/attribution/Ocean_Basemap" target="_blank">Esri</a>'
+				},
+				{
+					type: 'Layer',
+					id: 'base-enri-raster-imagery',
+					title: 'Esri Imagery',
+					url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+					maxZoom: 19,
+					minZoom: 1,
+					attribution:
+						'Tiles &copy; Esri, DigitalGlobe, GeoEye, i-cubed, USDA, USGS, AEX, Getmapping, Aerogrid, IGN, IGP, swisstopo, and the GIS User Community'
+				},
+				{
+					type: 'Layer',
+					id: 'base-enri-raster-shadedrelief',
+					title: 'Esri Shaded Relief',
+					url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}',
+					maxZoom: 13,
+					minZoom: 1,
+					attribution: 'Tiles &copy; ESRI, NAVTEQ, DeLorme'
+				}
+			]
+		},
+		{
+			type: 'LayerGroup',
 			title: 'Debug',
 			entries: [
 				{

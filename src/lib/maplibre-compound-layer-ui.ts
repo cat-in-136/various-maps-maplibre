@@ -313,8 +313,36 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 		this.#base.on('LayerChanged', (e) => {
 			if (this.#map) {
 				const layer = e.detail.layerEntry.config;
-				this.#map.setStyle(layer.url);
-				this.#map.setMaxZoom(layer.maxNativeZoom);
+				if (layer.url.indexOf('{x}') >= 0) {
+					this.#map.setStyle({
+						version: 8,
+						sources: {
+							[`source-${layer.id}-raster`]: {
+								type: 'raster',
+								tiles: [layer.url],
+								tileSize: (layer.tileSize ?? 256) as number,
+								attribution: layer.attribution as string | undefined
+							}
+						},
+						layers: [
+							{
+								id: `layer-${layer.id}-raster`,
+								type: 'raster',
+								source: `source-${layer.id}-raster`,
+								minzoom: layer.minZoom ?? 0,
+								maxzoom: layer.maxZoom ?? 22
+							}
+						]
+					});
+					if (layer.maxNativeZoom ?? layer.maxZoom) {
+						this.#map.setMaxZoom(layer.maxNativeZoom ?? layer.maxZoom);
+					}
+				} else {
+					this.#map.setStyle(layer.url);
+					if (layer.maxNativeZoom) {
+						this.#map.setMaxZoom(layer.maxNativeZoom);
+					}
+				}
 			}
 		});
 		this.#overlay = new LayerTreeView.LayerTreeView(this, false);
