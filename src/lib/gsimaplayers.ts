@@ -32,12 +32,12 @@ const GSIMAPLAYERS: GSIMapLayerConfig[] = [
 ];
 
 export class GSIMapLayers {
-	#data: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry<MaplibreCompondLayerUI.LayerConfig.OverlayLayer>[];
+	#data: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[];
 	constructor() {
 		this.#data = [];
 	}
 
-	getGroup(): MaplibreCompondLayerUI.LayerConfig.LayerGroup<MaplibreCompondLayerUI.LayerConfig.OverlayLayer> {
+	getGroup(): MaplibreCompondLayerUI.LayerConfig.LayerGroup {
 		return {
 			type: 'LayerGroup',
 			title: '国土地理院レイヤー',

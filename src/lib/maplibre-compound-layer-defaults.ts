@@ -1,6 +1,6 @@
 import type * as MaplibreCompondLayerUI from './maplibre-compound-layer-ui';
 
-export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry<MaplibreCompondLayerUI.LayerConfig.BaseLayer>[] =
+export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] =
 	[
 		{
 			type: 'LayerGroup',

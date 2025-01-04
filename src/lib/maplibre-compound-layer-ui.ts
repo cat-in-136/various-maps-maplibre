@@ -3,7 +3,7 @@ import maplibregl from 'maplibre-gl';
 const ELEMENT_CLASS_PREFIX = 'maplibregl-ctrl-compound-layer';
 
 export namespace LayerConfig {
-	export interface ILayer {
+	export interface Layer {
 		type: string;
 		id: string;
 		title: string;
@@ -12,75 +12,63 @@ export namespace LayerConfig {
 		description?: string;
 		legendUrl?: string;
 		maxNativeZoom?: number;
-	}
-
-	export interface BaseLayer extends ILayer {
-		[propName: string]: unknown;
-	}
-
-	export interface OverlayLayer extends ILayer {
 		maxZoom?: number;
 		minZoom?: number;
 		[propName: string]: unknown;
 	}
 
-	export interface LayerGroup<L extends ILayer> {
+	export interface LayerGroup {
 		type: 'LayerGroup';
 		title: string;
 		html?: string;
-		entries: LayerConfigEntry<L>[];
+		entries: LayerConfigEntry[];
 		[propName: string]: unknown;
 	}
 
-	export type LayerConfigEntry<L extends ILayer> = LayerGroup<L> | L;
+	export type LayerConfigEntry = LayerGroup | Layer;
 }
 
 namespace LayerTreeView {
-	type LayerTreeEventType<L extends LayerConfig.ILayer> = {
+	type LayerTreeEventType = {
 		LayerChanged: CustomEvent<{
 			type: 'LayerChanged';
-			layerEntry: LayerEntry<L>;
+			layerEntry: LayerEntry;
 			sourceEvent: Event;
 		}>;
 	};
-	type LayerTreeEventListener<
-		L extends LayerConfig.ILayer,
-		T extends keyof LayerTreeEventType<L>
-	> = (ev: LayerTreeEventType<L>[T] & Object) => void;
+	type LayerTreeEventListener<T extends keyof LayerTreeEventType> = (
+		ev: LayerTreeEventType[T] & Object
+	) => void;
 
-	type LayerTreeViewEntry<L extends LayerConfig.ILayer> = LayerEntry<L> | LayerGroupEntry<L>;
+	type LayerTreeViewEntry = LayerEntry | LayerGroupEntry;
 
-	interface LayerGroup<L extends LayerConfig.ILayer> {
-		entries(): Generator<LayerTreeViewEntry<L>>;
-		layerEntriesAll(): Generator<LayerEntry<L>>;
-		layerEntriesSelected(): Generator<LayerEntry<L>>;
+	interface LayerGroup {
+		entries(): Generator<LayerTreeViewEntry>;
+		layerEntriesAll(): Generator<LayerEntry>;
+		layerEntriesSelected(): Generator<LayerEntry>;
 	}
 
 	namespace LayerGroupCommonProcedure {
-		export function* layerEntriesAll<L extends LayerConfig.ILayer>(
-			lg: LayerGroup<L>
-		): Generator<LayerEntry<L>> {
+		export function* layerEntriesAll(lg: LayerGroup): Generator<LayerEntry> {
 			for (const entry of lg.entries()) {
-				if ((entry as LayerEntry<L>).type === 'LayerEntry') {
-					yield entry as LayerEntry<L>;
-				} else if ((entry as LayerGroupEntry<L>).type === 'LayerGroupEntry') {
-					yield* (entry as LayerGroupEntry<L>).layerEntriesAll();
+				if ((entry as LayerEntry).type === 'LayerEntry') {
+					yield entry as LayerEntry;
+				} else if ((entry as LayerGroupEntry).type === 'LayerGroupEntry') {
+					yield* (entry as LayerGroupEntry).layerEntriesAll();
 				} else {
 					throw new Error(`Not implemented type`);
 				}
 			}
 		}
 
-		export function* layerEntriesSelected<L extends LayerConfig.ILayer>(
-			lg: LayerGroup<L>
-		): Generator<LayerEntry<L>> {
+		export function* layerEntriesSelected(lg: LayerGroup): Generator<LayerEntry> {
 			for (const entry of lg.entries()) {
-				if ((entry as LayerEntry<L>).type === 'LayerEntry') {
-					if ((entry as LayerEntry<L>).selected) {
-						yield entry as LayerEntry<L>;
+				if ((entry as LayerEntry).type === 'LayerEntry') {
+					if ((entry as LayerEntry).selected) {
+						yield entry as LayerEntry;
 					}
-				} else if ((entry as LayerGroupEntry<L>).type === 'LayerGroupEntry') {
-					yield* (entry as LayerGroupEntry<L>).layerEntriesAll();
+				} else if ((entry as LayerGroupEntry).type === 'LayerGroupEntry') {
+					yield* (entry as LayerGroupEntry).layerEntriesAll();
 				} else {
 					throw new Error(`Not implemented type`);
 				}
@@ -88,18 +76,18 @@ namespace LayerTreeView {
 		}
 	}
 
-	export class LayerTreeView<L extends LayerConfig.ILayer> implements LayerGroup<L> {
+	export class LayerTreeView implements LayerGroup {
 		readonly #switchToggle: boolean;
-		#entries: LayerTreeViewEntry<L>[];
+		#entries: LayerTreeViewEntry[];
 		#control?: MapLibreCompondLayerSwitcherControl;
 		readonly #element: HTMLElement;
-		#listeners: { [T in keyof LayerTreeEventType<L>]: Set<LayerTreeEventListener<L, T>> };
+		#listeners: { [T in keyof LayerTreeEventType]: Set<LayerTreeEventListener<T>> };
 
 		constructor(control: MapLibreCompondLayerSwitcherControl, switchToggle: boolean = true) {
 			this.#switchToggle = switchToggle;
 			this.#entries = [];
 			this.#listeners = {
-				LayerChanged: new Set<LayerTreeEventListener<L, 'LayerChanged'>>()
+				LayerChanged: new Set<LayerTreeEventListener<'LayerChanged'>>()
 			};
 			this.#control = control;
 			this.#element = document.createElement('div');
@@ -116,17 +104,17 @@ namespace LayerTreeView {
 			}
 		}
 
-		addConfig(config: LayerConfig.LayerConfigEntry<L> | LayerConfig.LayerConfigEntry<L>[]): this {
+		addConfig(config: LayerConfig.LayerConfigEntry | LayerConfig.LayerConfigEntry[]): this {
 			if (Array.isArray(config)) {
 				for (const v of config) {
 					this.addConfig(v);
 				}
 			} else {
-				let entry: LayerTreeViewEntry<L>;
-				if ((config as L).type === 'Layer') {
-					entry = new LayerEntry(config as L, this);
-				} else if ((config as LayerConfig.LayerGroup<L>).type === 'LayerGroup') {
-					entry = new LayerGroupEntry<L>(config as LayerConfig.LayerGroup<L>, this);
+				let entry: LayerTreeViewEntry;
+				if ((config as LayerConfig.Layer).type === 'Layer') {
+					entry = new LayerEntry(config as LayerConfig.Layer, this);
+				} else if ((config as LayerConfig.LayerGroup).type === 'LayerGroup') {
+					entry = new LayerGroupEntry(config as LayerConfig.LayerGroup, this);
 				} else {
 					throw new Error(`unsupported config type`);
 				}
@@ -148,32 +136,26 @@ namespace LayerTreeView {
 			return this.#element;
 		}
 
-		*entries(): Generator<LayerTreeViewEntry<L>> {
+		*entries(): Generator<LayerTreeViewEntry> {
 			yield* this.#entries;
 		}
-		*layerEntriesAll(): Generator<LayerEntry<L>> {
+		*layerEntriesAll(): Generator<LayerEntry> {
 			yield* LayerGroupCommonProcedure.layerEntriesAll(this);
 		}
-		*layerEntriesSelected(): Generator<LayerEntry<L>> {
+		*layerEntriesSelected(): Generator<LayerEntry> {
 			yield* LayerGroupCommonProcedure.layerEntriesSelected(this);
 		}
 
-		on<T extends keyof LayerTreeEventType<L>>(
-			type: T,
-			listener: LayerTreeEventListener<L, T>
-		): this {
+		on<T extends keyof LayerTreeEventType>(type: T, listener: LayerTreeEventListener<T>): this {
 			this.#listeners[type].add(listener);
 			return this;
 		}
-		off<T extends keyof LayerTreeEventType<L>>(
-			type: T,
-			listener: LayerTreeEventListener<L, T>
-		): this {
+		off<T extends keyof LayerTreeEventType>(type: T, listener: LayerTreeEventListener<T>): this {
 			this.#listeners[type].delete(listener);
 			return this;
 		}
 
-		handleLayerChange(e: LayerTreeEventType<L>['LayerChanged']) {
+		handleLayerChange(e: LayerTreeEventType['LayerChanged']) {
 			if (this.#switchToggle) {
 				for (const entry of this.layerEntriesAll()) {
 					entry.selected = entry === e.detail.layerEntry;
@@ -191,18 +173,18 @@ namespace LayerTreeView {
 		}
 	}
 
-	class LayerEntry<L extends LayerConfig.ILayer> {
+	class LayerEntry {
 		readonly type: string = 'LayerEntry';
-		readonly #config: L;
-		readonly #owner: LayerTreeView<L>;
+		readonly #config: LayerConfig.Layer;
+		readonly #owner: LayerTreeView;
 		#element: HTMLElement;
-		constructor(config: L, owner: LayerTreeView<L>) {
+		constructor(config: LayerConfig.Layer, owner: LayerTreeView) {
 			this.#config = config;
 			this.#owner = owner;
 			this.#element = document.createElement('div');
 			this.#createElement();
 		}
-		get config(): L {
+		get config(): LayerConfig.Layer {
 			return this.#config;
 		}
 		get element(): HTMLElement {
@@ -263,22 +245,22 @@ namespace LayerTreeView {
 		}
 	}
 
-	class LayerGroupEntry<L extends LayerConfig.ILayer> implements LayerGroup<L> {
+	class LayerGroupEntry implements LayerGroup {
 		readonly type: string = 'LayerGroupEntry';
-		readonly #config: LayerConfig.LayerGroup<L>;
-		readonly #owner: LayerTreeView<L>;
-		readonly #entries: LayerTreeViewEntry<L>[];
+		readonly #config: LayerConfig.LayerGroup;
+		readonly #owner: LayerTreeView;
+		readonly #entries: LayerTreeViewEntry[];
 		#element: HTMLElement;
-		constructor(config: LayerConfig.LayerGroup<L>, owner: LayerTreeView<L>) {
+		constructor(config: LayerConfig.LayerGroup, owner: LayerTreeView) {
 			this.#config = config;
 			this.#owner = owner;
 
-			const entries: LayerTreeViewEntry<L>[] = [];
+			const entries: LayerTreeViewEntry[] = [];
 			for (const entry of config.entries || []) {
-				if (entry.type == 'LayerGroup') {
-					entries.push(new LayerGroupEntry(entry as LayerConfig.LayerGroup<L>, owner));
-				} else if (entry.type == 'Layer') {
-					entries.push(new LayerEntry(entry as L, owner));
+				if (entry.type == 'Layer') {
+					entries.push(new LayerEntry(entry as LayerConfig.Layer, owner));
+				} else if (entry.type == 'LayerGroup') {
+					entries.push(new LayerGroupEntry(entry as LayerConfig.LayerGroup, owner));
 				} else {
 					console.error(`unknown config.type: ${entry.type}`, entry);
 				}
@@ -288,7 +270,7 @@ namespace LayerTreeView {
 			this.#element = document.createElement('details');
 			this.#createElement();
 		}
-		get config(): LayerConfig.LayerGroup<L> {
+		get config(): LayerConfig.LayerGroup {
 			return this.#config;
 		}
 		get element(): HTMLElement {
@@ -308,13 +290,13 @@ namespace LayerTreeView {
 			this.#element.appendChild(entriesDiv);
 		}
 
-		*entries(): Generator<LayerTreeViewEntry<L>> {
+		*entries(): Generator<LayerTreeViewEntry> {
 			yield* this.#entries;
 		}
-		*layerEntriesAll(): Generator<LayerEntry<L>> {
+		*layerEntriesAll(): Generator<LayerEntry> {
 			yield* LayerGroupCommonProcedure.layerEntriesAll(this);
 		}
-		*layerEntriesSelected(): Generator<LayerEntry<L>> {
+		*layerEntriesSelected(): Generator<LayerEntry> {
 			yield* LayerGroupCommonProcedure.layerEntriesSelected(this);
 		}
 	}
@@ -323,8 +305,8 @@ namespace LayerTreeView {
 export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl {
 	#map?: maplibregl.Map;
 	#element: HTMLElement;
-	#base: LayerTreeView.LayerTreeView<LayerConfig.BaseLayer>;
-	#overlay: LayerTreeView.LayerTreeView<LayerConfig.OverlayLayer>;
+	#base: LayerTreeView.LayerTreeView;
+	#overlay: LayerTreeView.LayerTreeView;
 
 	constructor() {
 		this.#base = new LayerTreeView.LayerTreeView(this, true);
@@ -375,25 +357,21 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 		this.#createElement();
 	}
 
-	addBase(
-		config:
-			| LayerConfig.LayerConfigEntry<LayerConfig.BaseLayer>
-			| LayerConfig.LayerConfigEntry<LayerConfig.BaseLayer>[]
-	): this {
+	addBase(config: LayerConfig.LayerConfigEntry | LayerConfig.LayerConfigEntry[]): this {
 		this.#base.addConfig(config);
 		return this;
 	}
-	*baseLayerEntriesAll(): Generator<LayerConfig.BaseLayer> {
+	*baseLayerEntriesAll(): Generator<LayerConfig.Layer> {
 		for (const entry of this.#base.layerEntriesAll()) {
 			yield entry.config;
 		}
 	}
-	*baseLayerEntriesSelected(): Generator<LayerConfig.BaseLayer> {
+	*baseLayerEntriesSelected(): Generator<LayerConfig.Layer> {
 		for (const entry of this.#base.layerEntriesSelected()) {
 			yield entry.config;
 		}
 	}
-	setBaseLayerEntriesSelected(layer: LayerConfig.BaseLayer, selected: boolean) {
+	setBaseLayerEntriesSelected(layer: LayerConfig.Layer, selected: boolean) {
 		for (const entry of this.#base.layerEntriesAll()) {
 			if (entry.config === layer) {
 				entry.selected = selected;
@@ -401,11 +379,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 		}
 	}
 
-	addOverlay(
-		config:
-			| LayerConfig.LayerConfigEntry<LayerConfig.OverlayLayer>
-			| LayerConfig.LayerConfigEntry<LayerConfig.OverlayLayer>[]
-	): this {
+	addOverlay(config: LayerConfig.LayerConfigEntry | LayerConfig.LayerConfigEntry[]): this {
 		this.#overlay.addConfig(config);
 		return this;
 	}
