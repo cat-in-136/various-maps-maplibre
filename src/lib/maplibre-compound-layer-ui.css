@@ -16,5 +16,19 @@
 		& > button[popovertarget] {
 			display: inline-block;
 		}
+
+		.maplibregl-ctrl-compound-layer-layer-entry-opacity {
+			display: none;
+
+			input[type='range'] {
+				max-width: 5em;
+			}
+		}
+	}
+
+	.maplibregl-ctrl-compound-layer-layer-entry:has(:checked) {
+		.maplibregl-ctrl-compound-layer-layer-entry-opacity {
+			display: block;
+		}
 	}
 }

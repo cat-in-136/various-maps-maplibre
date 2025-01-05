@@ -35,6 +35,12 @@ namespace LayerTreeView {
 			layerEntry: LayerEntry;
 			sourceEvent: Event;
 		}>;
+		LayerOpacityChanged: CustomEvent<{
+			type: 'LayerOpacityChanged';
+			value: number;
+			layerEntry: LayerEntry;
+			sourceEvent: Event;
+		}>;
 	};
 	type LayerTreeEventListener<T extends keyof LayerTreeEventType> = (
 		ev: LayerTreeEventType[T] & Object
@@ -87,7 +93,8 @@ namespace LayerTreeView {
 			this.#switchToggle = switchToggle;
 			this.#entries = [];
 			this.#listeners = {
-				LayerChanged: new Set<LayerTreeEventListener<'LayerChanged'>>()
+				LayerChanged: new Set<LayerTreeEventListener<'LayerChanged'>>(),
+				LayerOpacityChanged: new Set<LayerTreeEventListener<'LayerOpacityChanged'>>()
 			};
 			this.#control = control;
 			this.#element = document.createElement('div');
@@ -155,32 +162,42 @@ namespace LayerTreeView {
 			return this;
 		}
 
-		handleLayerChange(e: LayerTreeEventType['LayerChanged']) {
+		handleCustomEvent<T extends keyof LayerTreeEventType>(e: LayerTreeEventType[T]) {
 			if (this.#switchToggle) {
 				for (const entry of this.layerEntriesAll()) {
 					entry.selected = entry === e.detail.layerEntry;
 					if (entry.selected) {
-						for (const listener of this.#listeners['LayerChanged']) {
+						for (const listener of this.#listeners[e.type as T]) {
 							listener.call(this, e);
 						}
 					}
 				}
 			} else {
-				for (const listener of this.#listeners['LayerChanged']) {
+				for (const listener of this.#listeners[e.type as T]) {
 					listener.call(this, e);
 				}
 			}
 		}
 	}
 
+	type LayerEntryTileType = 'raster' | undefined;
+
 	class LayerEntry {
 		readonly type: string = 'LayerEntry';
 		readonly #config: LayerConfig.Layer;
 		readonly #owner: LayerTreeView;
+		readonly #tileType: LayerEntryTileType;
 		#element: HTMLElement;
 		constructor(config: LayerConfig.Layer, owner: LayerTreeView) {
 			this.#config = config;
 			this.#owner = owner;
+			this.#tileType =
+				config.url.indexOf('{x}') >= 0 &&
+				config.url.indexOf('{y}') >= 0 &&
+				config.url.indexOf('{z}') >= 0 &&
+				!/\.(geojson|kml|gpx)$/.test(config.url)
+					? 'raster'
+					: undefined;
 			this.#element = document.createElement('div');
 			this.#createElement();
 		}
@@ -190,17 +207,34 @@ namespace LayerTreeView {
 		get element(): HTMLElement {
 			return this.#element;
 		}
+		get tileType(): LayerEntryTileType {
+			return this.#tileType;
+		}
+		get opacity(): number | undefined {
+			if (this.#tileType === 'raster') {
+				const opacity = this.#element.querySelector(
+					`.${ELEMENT_CLASS_PREFIX}-layer-entry-opacity input[type=range]`
+				) as HTMLInputElement;
+				return opacity ? parseInt(opacity.value) : undefined;
+			} else {
+				return undefined;
+			}
+		}
 		#createElement() {
 			this.#element.innerHTML = '';
 			this.#element.className = `${ELEMENT_CLASS_PREFIX}-layer-entry`;
-			const label = document.createElement('label');
+			if (this.tileType) {
+				this.#element.dataset['tileType'] = this.tileType;
+			}
+			const labelcheck = document.createElement('label');
 			const checkbox = document.createElement('input');
-			const span = document.createElement('span');
+			const spancheck = document.createElement('span');
+			labelcheck.className = `${ELEMENT_CLASS_PREFIX}-layer-entry-visibility`;
 			checkbox.type = 'checkbox';
-			span.innerHTML = this.#config.title;
-			label.appendChild(checkbox);
-			label.appendChild(span);
-			this.#element.appendChild(label);
+			spancheck.innerHTML = this.#config.title;
+			labelcheck.appendChild(checkbox);
+			labelcheck.appendChild(spancheck);
+			this.#element.appendChild(labelcheck);
 
 			if (this.#config.html) {
 				const popover = document.createElement('dialog');
@@ -222,8 +256,8 @@ namespace LayerTreeView {
 
 			checkbox.addEventListener(
 				'change',
-				(e) => {
-					this.#owner.handleLayerChange(
+				(e: Event) => {
+					this.#owner.handleCustomEvent(
 						new CustomEvent('LayerChanged', {
 							detail: {
 								type: 'LayerChanged',
@@ -235,6 +269,38 @@ namespace LayerTreeView {
 				},
 				false
 			);
+			if (this.tileType) {
+				const labelopacity = document.createElement('div');
+				const opacity = document.createElement('input');
+				const spanopacity = document.createElement('span');
+				labelopacity.className = `${ELEMENT_CLASS_PREFIX}-layer-entry-opacity`;
+				opacity.type = 'range';
+				opacity.min = String(0);
+				opacity.max = String(255);
+				opacity.value = String(255);
+				spanopacity.innerHTML = 'Opacity';
+				labelopacity.appendChild(spanopacity);
+				labelopacity.appendChild(opacity);
+				this.#element.appendChild(labelopacity);
+
+				opacity.addEventListener(
+					'change',
+					(e) => {
+						const value = parseInt(opacity.value);
+						this.#owner.handleCustomEvent(
+							new CustomEvent('LayerOpacityChanged', {
+								detail: {
+									type: 'LayerOpacityChanged',
+									value,
+									layerEntry: this,
+									sourceEvent: e
+								}
+							})
+						);
+					},
+					false
+				);
+			}
 		}
 
 		set selected(value: boolean) {
@@ -312,12 +378,14 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 		this.#base = new LayerTreeView.LayerTreeView(this, true);
 		this.#base.on('LayerChanged', (e) => {
 			if (this.#map) {
+				const tileType = e.detail.layerEntry.tileType;
 				const layer = e.detail.layerEntry.config;
-				if (layer.url.indexOf('{x}') >= 0) {
+				const id = layer.id;
+				if (tileType === 'raster') {
 					this.#map.setStyle({
 						version: 8,
 						sources: {
-							[`source-${layer.id}-raster`]: {
+							[`source-${id}-raster`]: {
 								type: 'raster',
 								tiles: [layer.url],
 								tileSize: (layer.tileSize ?? 256) as number,
@@ -326,9 +394,9 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 						},
 						layers: [
 							{
-								id: `layer-${layer.id}-raster`,
+								id: `layer-${id}-raster`,
 								type: 'raster',
-								source: `source-${layer.id}-raster`,
+								source: `source-${id}-raster`,
 								minzoom: layer.minZoom ?? 0,
 								maxzoom: layer.maxZoom ?? 22
 							}
@@ -336,6 +404,12 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 					});
 					if (layer.maxNativeZoom ?? layer.maxZoom) {
 						this.#map.setMaxZoom(layer.maxNativeZoom ?? layer.maxZoom);
+					}
+					if (e.detail.layerEntry.opacity !== undefined) {
+						const value = e.detail.layerEntry.opacity;
+						window.setTimeout(() => {
+							this.#map?.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
+						}, 100);
 					}
 				} else {
 					this.#map.setStyle(layer.url);
@@ -345,15 +419,28 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 				}
 			}
 		});
+		this.#base.on('LayerOpacityChanged', (e) => {
+			if (this.#map) {
+				const tileType = e.detail.layerEntry.tileType;
+				const layer = e.detail.layerEntry.config;
+				const id = layer.id;
+
+				if (tileType === 'raster') {
+					const value = e.detail.value;
+					this.#map.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
+				}
+			}
+		});
 		this.#overlay = new LayerTreeView.LayerTreeView(this, false);
 		this.#overlay.on('LayerChanged', (e) => {
 			if (this.#map) {
+				const tileType = e.detail.layerEntry.tileType;
 				const layer = e.detail.layerEntry.config;
 				const selected = e.detail.layerEntry.selected;
 				const id = layer.id;
 
 				if (selected) {
-					if (/\.(png|jpg|gif|svg)$/.test(layer.url)) {
+					if (tileType === 'raster') {
 						let source: maplibregl.RasterSourceSpecification = {
 							type: 'raster',
 							tiles: [layer.url]
@@ -364,18 +451,36 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 						if (layer.minZoom) {
 							source.minzoom = layer.minZoom;
 						}
-						this.#map.addSource(`source-#{id}`, source);
+						this.#map.addSource(`source-${id}-raster`, source);
 						this.#map.addLayer({
-							id,
+							id: `layer-${id}-raster`,
 							type: 'raster',
-							source: `source-#{id}`
+							source: `source-${id}-raster`
 						} as maplibregl.RasterLayerSpecification);
+						if (e.detail.layerEntry.opacity !== undefined) {
+							const value = e.detail.layerEntry.opacity;
+							window.setTimeout(() => {
+								this.#map?.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
+							}, 100);
+						}
 					} else {
 						console.debug(`Not implemented yet`, e); // TODO
 					}
 				} else {
-					this.#map.removeLayer(id);
-					this.#map.removeSource(`source-#{id}`);
+					this.#map.removeLayer(`layer-${id}-raster`);
+					this.#map.removeSource(`source-${id}-raster`);
+				}
+			}
+		});
+		this.#overlay.on('LayerOpacityChanged', (e) => {
+			if (this.#map) {
+				const tileType = e.detail.layerEntry.tileType;
+				const layer = e.detail.layerEntry.config;
+				const id = layer.id;
+
+				if (tileType === 'raster') {
+					const value = e.detail.value;
+					this.#map.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
 				}
 			}
 		});
