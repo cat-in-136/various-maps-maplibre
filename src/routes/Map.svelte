@@ -16,7 +16,10 @@
 	import { GSIMapLayers } from '../lib/gsimaplayers';
 	import * as MaplibreCompondLayerUI from '../lib/maplibre-compound-layer-ui';
 	import '../lib/maplibre-compound-layer-ui.css';
-	import { BASE_LAYER_DEFAULT } from '../lib/maplibre-compound-layer-defaults';
+	import {
+		BASE_LAYER_DEFAULT,
+		OVERLAY_LAYER_DEFAULT
+	} from '../lib/maplibre-compound-layer-defaults';
 
 	const initMap = () => {
 		const map = new maplibregl.Map({
@@ -115,6 +118,8 @@
 				layerswitcher.setBaseLayerEntriesSelected(layer, true);
 				break;
 			}
+
+			layerswitcher.addOverlay(OVERLAY_LAYER_DEFAULT);
 
 			const gsimaplayers = new GSIMapLayers();
 			await gsimaplayers.load();

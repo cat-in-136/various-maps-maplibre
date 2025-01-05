@@ -14,6 +14,7 @@ export namespace LayerConfig {
 		maxNativeZoom?: number;
 		maxZoom?: number;
 		minZoom?: number;
+		scheme?: 'xyz' | 'tms';
 		[propName: string]: unknown;
 	}
 
@@ -389,6 +390,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 								type: 'raster',
 								tiles: [layer.url],
 								tileSize: (layer.tileSize ?? 256) as number,
+								scheme: layer.scheme ?? 'xyz',
 								attribution: layer.attribution as string | undefined
 							}
 						},
@@ -443,7 +445,8 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 					if (tileType === 'raster') {
 						let source: maplibregl.RasterSourceSpecification = {
 							type: 'raster',
-							tiles: [layer.url]
+							tiles: [layer.url],
+							scheme: layer.scheme ?? 'xyz'
 						};
 						if (layer.maxZoom) {
 							source.maxzoom = layer.maxZoom;
