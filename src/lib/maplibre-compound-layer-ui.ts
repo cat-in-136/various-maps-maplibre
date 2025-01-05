@@ -199,9 +199,6 @@ namespace LayerTreeView {
 				!/\.(geojson|kml|gpx)$/.test(config.url)
 					? 'raster'
 					: undefined;
-			if (config.url.indexOf('ktgis') >= 0) {
-				config.scheme = 'tms';
-			}
 			this.#element = document.createElement('div');
 			this.#createElement();
 		}
@@ -377,6 +374,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 	#element: HTMLElement;
 	#base: LayerTreeView.LayerTreeView;
 	#overlay: LayerTreeView.LayerTreeView;
+	#optional: HTMLElement;
 
 	constructor() {
 		this.#base = new LayerTreeView.LayerTreeView(this, true);
@@ -492,6 +490,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 		});
 
 		// Create the main div element
+		this.#optional = document.createElement('div');
 		this.#element = document.createElement('div');
 		this.#createElement();
 	}
@@ -521,6 +520,10 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 	addOverlay(config: LayerConfig.LayerConfigEntry | LayerConfig.LayerConfigEntry[]): this {
 		this.#overlay.addConfig(config);
 		return this;
+	}
+
+	get optionalElement(): HTMLElement {
+		return this.#optional;
 	}
 
 	#createElement(): HTMLElement {
@@ -556,6 +559,9 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 		// Append both details elements to the main div
 		this.#element.appendChild(detailsBase);
 		this.#element.appendChild(detailsOverlay);
+
+		// Append optionals
+		this.#element.appendChild(this.#optional);
 
 		return this.#element;
 	}
