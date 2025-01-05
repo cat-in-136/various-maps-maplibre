@@ -199,6 +199,9 @@ namespace LayerTreeView {
 				!/\.(geojson|kml|gpx)$/.test(config.url)
 					? 'raster'
 					: undefined;
+			if (config.url.indexOf('ktgis') >= 0) {
+				config.scheme = 'tms';
+			}
 			this.#element = document.createElement('div');
 			this.#createElement();
 		}

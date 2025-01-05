@@ -122,8 +122,42 @@
 			layerswitcher.addOverlay(OVERLAY_LAYER_DEFAULT);
 
 			const gsimaplayers = new GSIMapLayers();
-			await gsimaplayers.load();
+			const qchizulayers = new GSIMapLayers();
+			await Promise.all([
+				gsimaplayers.load(),
+				qchizulayers.load(
+					[
+						{
+							url: 'https://qchizu.github.io/qchizu/layers_txt/layers99.txt'
+						}
+					],
+					(v) => {
+						if (
+							(v as MaplibreCompondLayerUI.LayerConfig.LayerGroup | undefined)?.type ===
+							'LayerGroup'
+						) {
+							const layerGroup = v as MaplibreCompondLayerUI.LayerConfig.LayerGroup;
+							if (!layerGroup.entries || layerGroup.entries?.length === 0) {
+								return undefined;
+							}
+						} else if (
+							(v as MaplibreCompondLayerUI.LayerConfig.Layer | undefined)?.type === 'Layer'
+						) {
+							const layer = v as MaplibreCompondLayerUI.LayerConfig.Layer;
+							if (!layer.url.startsWith('https://')) {
+								return undefined;
+							}
+							if (!layer.id) {
+								const rand = Math.random().toString(32).substring(2);
+								layer.id = `autoid-${rand}`;
+							}
+						}
+						return v;
+					}
+				)
+			]);
 			layerswitcher.addOverlay(gsimaplayers.getGroup());
+			layerswitcher.addOverlay(qchizulayers.getGroup('全国Q地図'));
 		});
 
 		map.on('contextmenu', (e: maplibregl.MapMouseEvent) => {

@@ -37,15 +37,18 @@ export class GSIMapLayers {
 		this.#data = [];
 	}
 
-	getGroup(): MaplibreCompondLayerUI.LayerConfig.LayerGroup {
+	getGroup(title: string = '国土地理院レイヤー'): MaplibreCompondLayerUI.LayerConfig.LayerGroup {
 		return {
 			type: 'LayerGroup',
-			title: '国土地理院レイヤー',
+			title,
 			entries: this.#data
 		};
 	}
 
-	async load(layers: GSIMapLayerConfig[] = GSIMAPLAYERS): Promise<void> {
+	async load(
+		layers: GSIMapLayerConfig[] = GSIMAPLAYERS,
+		convFn: ((v: Object) => Object | undefined) | undefined = undefined
+	): Promise<void> {
 		const data = (
 			await Promise.all(
 				layers.map(async (config) => {
@@ -65,6 +68,27 @@ export class GSIMapLayers {
 				})
 			)
 		).flatMap((v) => v?.layers);
+		if (convFn) {
+			GSIMapLayers.#fixData(data, convFn);
+		}
 		this.#data.push(...data);
+	}
+
+	static #fixData(data: any[], convFn: (v: Object) => Object | undefined) {
+		const elements_to_remove: any[] = [];
+		for (const d of data) {
+			if (d.type === 'LayerGroup') {
+				if (Array.isArray(d.entries)) {
+					GSIMapLayers.#fixData(d.entries, convFn);
+				}
+			}
+			if (convFn) {
+				const ret = convFn(d);
+				if (ret === undefined) {
+					elements_to_remove.push(d);
+				}
+			}
+		}
+		data.filter((item) => !elements_to_remove.includes(item));
 	}
 }
