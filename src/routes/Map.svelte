@@ -110,8 +110,8 @@
 			})
 		);
 
+		const layerswitcher = new MaplibreCompondLayerUI.MapLibreCompondLayerSwitcherControl();
 		map.on('load', async () => {
-			const layerswitcher = new MaplibreCompondLayerUI.MapLibreCompondLayerSwitcherControl();
 			layerswitcher.addBase(BASE_LAYER_DEFAULT);
 			map.addControl(layerswitcher);
 			for (const layer of layerswitcher.baseLayerEntriesAll()) {
@@ -239,6 +239,69 @@
 				)
 				.addTo(map);
 		});
+
+		map.getContainer().addEventListener('dragover', (e) => e.preventDefault(), false);
+		map.getContainer().addEventListener(
+			'drop',
+			(e) => {
+				e.preventDefault();
+
+				const files: File[] = [];
+
+				if (e.dataTransfer?.items) {
+					[...e.dataTransfer.items].forEach((item, _i) => {
+						if (item.kind === 'file') {
+							const file = item.getAsFile();
+							if (file) {
+								files.push(file);
+							}
+						}
+					});
+				} else if (e.dataTransfer?.files) {
+					[...e.dataTransfer.files].forEach((file, _i) => {
+						files.push(file);
+					});
+				}
+
+				const entries: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [];
+				for (const file of files) {
+					const rand = Math.random().toString(32).substring(2);
+					const id = `${file.name.replaceAll(/[-_\s]/g, '-')}-${rand}`;
+					console.debug(`processing ${file.name} as ${id}`, file);
+					if (/\.gpx$/i.test(file.name) || file.type === 'application/gpx+xml') {
+						entries.push({
+							type: 'Layer',
+							id: `source-${id}`,
+							title: file.name,
+							url: `gpx://${URL.createObjectURL(file)}`
+						});
+					} else if (
+						/\.kml$/i.test(file.name) ||
+						file.type === 'application/vnd.google-earth.kml+xml'
+					) {
+					}
+					entries.push({
+						type: 'Layer',
+						id: `source-${id}`,
+						title: file.name,
+						url: `kml://${URL.createObjectURL(file)}`
+					});
+				}
+
+				if (entries.length > 0) {
+					const now = new Date();
+					layerswitcher.addOverlay({
+						type: 'LayerGroup',
+						title: `Drag and Drop (${now.getHours().toString().padStart(2, '0')}:${now
+							.getMinutes()
+							.toString()
+							.padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')})`,
+						entries
+					});
+				}
+			},
+			false
+		);
 	};
 	onMount(initMap);
 </script>

@@ -1,4 +1,5 @@
 import maplibregl from 'maplibre-gl';
+import * as VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
 
 const ELEMENT_CLASS_PREFIX = 'maplibregl-ctrl-compound-layer';
 
@@ -181,7 +182,7 @@ namespace LayerTreeView {
 		}
 	}
 
-	type LayerEntryTileType = 'raster' | undefined;
+	type LayerEntryTileType = 'raster' | 'geojson' | undefined;
 
 	class LayerEntry {
 		readonly type: string = 'LayerEntry';
@@ -190,13 +191,16 @@ namespace LayerTreeView {
 		readonly #tileType: LayerEntryTileType;
 		#element: HTMLElement;
 		constructor(config: LayerConfig.Layer, owner: LayerTreeView) {
+			VectorTextProtocol.addProtocols(maplibregl);
+
 			this.#config = config;
 			this.#owner = owner;
-			this.#tileType =
-				config.url.indexOf('{x}') >= 0 &&
-				config.url.indexOf('{y}') >= 0 &&
-				config.url.indexOf('{z}') >= 0 &&
-				!/\.(geojson|kml|gpx)$/.test(config.url)
+			this.#tileType = /^(kml|topojson|osm|gpx):\/\//.test(config.url)
+				? 'geojson'
+				: config.url.indexOf('{x}') >= 0 &&
+					  config.url.indexOf('{y}') >= 0 &&
+					  config.url.indexOf('{z}') >= 0 &&
+					  !/\.(geojson|kml|gpx)$/.test(config.url)
 					? 'raster'
 					: undefined;
 			this.#element = document.createElement('div');
@@ -217,6 +221,8 @@ namespace LayerTreeView {
 					`.${ELEMENT_CLASS_PREFIX}-layer-entry-opacity input[type=range]`
 				) as HTMLInputElement;
 				return opacity ? parseInt(opacity.value) : undefined;
+				//} else if (this.#tileType === 'geojson') {
+				//  return undefined;
 			} else {
 				return undefined;
 			}
@@ -414,6 +420,8 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 							this.#map?.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
 						}, 100);
 					}
+				} else if (tileType === 'geojson') {
+					console.error(`unsupported tileType ${tileType}`);
 				} else {
 					this.#map.setStyle(layer.url);
 					if (layer.maxNativeZoom) {
@@ -431,6 +439,8 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 				if (tileType === 'raster') {
 					const value = e.detail.value;
 					this.#map.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
+				} else if (tileType === 'geojson') {
+					console.error(`unsupported tileType ${tileType}`);
 				}
 			}
 		});
@@ -467,12 +477,55 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 								this.#map?.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
 							}, 100);
 						}
+					} else if (tileType === 'geojson') {
+						let source: maplibregl.GeoJSONSourceSpecification = {
+							type: 'geojson',
+							data: layer.url
+						};
+						this.#map.addSource(`source-${id}-geojson`, source);
+						//this.#map.addLayer({
+						//	id: `layer-${id}-geojson-fill`,
+						//	type: 'fill',
+						//	source: `source-${id}-geojson`,
+						//	paint: {
+						//		'fill-color': 'green',
+						//		'fill-outline-color': 'gray'
+						//	}
+						//});
+						this.#map.addLayer({
+							id: `layer-${id}-geojson-line`,
+							type: 'line',
+							source: `source-${id}-geojson`,
+							paint: {
+								'line-color': ['case', ['has', 'color'], ['get', 'color'], '#ff00ff'],
+								'line-width': 3
+							}
+						});
+						if (e.detail.layerEntry.opacity !== undefined) {
+							const value = e.detail.layerEntry.opacity;
+							window.setTimeout(() => {
+								//this.#map?.setPaintProperty(`layer-${id}-geojson-line`, 'fill-opacity', value / 255.0);
+								this.#map?.setPaintProperty(
+									`layer-${id}-geojson-line`,
+									'line-opacity',
+									value / 255.0
+								);
+							}, 100);
+						}
 					} else {
-						console.debug(`Not implemented yet`, e); // TODO
+						console.error(`Not implemented yet`, e); // TODO
 					}
 				} else {
-					this.#map.removeLayer(`layer-${id}-raster`);
-					this.#map.removeSource(`source-${id}-raster`);
+					if (tileType === 'raster') {
+						this.#map.removeLayer(`layer-${id}-raster`);
+						this.#map.removeSource(`source-${id}-raster`);
+					} else if (tileType === 'geojson') {
+						//this.#map.removeLayer(`layer-${id}-geojson-fill`);
+						this.#map.removeLayer(`layer-${id}-geojson-line`);
+						this.#map.removeSource(`source-${id}-geojson`);
+					} else {
+						console.error(`Not implemented yet`, e); // TODO
+					}
 				}
 			}
 		});
@@ -485,6 +538,10 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 				if (tileType === 'raster') {
 					const value = e.detail.value;
 					this.#map.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
+				} else if (tileType === 'geojson') {
+					const value = e.detail.value;
+					//this.#map?.setPaintProperty(`layer-${id}-geojson-line`, 'fill-opacity', value / 255.0);
+					this.#map?.setPaintProperty(`layer-${id}-geojson-line`, 'line-opacity', value / 255.0);
 				}
 			}
 		});
