@@ -46,6 +46,48 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 				id: 'base-osm-tonar-ja',
 				title: 'OSM Maptiler Toner EN',
 				url: 'https://tile.openstreetmap.jp/styles/maptiler-toner-en/style.json'
+			},
+			{
+				type: 'LayerGroup',
+				title: 'CartoCDN Basemaps',
+				entries: [
+					{
+						type: 'Layer',
+						id: 'base-cartocdn-dark-matter',
+						title: 'Dark Matter',
+						url: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-cartocdn-dark-matter-nolabels',
+						title: 'Dark Matter No Labels',
+						url: 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-cartocdn-positron',
+						title: 'Positron',
+						url: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-cartocdn-positron-nolabels',
+						title: 'Positron No Labels',
+						url: 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-cartocdn-voyager',
+						title: 'Voyager',
+						url: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-cartocdn-voyager-nolabels',
+						title: 'Voyager No Labels',
+						url: 'https://basemaps.cartocdn.com/gl/voyager-nolabels-gl-style/style.json'
+					}
+				]
 			}
 		]
 	},
@@ -73,48 +115,6 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 				title: '白地図',
 				url: 'https://gsi-cyberjapan.github.io/gsivectortile-mapbox-gl-js/blank.json',
 				maxNativeZoom: 17.9
-			}
-		]
-	},
-	{
-		type: 'LayerGroup',
-		title: 'CartoCDN Basemaps',
-		entries: [
-			{
-				type: 'Layer',
-				id: 'base-cartocdn-dark-matter',
-				title: 'Dark Matter',
-				url: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
-			},
-			{
-				type: 'Layer',
-				id: 'base-cartocdn-dark-matter-nolabels',
-				title: 'Dark Matter No Labels',
-				url: 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json'
-			},
-			{
-				type: 'Layer',
-				id: 'base-cartocdn-positron',
-				title: 'Positron',
-				url: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
-			},
-			{
-				type: 'Layer',
-				id: 'base-cartocdn-positron-nolabels',
-				title: 'Positron No Labels',
-				url: 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json'
-			},
-			{
-				type: 'Layer',
-				id: 'base-cartocdn-voyager',
-				title: 'Voyager',
-				url: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json'
-			},
-			{
-				type: 'Layer',
-				id: 'base-cartocdn-voyager-nolabels',
-				title: 'Voyager No Labels',
-				url: 'https://basemaps.cartocdn.com/gl/voyager-nolabels-gl-style/style.json'
 			}
 		]
 	},
