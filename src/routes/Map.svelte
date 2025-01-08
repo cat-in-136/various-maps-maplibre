@@ -279,13 +279,13 @@
 						/\.kml$/i.test(file.name) ||
 						file.type === 'application/vnd.google-earth.kml+xml'
 					) {
+            entries.push({
+              type: 'Layer',
+              id: `source-${id}`,
+              title: file.name,
+              url: `kml://${URL.createObjectURL(file)}`
+            });
 					}
-					entries.push({
-						type: 'Layer',
-						id: `source-${id}`,
-						title: file.name,
-						url: `kml://${URL.createObjectURL(file)}`
-					});
 				}
 
 				if (entries.length > 0) {
