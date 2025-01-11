@@ -266,25 +266,34 @@
 				const entries: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [];
 				for (const file of files) {
 					const rand = Math.random().toString(32).substring(2);
-					const id = `${file.name.replaceAll(/[-_\s]/g, '-')}-${rand}`;
-					console.debug(`processing ${file.name} as ${id}`, file);
+					const id = `${file.name.replaceAll(/[-_\.\s]/g, '-')}-${rand}`;
 					if (/\.gpx$/i.test(file.name) || file.type === 'application/gpx+xml') {
 						entries.push({
 							type: 'Layer',
-							id: `source-${id}`,
+							id: `dndfile-${id}`,
 							title: file.name,
-							url: `gpx://${URL.createObjectURL(file)}`
+							url: `gpx://${URL.createObjectURL(file)}`,
+							layerFormat: { single: 'geojson' }
 						});
 					} else if (
 						/\.kml$/i.test(file.name) ||
 						file.type === 'application/vnd.google-earth.kml+xml'
 					) {
-            entries.push({
-              type: 'Layer',
-              id: `source-${id}`,
-              title: file.name,
-              url: `kml://${URL.createObjectURL(file)}`
-            });
+						entries.push({
+							type: 'Layer',
+							id: `dndfile-${id}`,
+							title: file.name,
+							url: `kml://${URL.createObjectURL(file)}`,
+							layerFormat: { single: 'geojson' }
+						});
+					} else if (/\.geojson$/i.test(file.name)) {
+						entries.push({
+							type: 'Layer',
+							id: `dndfile-${id}`,
+							title: file.name,
+							url: URL.createObjectURL(file),
+							layerFormat: { single: 'geojson' }
+						});
 					}
 				}
 

@@ -223,6 +223,7 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 				id: 'base-enri-raster-topograph',
 				title: 'Esri Topograph',
 				url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+				layerFormat: { tile: 'raster' },
 				maxZoom: 19,
 				minZoom: 1,
 				attribution:
@@ -233,6 +234,7 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 				id: 'base-enri-raster-streets',
 				title: 'Esri Streets',
 				url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+				layerFormat: { tile: 'raster' },
 				maxZoom: 19,
 				minZoom: 1,
 				attribution:
@@ -243,6 +245,7 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 				id: 'base-enri-raster-natgeo',
 				title: 'Esri National Geographic',
 				url: 'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',
+				layerFormat: { tile: 'raster' },
 				maxZoom: 19,
 				minZoom: 1,
 				attribution:
@@ -253,6 +256,7 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 				id: 'base-enri-raster-ocean',
 				title: 'Esri Ocean',
 				url: 'https://server.arcgisonline.com/arcgis/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}',
+				layerFormat: { tile: 'raster' },
 				maxZoom: 19,
 				minZoom: 1,
 				attribution:
@@ -263,6 +267,7 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 				id: 'base-enri-raster-imagery',
 				title: 'Esri Imagery',
 				url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+				layerFormat: { tile: 'raster' },
 				maxZoom: 19,
 				minZoom: 1,
 				attribution:
@@ -273,6 +278,7 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 				id: 'base-enri-raster-shadedrelief',
 				title: 'Esri Shaded Relief',
 				url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}',
+				layerFormat: { tile: 'raster' },
 				maxZoom: 13,
 				minZoom: 1,
 				attribution: 'Tiles &copy; ESRI, NAVTEQ, DeLorme'

@@ -1,9 +1,15 @@
 import maplibregl from 'maplibre-gl';
+import type * as maplibreglstyle from '@maplibre/maplibre-gl-style-spec';
 import * as VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
 
 const ELEMENT_CLASS_PREFIX = 'maplibregl-ctrl-compound-layer';
 
 export namespace LayerConfig {
+	export type LayerFormat =
+		| 'style'
+		| { tile: 'raster' | 'vector' | 'geojson' }
+		| { single: 'geojson' };
+
 	export interface Layer {
 		type: string;
 		id: string;
@@ -16,6 +22,7 @@ export namespace LayerConfig {
 		maxZoom?: number;
 		minZoom?: number;
 		scheme?: 'xyz' | 'tms';
+		layerFormat?: LayerFormat;
 		[propName: string]: unknown;
 	}
 
@@ -28,6 +35,197 @@ export namespace LayerConfig {
 	}
 
 	export type LayerConfigEntry = LayerGroup | Layer;
+}
+
+namespace Styling {
+	export function createPaintForPolygonFill(
+		forceValue: boolean = false,
+		fillOpacity: number = 0.5,
+		fillColor: string = '#0000ff',
+		fillOutlineColor: string = 'rgba(0,0,0,0)'
+	): Required<maplibreglstyle.FillLayerSpecification>['paint'] {
+		return {
+			'fill-antialias': true,
+			'fill-opacity': forceValue
+				? fillOpacity
+				: [
+						'case',
+						// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+						['has', '_fillOpacity'],
+						['get', '_fillOpacity'],
+						['has', '_opacity'],
+						['get', '_opacity'],
+						// mapbox/simplestyle-spec
+						['has', 'fill-opacity'],
+						['get', 'fill-opacity'],
+						// Default
+						fillOpacity
+					],
+			'fill-color': forceValue
+				? fillColor
+				: [
+						'case',
+						// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+						['has', '_fillColor'],
+						['get', '_fillColor'],
+						['has', '_color'],
+						['get', '_color'],
+						// mapbox/simplestyle-spec
+						['has', 'fill'],
+						['get', 'fill'],
+						// Default
+						fillColor
+					],
+			'fill-outline-color': forceValue
+				? fillOutlineColor
+				: [
+						'case',
+						// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+						['has', '_color'],
+						['get', '_color'],
+						// mapbox/simplestyle-spec
+						['has', 'stroke'],
+						['get', 'stroke'],
+						// Default
+						fillOutlineColor
+					]
+		};
+	}
+	export function createPaintLineLine(
+		forceValue: boolean = false,
+		lineWidth: number = 3,
+		lineOpacity: number = 0.5,
+		lineColor: string = '#ff00ff'
+	): Required<maplibreglstyle.LineLayerSpecification>['paint'] {
+		return {
+			'line-width': forceValue
+				? lineWidth
+				: [
+						'case',
+						// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+						['has', '_weight'],
+						['get', '_weight'],
+						// mapbox/simplestyle-spec
+						['has', 'stroke-width'],
+						['get', 'stroke-width'],
+						// Default
+						lineWidth
+					],
+			'line-opacity': forceValue
+				? lineOpacity
+				: [
+						'case',
+						// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+						['has', '_opacity'],
+						['get', '_opacity'],
+						// mapbox/simplestyle-spec
+						['has', 'stroke-opacity'],
+						['get', 'stroke-opacity'],
+						// Default
+						lineOpacity
+					],
+			'line-color': forceValue
+				? lineColor
+				: [
+						'case',
+						// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+						['has', '_color'],
+						['get', '_color'],
+						// mapbox/simplestyle-spec
+						['has', 'stroke'],
+						['get', 'stroke'],
+						// Default
+						lineColor
+					]
+		};
+	}
+	export function createPaintForPointCircle(
+		forceValue: boolean = false,
+		circleRadius: number = 8,
+		circleColor: string = '#ff0000',
+		circleOpacity: number = 0.5
+	): Required<maplibreglstyle.CircleLayerSpecification>['paint'] {
+		return {
+			'circle-radius': forceValue
+				? circleRadius
+				: [
+						'case',
+						// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+						['has', '_radius'],
+						['get', '_radius'],
+						// mapbox/simplestyle-spec
+						['has', 'marker-size'],
+						['match', ['get', 'marker-size'], 'small', 5, 'medium', 8, 'large', 10, circleRadius],
+						// Default
+						circleRadius
+					],
+			'circle-color': forceValue
+				? circleColor
+				: [
+						'case',
+						// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+						['has', '_fillColor'],
+						['get', '_fillColor'],
+						['has', '_color'],
+						['get', '_color'],
+						// mapbox/simplestyle-spec
+						['has', 'marker-color'],
+						['get', 'marker-color'],
+						['has', 'fill'],
+						['get', 'fill'],
+						// Default
+						circleColor
+					],
+			'circle-opacity': forceValue
+				? circleOpacity
+				: [
+						'case',
+						// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+						['has', '_fillOpacity'],
+						['get', '_fillOpacity'],
+						['has', '_opacity'],
+						['get', '_opacity'],
+						// mapbox/simplestyle-spec
+						['has', 'fill-opacity'],
+						['get', 'fill-opacity'],
+						// Default
+						circleOpacity
+					],
+			'circle-stroke-width': [
+				'case',
+				// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+				['has', '_weight'],
+				['get', '_weight'],
+				// mapbox/simplestyle-spec
+				['has', 'stroke-width'],
+				['get', 'stroke-width'],
+				// Default
+				3
+			],
+			'circle-stroke-color': [
+				'case',
+				// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+				['has', '_color'],
+				['get', '_color'],
+				// mapbox/simplestyle-spec
+				['has', 'stroke'],
+				['get', 'stroke'],
+				// Default
+				'rgba(0,0,0,0)'
+			],
+			'circle-stroke-opacity': [
+				'case',
+				// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+				['has', '_opacity'],
+				['get', '_opacity'],
+				// mapbox/simplestyle-spec
+				['has', 'stroke-opacity'],
+				['get', 'stroke-opacity'],
+				// Default
+				0
+			]
+		};
+	}
 }
 
 namespace LayerTreeView {
@@ -182,27 +380,37 @@ namespace LayerTreeView {
 		}
 	}
 
-	type LayerEntryTileType = 'raster' | 'geojson' | undefined;
-
 	class LayerEntry {
 		readonly type: string = 'LayerEntry';
 		readonly #config: LayerConfig.Layer;
 		readonly #owner: LayerTreeView;
-		readonly #tileType: LayerEntryTileType;
+		readonly #layerFormat: LayerConfig.LayerFormat;
 		#element: HTMLElement;
 		constructor(config: LayerConfig.Layer, owner: LayerTreeView) {
 			VectorTextProtocol.addProtocols(maplibregl);
 
 			this.#config = config;
 			this.#owner = owner;
-			this.#tileType = /^(kml|topojson|osm|gpx):\/\//.test(config.url)
-				? 'geojson'
-				: config.url.indexOf('{x}') >= 0 &&
-					  config.url.indexOf('{y}') >= 0 &&
-					  config.url.indexOf('{z}') >= 0 &&
-					  !/\.(geojson|kml|gpx)$/.test(config.url)
-					? 'raster'
-					: undefined;
+
+			if (config.layerFormat) {
+				this.#layerFormat = config.layerFormat;
+			} else if (
+				config.url.indexOf('{x}') >= 0 &&
+				config.url.indexOf('{y}') >= 0 &&
+				config.url.indexOf('{z}') >= 0
+			) {
+				this.#layerFormat = {
+					tile: /\.(jpg|png|webp|gif)$/i.test(config.url)
+						? 'raster'
+						: /\.(geojson|kml|gpx)$/.test(config.url)
+							? 'geojson'
+							: 'vector'
+				};
+			} else if (/\.(geojson|kml|gpx)$/.test(config.url)) {
+				this.#layerFormat = { single: 'geojson' };
+			} else {
+				this.#layerFormat = 'style';
+			}
 			this.#element = document.createElement('div');
 			this.#createElement();
 		}
@@ -212,17 +420,18 @@ namespace LayerTreeView {
 		get element(): HTMLElement {
 			return this.#element;
 		}
-		get tileType(): LayerEntryTileType {
-			return this.#tileType;
+		get layerFormat(): LayerConfig.LayerFormat {
+			return this.#layerFormat;
 		}
 		get opacity(): number | undefined {
-			if (this.#tileType === 'raster') {
+			if (
+				(this.#layerFormat as { tile: 'raster' }).tile === 'raster' ||
+				(this.#layerFormat as { single: 'geojson' }).single === 'geojson'
+			) {
 				const opacity = this.#element.querySelector(
 					`.${ELEMENT_CLASS_PREFIX}-layer-entry-opacity input[type=range]`
 				) as HTMLInputElement;
 				return opacity ? parseInt(opacity.value) : undefined;
-				//} else if (this.#tileType === 'geojson') {
-				//  return undefined;
 			} else {
 				return undefined;
 			}
@@ -230,9 +439,6 @@ namespace LayerTreeView {
 		#createElement() {
 			this.#element.innerHTML = '';
 			this.#element.className = `${ELEMENT_CLASS_PREFIX}-layer-entry`;
-			if (this.tileType) {
-				this.#element.dataset['tileType'] = this.tileType;
-			}
 			const labelcheck = document.createElement('label');
 			const checkbox = document.createElement('input');
 			const spancheck = document.createElement('span');
@@ -276,7 +482,10 @@ namespace LayerTreeView {
 				},
 				false
 			);
-			if (this.tileType) {
+			if (
+				(this.#layerFormat as { tile: 'raster' }).tile === 'raster' ||
+				(this.#layerFormat as { single: 'geojson' }).single === 'geojson'
+			) {
 				const labelopacity = document.createElement('div');
 				const opacity = document.createElement('input');
 				const spanopacity = document.createElement('span');
@@ -386,10 +595,10 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 		this.#base = new LayerTreeView.LayerTreeView(this, true);
 		this.#base.on('LayerChanged', (e) => {
 			if (this.#map) {
-				const tileType = e.detail.layerEntry.tileType;
+				const layerFormat = e.detail.layerEntry.layerFormat;
 				const layer = e.detail.layerEntry.config;
 				const id = layer.id;
-				if (tileType === 'raster') {
+				if ((layerFormat as { tile: 'raster' }).tile === 'raster') {
 					this.#map.setStyle({
 						version: 8,
 						sources: {
@@ -420,40 +629,43 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 							this.#map?.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
 						}, 100);
 					}
-				} else if (tileType === 'geojson') {
-					console.error(`unsupported tileType ${tileType}`);
-				} else {
+				} else if (layerFormat === 'style') {
 					this.#map.setStyle(layer.url);
 					if (layer.maxNativeZoom) {
 						this.#map.setMaxZoom(layer.maxNativeZoom);
 					}
+				} else {
+					console.error(`unsupported layerFormat ${JSON.stringify(layerFormat)} as base`, layer);
 				}
 			}
 		});
 		this.#base.on('LayerOpacityChanged', (e) => {
 			if (this.#map) {
-				const tileType = e.detail.layerEntry.tileType;
+				const layerFormat = e.detail.layerEntry.layerFormat;
 				const layer = e.detail.layerEntry.config;
 				const id = layer.id;
 
-				if (tileType === 'raster') {
+				if ((layerFormat as { tile: 'raster' }).tile === 'raster') {
 					const value = e.detail.value;
 					this.#map.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
-				} else if (tileType === 'geojson') {
-					console.error(`unsupported tileType ${tileType}`);
+				} else {
+					console.error(
+						`unsupported layerFormat ${JSON.stringify(layerFormat)} for base overlay`,
+						layer
+					);
 				}
 			}
 		});
 		this.#overlay = new LayerTreeView.LayerTreeView(this, false);
 		this.#overlay.on('LayerChanged', (e) => {
 			if (this.#map) {
-				const tileType = e.detail.layerEntry.tileType;
+				const layerFormat = e.detail.layerEntry.layerFormat;
 				const layer = e.detail.layerEntry.config;
 				const selected = e.detail.layerEntry.selected;
 				const id = layer.id;
 
 				if (selected) {
-					if (tileType === 'raster') {
+					if ((layerFormat as { tile: 'raster' }).tile === 'raster') {
 						let source: maplibregl.RasterSourceSpecification = {
 							type: 'raster',
 							tiles: [layer.url],
@@ -477,71 +689,85 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 								this.#map?.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
 							}, 100);
 						}
-					} else if (tileType === 'geojson') {
-						let source: maplibregl.GeoJSONSourceSpecification = {
+					} else if ((layerFormat as { single: 'geojson' }).single === 'geojson') {
+						let data =
+							!/^kml:\/\//.test(layer.url) && /\.kml$/i.test(layer.url)
+								? `kml://${layer.url}`
+								: !/^gpx:\/\//.test(layer.url) && /\.gpx$/i.test(layer.url)
+									? `gpx://${layer.url}`
+									: layer.url;
+						const source = `source-${id}-geojson`;
+						this.#map.addSource(source, {
 							type: 'geojson',
-							data: layer.url
-						};
-						this.#map.addSource(`source-${id}-geojson`, source);
-						//this.#map.addLayer({
-						//	id: `layer-${id}-geojson-fill`,
-						//	type: 'fill',
-						//	source: `source-${id}-geojson`,
-						//	paint: {
-						//		'fill-color': 'green',
-						//		'fill-outline-color': 'gray'
-						//	}
-						//});
+							data
+						});
+						this.#map.addLayer({
+							id: `layer-${id}-geojson-fill`,
+							type: 'fill',
+							source,
+							paint: Styling.createPaintForPolygonFill(false),
+							filter: ['==', '$type', 'Polygon']
+						});
 						this.#map.addLayer({
 							id: `layer-${id}-geojson-line`,
 							type: 'line',
-							source: `source-${id}-geojson`,
-							paint: {
-								'line-color': ['case', ['has', 'color'], ['get', 'color'], '#ff00ff'],
-								'line-width': 3
-							}
+							source,
+							paint: Styling.createPaintLineLine(false),
+							filter: ['==', '$type', 'LineString']
+						});
+						this.#map.addLayer({
+							id: `layer-${id}-geojson-circle`,
+							type: 'circle',
+							source,
+							paint: Styling.createPaintForPointCircle(false),
+							filter: ['==', '$type', 'Point']
 						});
 						if (e.detail.layerEntry.opacity !== undefined) {
 							const value = e.detail.layerEntry.opacity;
 							window.setTimeout(() => {
-								//this.#map?.setPaintProperty(`layer-${id}-geojson-line`, 'fill-opacity', value / 255.0);
 								this.#map?.setPaintProperty(
 									`layer-${id}-geojson-line`,
+									'line-opacity',
+									value / 255.0
+								);
+								this.#map?.setPaintProperty(
+									`layer-${id}-geojson-circle`,
 									'line-opacity',
 									value / 255.0
 								);
 							}, 100);
 						}
 					} else {
-						console.error(`Not implemented yet`, e); // TODO
+						console.error(`Unsupported layerFormat ${JSON.stringify(layerFormat)}`, e); // TODO
 					}
 				} else {
-					if (tileType === 'raster') {
+					if ((layerFormat as { tile: 'raster' }).tile === 'raster') {
 						this.#map.removeLayer(`layer-${id}-raster`);
 						this.#map.removeSource(`source-${id}-raster`);
-					} else if (tileType === 'geojson') {
-						//this.#map.removeLayer(`layer-${id}-geojson-fill`);
+					} else if ((layerFormat as { single: 'geojson' }).single === 'geojson') {
+						this.#map.removeLayer(`layer-${id}-geojson-fill`);
 						this.#map.removeLayer(`layer-${id}-geojson-line`);
+						this.#map.removeLayer(`layer-${id}-geojson-circle`);
 						this.#map.removeSource(`source-${id}-geojson`);
 					} else {
-						console.error(`Not implemented yet`, e); // TODO
+						console.error(`Unsupported layerFormat ${JSON.stringify(layerFormat)}`, e); // TODO
 					}
 				}
 			}
 		});
 		this.#overlay.on('LayerOpacityChanged', (e) => {
 			if (this.#map) {
-				const tileType = e.detail.layerEntry.tileType;
+				const layerFormat = e.detail.layerEntry.layerFormat;
 				const layer = e.detail.layerEntry.config;
 				const id = layer.id;
 
-				if (tileType === 'raster') {
+				if ((layerFormat as { tile: 'raster' }).tile === 'raster') {
 					const value = e.detail.value;
 					this.#map.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
-				} else if (tileType === 'geojson') {
+				} else if ((layerFormat as { single: 'geojson' }).single === 'geojson') {
 					const value = e.detail.value;
-					//this.#map?.setPaintProperty(`layer-${id}-geojson-line`, 'fill-opacity', value / 255.0);
-					this.#map?.setPaintProperty(`layer-${id}-geojson-line`, 'line-opacity', value / 255.0);
+					this.#map.setPaintProperty(`layer-${id}-geojson-line`, 'line-opacity', value / 255.0);
+					//this.#map.setPaintProperty(`layer-${id}-geojson-circle`, 'line-opacity', value / 255.0);
 				}
 			}
 		});
