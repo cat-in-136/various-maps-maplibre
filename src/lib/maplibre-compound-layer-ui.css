@@ -16,18 +16,27 @@
 		& > button[popovertarget] {
 			display: inline-block;
 		}
+	}
 
-		.maplibregl-ctrl-compound-layer-layer-entry-opacity {
-			display: none;
+	.maplibregl-ctrl-compound-layer-layer-entry-modify {
+		display: none;
 
-			input[type='range'] {
-				max-width: 5em;
+		.maplibregl-ctrl-compound-layer-layer-entry-opacity input[type='range'] {
+			max-width: 5em;
+		}
+
+		label {
+			display: inline-block;
+			span {
+				display: none;
 			}
 		}
 	}
 
-	.maplibregl-ctrl-compound-layer-layer-entry:has(:checked) {
-		.maplibregl-ctrl-compound-layer-layer-entry-opacity {
+	.maplibregl-ctrl-compound-layer-layer-entry:has(
+			.maplibregl-ctrl-compound-layer-layer-entry-visibility input:checked
+		) {
+		.maplibregl-ctrl-compound-layer-layer-entry-modify {
 			display: block;
 		}
 	}

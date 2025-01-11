@@ -91,7 +91,7 @@ namespace Styling {
 					]
 		};
 	}
-	export function createPaintLineLine(
+	export function createPaintForLineLine(
 		forceValue: boolean = false,
 		lineWidth: number = 3,
 		lineOpacity: number = 0.5,
@@ -235,9 +235,11 @@ namespace LayerTreeView {
 			layerEntry: LayerEntry;
 			sourceEvent: Event;
 		}>;
-		LayerOpacityChanged: CustomEvent<{
-			type: 'LayerOpacityChanged';
-			value: number;
+		LayerModificationChanged: CustomEvent<{
+			type: 'LayerModificationChanged';
+			modifyEnabled: boolean;
+			opacity?: number | undefined;
+			color?: string | undefined;
 			layerEntry: LayerEntry;
 			sourceEvent: Event;
 		}>;
@@ -294,7 +296,7 @@ namespace LayerTreeView {
 			this.#entries = [];
 			this.#listeners = {
 				LayerChanged: new Set<LayerTreeEventListener<'LayerChanged'>>(),
-				LayerOpacityChanged: new Set<LayerTreeEventListener<'LayerOpacityChanged'>>()
+				LayerModificationChanged: new Set<LayerTreeEventListener<'LayerModificationChanged'>>()
 			};
 			this.#control = control;
 			this.#element = document.createElement('div');
@@ -362,7 +364,7 @@ namespace LayerTreeView {
 			return this;
 		}
 
-		handleCustomEvent<T extends keyof LayerTreeEventType>(e: LayerTreeEventType[T]) {
+		fireEvent<T extends keyof LayerTreeEventType>(e: LayerTreeEventType[T]) {
 			if (this.#switchToggle) {
 				for (const entry of this.layerEntriesAll()) {
 					entry.selected = entry === e.detail.layerEntry;
@@ -428,10 +430,16 @@ namespace LayerTreeView {
 				(this.#layerFormat as { tile: 'raster' }).tile === 'raster' ||
 				(this.#layerFormat as { single: 'geojson' }).single === 'geojson'
 			) {
+				const modifyEnabled = this.#element.querySelector(
+					`.${ELEMENT_CLASS_PREFIX}-layer-entry-modify-enabled input[type=checkbox]`
+				) as HTMLInputElement;
 				const opacity = this.#element.querySelector(
 					`.${ELEMENT_CLASS_PREFIX}-layer-entry-opacity input[type=range]`
 				) as HTMLInputElement;
-				return opacity ? parseInt(opacity.value) : undefined;
+
+				return modifyEnabled && modifyEnabled.checked && opacity
+					? parseInt(opacity.value)
+					: undefined;
 			} else {
 				return undefined;
 			}
@@ -470,7 +478,7 @@ namespace LayerTreeView {
 			checkbox.addEventListener(
 				'change',
 				(e: Event) => {
-					this.#owner.handleCustomEvent(
+					this.#owner.fireEvent(
 						new CustomEvent('LayerChanged', {
 							detail: {
 								type: 'LayerChanged',
@@ -486,36 +494,54 @@ namespace LayerTreeView {
 				(this.#layerFormat as { tile: 'raster' }).tile === 'raster' ||
 				(this.#layerFormat as { single: 'geojson' }).single === 'geojson'
 			) {
-				const labelopacity = document.createElement('div');
-				const opacity = document.createElement('input');
-				const spanopacity = document.createElement('span');
-				labelopacity.className = `${ELEMENT_CLASS_PREFIX}-layer-entry-opacity`;
-				opacity.type = 'range';
-				opacity.min = String(0);
-				opacity.max = String(255);
-				opacity.value = String(255);
-				spanopacity.innerHTML = 'Opacity';
-				labelopacity.appendChild(spanopacity);
-				labelopacity.appendChild(opacity);
-				this.#element.appendChild(labelopacity);
+				const container = document.createElement('div');
+				container.className = `${ELEMENT_CLASS_PREFIX}-layer-entry-modify`;
+				container.innerHTML = `
+          <label class="${ELEMENT_CLASS_PREFIX}-layer-entry-modify-enabled">
+            <input type="checkbox" />
+            <span>Enable Modification</span>
+          </label>
+          <label class="${ELEMENT_CLASS_PREFIX}-layer-entry-opacity">
+            <span>Opacity</span>
+            <input type="range" min="0" max="255" value="255" />
+          </label>`;
 
-				opacity.addEventListener(
-					'change',
-					(e) => {
-						const value = parseInt(opacity.value);
-						this.#owner.handleCustomEvent(
-							new CustomEvent('LayerOpacityChanged', {
-								detail: {
-									type: 'LayerOpacityChanged',
-									value,
-									layerEntry: this,
-									sourceEvent: e
-								}
-							})
-						);
-					},
-					false
-				);
+				const modifyEnabledCheckbox = container.querySelector(
+					`.${ELEMENT_CLASS_PREFIX}-layer-entry-modify-enabled input[type=checkbox]`
+				) as HTMLInputElement;
+				const opacityRange = container.querySelector(
+					`.${ELEMENT_CLASS_PREFIX}-layer-entry-opacity input[type=range]`
+				) as HTMLInputElement;
+				if ((this.#layerFormat as { tile: 'raster' }).tile === 'raster') {
+					modifyEnabledCheckbox.checked = true;
+					modifyEnabledCheckbox.disabled = true;
+				}
+				if ((this.#layerFormat as { single: 'geojson' }).single === 'geojson') {
+					modifyEnabledCheckbox.checked = false;
+					opacityRange.disabled = true;
+				}
+				this.#element.appendChild(container);
+
+				const updateLayerModification = (e: Event) => {
+					const modifyEnabled = modifyEnabledCheckbox.checked;
+					const opacity = parseInt(opacityRange.value, 10);
+
+					opacityRange.disabled = !modifyEnabled;
+
+					this.#owner.fireEvent(
+						new CustomEvent('LayerModificationChanged', {
+							detail: {
+								type: 'LayerModificationChanged',
+								modifyEnabled,
+								opacity,
+								layerEntry: this,
+								sourceEvent: e
+							}
+						})
+					);
+				};
+				modifyEnabledCheckbox.addEventListener('change', updateLayerModification, false);
+				opacityRange.addEventListener('change', updateLayerModification, false);
 			}
 		}
 
@@ -639,15 +665,19 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 				}
 			}
 		});
-		this.#base.on('LayerOpacityChanged', (e) => {
+		this.#base.on('LayerModificationChanged', (e) => {
 			if (this.#map) {
 				const layerFormat = e.detail.layerEntry.layerFormat;
 				const layer = e.detail.layerEntry.config;
 				const id = layer.id;
 
 				if ((layerFormat as { tile: 'raster' }).tile === 'raster') {
-					const value = e.detail.value;
-					this.#map.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
+					if (e.detail.layerEntry.opacity !== undefined) {
+						const value = e.detail.layerEntry.opacity;
+						this.#map?.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
+					} else {
+						this.#map.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', 1);
+					}
 				} else {
 					console.error(
 						`unsupported layerFormat ${JSON.stringify(layerFormat)} for base overlay`,
@@ -712,7 +742,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 							id: `layer-${id}-geojson-line`,
 							type: 'line',
 							source,
-							paint: Styling.createPaintLineLine(false),
+							paint: Styling.createPaintForLineLine(false),
 							filter: ['==', '$type', 'LineString']
 						});
 						this.#map.addLayer({
@@ -724,18 +754,25 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 						});
 						if (e.detail.layerEntry.opacity !== undefined) {
 							const value = e.detail.layerEntry.opacity;
-							window.setTimeout(() => {
-								this.#map?.setPaintProperty(
-									`layer-${id}-geojson-line`,
-									'line-opacity',
-									value / 255.0
-								);
-								this.#map?.setPaintProperty(
-									`layer-${id}-geojson-circle`,
-									'line-opacity',
-									value / 255.0
-								);
-							}, 100);
+							if (value) {
+								window.setTimeout(() => {
+									this.#map?.setPaintProperty(
+										`layer-${id}-geojson-fill`,
+										'fill-opacity',
+										value / 255.0
+									);
+									this.#map?.setPaintProperty(
+										`layer-${id}-geojson-line`,
+										'line-opacity',
+										value / 255.0
+									);
+									//this.#map?.setPaintProperty(
+									//	`layer-${id}-geojson-circle`,
+									//	'circle-opacity',
+									//	value / 255.0
+									//);
+								}, 100);
+							}
 						}
 					} else {
 						console.error(`Unsupported layerFormat ${JSON.stringify(layerFormat)}`, e); // TODO
@@ -755,19 +792,52 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 				}
 			}
 		});
-		this.#overlay.on('LayerOpacityChanged', (e) => {
+		this.#overlay.on('LayerModificationChanged', (e) => {
 			if (this.#map) {
 				const layerFormat = e.detail.layerEntry.layerFormat;
 				const layer = e.detail.layerEntry.config;
 				const id = layer.id;
 
 				if ((layerFormat as { tile: 'raster' }).tile === 'raster') {
-					const value = e.detail.value;
-					this.#map.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
+					if (e.detail.layerEntry.opacity !== undefined) {
+						const value = e.detail.layerEntry.opacity;
+						this.#map.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
+					} else {
+						this.#map.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', 1);
+					}
 				} else if ((layerFormat as { single: 'geojson' }).single === 'geojson') {
-					const value = e.detail.value;
-					this.#map.setPaintProperty(`layer-${id}-geojson-line`, 'line-opacity', value / 255.0);
-					//this.#map.setPaintProperty(`layer-${id}-geojson-circle`, 'line-opacity', value / 255.0);
+					const defaultPaint = {
+						polygonFill: Styling.createPaintForPolygonFill(),
+						lineLine: Styling.createPaintForLineLine(),
+						pointCircle: Styling.createPaintForPointCircle()
+					};
+
+					if (e.detail.layerEntry.opacity !== undefined) {
+						const value = e.detail.layerEntry.opacity;
+						this.#map?.setPaintProperty(`layer-${id}-geojson-fill`, 'fill-opacity', value / 255.0);
+						this.#map.setPaintProperty(`layer-${id}-geojson-line`, 'line-opacity', value / 255.0);
+						//this.#map.setPaintProperty(
+						//	`layer-${id}-geojson-circle`,
+						//	'circle-opacity',
+						//	value / 255.0
+						//);
+					} else {
+						this.#map?.setPaintProperty(
+							`layer-${id}-geojson-fill`,
+							'fill-opacity',
+							defaultPaint.polygonFill['fill-opacity']
+						);
+						this.#map.setPaintProperty(
+							`layer-${id}-geojson-line`,
+							'line-opacity',
+							defaultPaint.lineLine['line-opacity']
+						);
+						//this.#map.setPaintProperty(
+						//	`layer-${id}-geojson-circle`,
+						//	'circle-opacity',
+						//	defaultPaint.pointCircle['circle-opacity']
+						//);
+					}
 				}
 			}
 		});
