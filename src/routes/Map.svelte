@@ -165,6 +165,94 @@
 			});
 			const optional = document.createElement('div');
 			{
+				const detailsTerrain = document.createElement('details');
+				const summaryTerrain = document.createElement('summary');
+				const divTerrainEntries = document.createElement('div');
+				summaryTerrain.textContent = 'Terrain';
+				detailsTerrain.appendChild(summaryTerrain);
+				detailsTerrain.appendChild(divTerrainEntries);
+
+				const TerrainSources: {
+					[id: string]: { title: string; source: maplibregl.RasterDEMSourceSpecification };
+				} = {
+					'terrain-aws': {
+						title: 'Terrain Tiles on AWS<',
+						source: {
+							type: 'raster-dem',
+							tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
+							encoding: 'terrarium',
+							tileSize: 256,
+							maxzoom: 15,
+							minzoom: 1,
+							attribution:
+								'ArcticDEM terrain data DEM(s) were created from DigitalGlobe, Inc., imagery and funded under National Science Foundation awards 1043681, 1559691, and 1542736; / Australia terrain data © Commonwealth of Australia (Geoscience Australia) 2017; / Austria terrain data © offene Daten Österreichs – Digitales Geländemodell (DGM) Österreich; / Canada terrain data contains information licensed under the Open Government Licence – Canada; / Europe terrain data produced using Copernicus data and information funded by the European Union - EU-DEM layers; / Global ETOPO1 terrain data U.S. National Oceanic and Atmospheric Administration / Mexico terrain data source: INEGI, Continental relief, 2016; / New Zealand terrain data Copyright 2011 Crown copyright (c) Land Information New Zealand and the New Zealand Government (All rights reserved); / Norway terrain data © Kartverket; / United Kingdom terrain data © Environment Agency copyright and/or database right 2015. All rights reserved; / United States 3DEP (formerly NED) and global GMTED2010 and SRTM terrain data courtesy of the U.S. Geological Survey.'
+						}
+					}
+				};
+
+				for (const id in TerrainSources) {
+					const { title, source } = TerrainSources[id];
+
+					const entryDiv = document.createElement('div');
+					entryDiv.className = 'maplibregl-ctrl-compound-layer-layer-entry-visibility';
+					const terrainEntryLabel = document.createElement('label');
+					const terrainCheckbox = document.createElement('input');
+					terrainCheckbox.type = 'checkbox';
+					const spanElement = document.createElement('span');
+					spanElement.textContent = 'Terrain Tiles on AWS';
+					terrainEntryLabel.appendChild(terrainCheckbox);
+					terrainEntryLabel.appendChild(spanElement);
+					entryDiv.appendChild(terrainEntryLabel);
+
+					terrainCheckbox.addEventListener(
+						'change',
+						(e) => {
+							for (const checkbox of detailsTerrain.querySelectorAll(
+								'.maplibregl-ctrl-compound-layer-layer-entry-visibility input[type=checkbox]'
+							)) {
+								if (map.getSource('terrain')) {
+									map.removeSource('terrain');
+								}
+								if (checkbox !== terrainCheckbox) {
+									(checkbox as HTMLInputElement).checked = false;
+								}
+
+								if ((terrainCheckbox as HTMLInputElement).checked) {
+									map.addSource('terrain', source);
+									map.addLayer({
+										id: 'hills',
+										type: 'hillshade',
+										source: 'terrain',
+										paint: {
+											'hillshade-illumination-anchor': 'map',
+											'hillshade-exaggeration': 0.2
+										}
+									});
+									if (!map.hasControl(terrainControl)) {
+										map.addControl(terrainControl);
+									}
+								} else {
+									map.setTerrain(null);
+									if (map.getLayer('hills')) {
+										map.removeLayer('hills');
+									}
+									if (map.hasControl(terrainControl)) {
+										map.removeControl(terrainControl);
+									}
+								}
+							}
+						},
+						false
+					);
+
+					detailsTerrain.appendChild(entryDiv);
+				}
+
+				optional.appendChild(detailsTerrain);
+			}
+
+			/*
+			{
 				const divTerrainEntries = document.createElement('div');
 				const labelcheck = document.createElement('label');
 				const checkbox = document.createElement('input');
@@ -217,6 +305,7 @@
 					false
 				);
 			}
+      */
 			layerswitcher.optionalElement.appendChild(optional);
 		});
 
