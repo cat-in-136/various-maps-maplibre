@@ -2,6 +2,10 @@ import maplibregl from 'maplibre-gl';
 import type * as maplibreglstyle from '@maplibre/maplibre-gl-style-spec';
 import * as VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
 
+import { getGeoJsonProtocolAction } from '../lib/maplibre-gl-geojson-tiles-qiita';
+
+maplibregl.addProtocol('geojson-tile', getGeoJsonProtocolAction());
+
 const ELEMENT_CLASS_PREFIX = 'maplibregl-ctrl-compound-layer';
 
 export namespace LayerConfig {
@@ -404,7 +408,7 @@ namespace LayerTreeView {
 				this.#layerFormat = {
 					tile: /\.(jpg|png|webp|gif)$/i.test(config.url)
 						? 'raster'
-						: /\.(geojson|kml|gpx)$/.test(config.url)
+						: /\.(geojson)$/.test(config.url)
 							? 'geojson'
 							: 'vector'
 				};
@@ -428,6 +432,7 @@ namespace LayerTreeView {
 		get opacity(): number | undefined {
 			if (
 				(this.#layerFormat as { tile: 'raster' }).tile === 'raster' ||
+				(this.#layerFormat as { tile: 'geojson' }).tile === 'geojson' ||
 				(this.#layerFormat as { single: 'geojson' }).single === 'geojson'
 			) {
 				const modifyEnabled = this.#element.querySelector(
@@ -492,6 +497,7 @@ namespace LayerTreeView {
 			);
 			if (
 				(this.#layerFormat as { tile: 'raster' }).tile === 'raster' ||
+				(this.#layerFormat as { tile: 'geojson' }).tile === 'geojson' ||
 				(this.#layerFormat as { single: 'geojson' }).single === 'geojson'
 			) {
 				const container = document.createElement('div');
@@ -515,8 +521,10 @@ namespace LayerTreeView {
 				if ((this.#layerFormat as { tile: 'raster' }).tile === 'raster') {
 					modifyEnabledCheckbox.checked = true;
 					modifyEnabledCheckbox.disabled = true;
-				}
-				if ((this.#layerFormat as { single: 'geojson' }).single === 'geojson') {
+				} else if ((this.#layerFormat as { tile: 'geojson' }).tile === 'geojson') {
+					modifyEnabledCheckbox.checked = false;
+					opacityRange.disabled = true;
+				} else if ((this.#layerFormat as { single: 'geojson' }).single === 'geojson') {
 					modifyEnabledCheckbox.checked = false;
 					opacityRange.disabled = true;
 				}
@@ -696,18 +704,18 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 
 				if (selected) {
 					if ((layerFormat as { tile: 'raster' }).tile === 'raster') {
-						let source: maplibregl.RasterSourceSpecification = {
+						let rasterSource: maplibregl.RasterSourceSpecification = {
 							type: 'raster',
 							tiles: [layer.url],
 							scheme: layer.scheme ?? 'xyz'
 						};
 						if (layer.maxZoom) {
-							source.maxzoom = layer.maxZoom;
+							rasterSource.maxzoom = layer.maxZoom;
 						}
 						if (layer.minZoom) {
-							source.minzoom = layer.minZoom;
+							rasterSource.minzoom = layer.minZoom;
 						}
-						this.#map.addSource(`source-${id}-raster`, source);
+						this.#map.addSource(`source-${id}-raster`, rasterSource);
 						this.#map.addLayer({
 							id: `layer-${id}-raster`,
 							type: 'raster',
@@ -719,22 +727,43 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 								this.#map?.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
 							}, 100);
 						}
-					} else if ((layerFormat as { single: 'geojson' }).single === 'geojson') {
-						let data =
-							!/^kml:\/\//.test(layer.url) && /\.kml$/i.test(layer.url)
-								? `kml://${layer.url}`
-								: !/^gpx:\/\//.test(layer.url) && /\.gpx$/i.test(layer.url)
-									? `gpx://${layer.url}`
-									: layer.url;
+					} else if (
+						(layerFormat as { tile: 'geojson' }).tile === 'geojson' ||
+						(layerFormat as { single: 'geojson' }).single === 'geojson'
+					) {
 						const source = `source-${id}-geojson`;
-						this.#map.addSource(source, {
-							type: 'geojson',
-							data
-						});
+						let sourceLayer = undefined;
+						if ((layerFormat as { tile: 'geojson' }).tile === 'geojson') {
+							let vectorSource: maplibregl.VectorSourceSpecification = {
+								type: 'vector',
+								tiles: [`geojson-tile://${layer.url}`],
+								scheme: layer.scheme ?? 'xyz'
+							};
+							if (layer.maxZoom) {
+								vectorSource.maxzoom = layer.maxZoom;
+							}
+							if (layer.minZoom) {
+								vectorSource.minzoom = layer.minZoom;
+							}
+							this.#map.addSource(source, vectorSource);
+							sourceLayer = 'v'; // 変換時、source-layer 名は "v" としている
+						} else if ((layerFormat as { single: 'geojson' }).single === 'geojson') {
+							let data =
+								!/^kml:\/\//.test(layer.url) && /\.kml$/i.test(layer.url)
+									? `kml://${layer.url}`
+									: !/^gpx:\/\//.test(layer.url) && /\.gpx$/i.test(layer.url)
+										? `gpx://${layer.url}`
+										: layer.url;
+							this.#map.addSource(source, {
+								type: 'geojson',
+								data
+							});
+						}
 						this.#map.addLayer({
 							id: `layer-${id}-geojson-fill`,
 							type: 'fill',
 							source,
+							'source-layer': sourceLayer,
 							paint: Styling.createPaintForPolygonFill(false),
 							filter: ['==', '$type', 'Polygon']
 						});
@@ -742,6 +771,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 							id: `layer-${id}-geojson-line`,
 							type: 'line',
 							source,
+							'source-layer': sourceLayer,
 							paint: Styling.createPaintForLineLine(false),
 							filter: ['==', '$type', 'LineString']
 						});
@@ -749,6 +779,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 							id: `layer-${id}-geojson-circle`,
 							type: 'circle',
 							source,
+							'source-layer': sourceLayer,
 							paint: Styling.createPaintForPointCircle(false),
 							filter: ['==', '$type', 'Point']
 						});
@@ -781,7 +812,10 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 					if ((layerFormat as { tile: 'raster' }).tile === 'raster') {
 						this.#map.removeLayer(`layer-${id}-raster`);
 						this.#map.removeSource(`source-${id}-raster`);
-					} else if ((layerFormat as { single: 'geojson' }).single === 'geojson') {
+					} else if (
+						(layerFormat as { tile: 'geojson' }).tile === 'geojson' ||
+						(layerFormat as { single: 'geojson' }).single === 'geojson'
+					) {
 						this.#map.removeLayer(`layer-${id}-geojson-fill`);
 						this.#map.removeLayer(`layer-${id}-geojson-line`);
 						this.#map.removeLayer(`layer-${id}-geojson-circle`);
@@ -805,7 +839,10 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 					} else {
 						this.#map.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', 1);
 					}
-				} else if ((layerFormat as { single: 'geojson' }).single === 'geojson') {
+				} else if (
+					(layerFormat as { tile: 'geojson' }).tile === 'geojson' ||
+					(layerFormat as { single: 'geojson' }).single === 'geojson'
+				) {
 					const defaultPaint = {
 						polygonFill: Styling.createPaintForPolygonFill(),
 						lineLine: Styling.createPaintForLineLine(),
