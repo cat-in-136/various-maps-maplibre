@@ -20,6 +20,7 @@
 		BASE_LAYER_DEFAULT,
 		OVERLAY_LAYER_DEFAULT
 	} from '../lib/maplibre-compound-layer-defaults';
+	import { getGsiDemProtocolAction } from '../lib/maplibre-gl-gsi-terrain-qiita';
 
 	const initMap = () => {
 		const map = new maplibregl.Map({
@@ -159,6 +160,7 @@
 			layerswitcher.addOverlay(gsimaplayers.getGroup());
 			layerswitcher.addOverlay(qchizulayers.getGroup('全国Q地図'));
 
+			maplibregl.addProtocol('gsidem', getGsiDemProtocolAction('gsidem'));
 			const terrainControl = new maplibregl.TerrainControl({
 				source: 'terrain',
 				exaggeration: 1
@@ -176,7 +178,7 @@
 					[id: string]: { title: string; source: maplibregl.RasterDEMSourceSpecification };
 				} = {
 					'terrain-aws': {
-						title: 'Terrain Tiles on AWS<',
+						title: 'Terrain Tiles on AWS',
 						source: {
 							type: 'raster-dem',
 							tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
@@ -186,6 +188,18 @@
 							minzoom: 1,
 							attribution:
 								'ArcticDEM terrain data DEM(s) were created from DigitalGlobe, Inc., imagery and funded under National Science Foundation awards 1043681, 1559691, and 1542736; / Australia terrain data © Commonwealth of Australia (Geoscience Australia) 2017; / Austria terrain data © offene Daten Österreichs – Digitales Geländemodell (DGM) Österreich; / Canada terrain data contains information licensed under the Open Government Licence – Canada; / Europe terrain data produced using Copernicus data and information funded by the European Union - EU-DEM layers; / Global ETOPO1 terrain data U.S. National Oceanic and Atmospheric Administration / Mexico terrain data source: INEGI, Continental relief, 2016; / New Zealand terrain data Copyright 2011 Crown copyright (c) Land Information New Zealand and the New Zealand Government (All rights reserved); / Norway terrain data © Kartverket; / United Kingdom terrain data © Environment Agency copyright and/or database right 2015. All rights reserved; / United States 3DEP (formerly NED) and global GMTED2010 and SRTM terrain data courtesy of the U.S. Geological Survey.'
+						}
+					},
+					'terrain-gsi': {
+						title: '地理院地図標高タイル',
+						source: {
+							type: 'raster-dem',
+							tiles: ['gsidem://https://cyberjapandata.gsi.go.jp/xyz/dem_png/{z}/{x}/{y}.png'],
+							tileSize: 256,
+							minzoom: 1,
+							maxzoom: 14,
+							attribution:
+								'<a href="https://maps.gsi.go.jp/development/ichiran.html#dem" target="_blank">地理院タイル(標高タイル)</a>'
 						}
 					}
 				};
@@ -199,7 +213,7 @@
 					const terrainCheckbox = document.createElement('input');
 					terrainCheckbox.type = 'checkbox';
 					const spanElement = document.createElement('span');
-					spanElement.textContent = 'Terrain Tiles on AWS';
+					spanElement.textContent = title;
 					terrainEntryLabel.appendChild(terrainCheckbox);
 					terrainEntryLabel.appendChild(spanElement);
 					entryDiv.appendChild(terrainEntryLabel);
@@ -210,6 +224,11 @@
 							for (const checkbox of detailsTerrain.querySelectorAll(
 								'.maplibregl-ctrl-compound-layer-layer-entry-visibility input[type=checkbox]'
 							)) {
+								const isTerrainUsed = !!map.getTerrain()?.source;
+								map.setTerrain(null);
+								if (map.getLayer('hills')) {
+									map.removeLayer('hills');
+								}
 								if (map.getSource('terrain')) {
 									map.removeSource('terrain');
 								}
@@ -231,8 +250,10 @@
 									if (!map.hasControl(terrainControl)) {
 										map.addControl(terrainControl);
 									}
+									if (isTerrainUsed) {
+										map.setTerrain({ source: 'terrain' });
+									}
 								} else {
-									map.setTerrain(null);
 									if (map.getLayer('hills')) {
 										map.removeLayer('hills');
 									}
