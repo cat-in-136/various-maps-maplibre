@@ -1,9 +1,10 @@
 import type * as MaplibreCompondLayerUI from './maplibre-compound-layer-ui';
 
+import gsi_light from '../../static/assets/map-data/gsi-light.min.json?url';
 import gsi_ort_label from '../../static/assets/map-data/gsi-ort-label.min.json?url';
+import gsi_ort_hybrid_light from '../../static/assets/map-data/gsi-ort-hybrid-light-catin136.min.json?url';
 import gsi_h_std from '../../static/assets/map-data/gsi-h-std.min.json?url';
 import gsi_h_pale from '../../static/assets/map-data/gsi-h-pale.min.json?url';
-import gsi_light from '../../static/assets/map-data/gsi-light.min.json?url';
 import gsi_railway from '../../static/assets/map-data/gsi-railway.min.json?url';
 import gsi_land from '../../static/assets/map-data/gsi-land.min.json?url';
 import gsi_river from '../../static/assets/map-data/gsi-river.min.json?url';
@@ -130,10 +131,24 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 				entries: [
 					{
 						type: 'Layer',
+						id: 'extra-gsi-light',
+						title: '軽い標準地図',
+						url: gsi_light,
+						maxNativeZoom: 17.9
+					},
+					{
+						type: 'Layer',
 						id: 'extra-gsi-ort-label',
 						title: '写真+注記',
 						url: gsi_ort_label,
-						maxNativeZoom: 17.9
+						maxNativeZoom: 18.9
+					},
+					{
+						type: 'Layer',
+						id: 'extra-gsi-hybrid-light',
+						title: '写真+軽い標準地図',
+						url: gsi_ort_hybrid_light,
+						maxNativeZoom: 18.9
 					},
 					{
 						type: 'Layer',
@@ -147,13 +162,6 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 						id: 'extra-gsi-h-pale',
 						title: '淡色+陰影',
 						url: gsi_h_pale,
-						maxNativeZoom: 17.9
-					},
-					{
-						type: 'Layer',
-						id: 'extra-gsi-light',
-						title: '軽い標準地図',
-						url: gsi_light,
 						maxNativeZoom: 17.9
 					},
 					{
