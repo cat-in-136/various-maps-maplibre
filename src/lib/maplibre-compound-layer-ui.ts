@@ -759,30 +759,37 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 								data
 							});
 						}
-						this.#map.addLayer({
-							id: `layer-${id}-geojson-fill`,
-							type: 'fill',
-							source,
-							'source-layer': sourceLayer,
-							paint: Styling.createPaintForPolygonFill(false),
-							filter: ['==', '$type', 'Polygon']
-						});
-						this.#map.addLayer({
-							id: `layer-${id}-geojson-line`,
-							type: 'line',
-							source,
-							'source-layer': sourceLayer,
-							paint: Styling.createPaintForLineLine(false),
-							filter: ['==', '$type', 'LineString']
-						});
-						this.#map.addLayer({
-							id: `layer-${id}-geojson-circle`,
-							type: 'circle',
-							source,
-							'source-layer': sourceLayer,
-							paint: Styling.createPaintForPointCircle(false),
-							filter: ['==', '$type', 'Point']
-						});
+
+						const addLayerObjects: maplibregl.LayerSpecification[] = [
+							{
+								id: `layer-${id}-geojson-fill`,
+								type: 'fill',
+								source,
+								paint: Styling.createPaintForPolygonFill(false),
+								filter: ['==', '$type', 'Polygon']
+							},
+							{
+								id: `layer-${id}-geojson-line`,
+								type: 'line',
+								source,
+								paint: Styling.createPaintForLineLine(false),
+								filter: ['==', '$type', 'LineString']
+							},
+							{
+								id: `layer-${id}-geojson-circle`,
+								type: 'circle',
+								source,
+								paint: Styling.createPaintForPointCircle(false),
+								filter: ['==', '$type', 'Point']
+							}
+						];
+
+						for (const l of addLayerObjects) {
+							if (sourceLayer && 'source-layer' in l) {
+								l['source-layer'] = sourceLayer;
+							}
+							this.#map.addLayer(l);
+						}
 						if (e.detail.layerEntry.opacity !== undefined) {
 							const value = e.detail.layerEntry.opacity;
 							if (value) {
