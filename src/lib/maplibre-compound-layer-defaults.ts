@@ -358,18 +358,24 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 	},
 	{
 		type: 'LayerGroup',
-		title: 'Debug',
+		title: 'Misc',
 		entries: [
 			{
 				type: 'Layer',
-				id: 'base-debug-empty-style',
-				title: 'Empty Style',
-				url: 'https://unpkg.com/maputnik/src/config/empty-style.json'
+				id: 'base-rekichizu-mierune',
+				title: 'れきちず',
+				url: 'https://mierune.github.io/rekichizu-style/styles/street/style.json'
 			},
 			{
 				type: 'LayerGroup',
-				title: 'MapLibre Demo Tiles',
+				title: 'Debug',
 				entries: [
+					{
+						type: 'Layer',
+						id: 'base-debug-empty-style',
+						title: 'Empty Style',
+						url: 'https://unpkg.com/maputnik/src/config/empty-style.json'
+					},
 					{
 						type: 'Layer',
 						id: 'base-demotiles',
