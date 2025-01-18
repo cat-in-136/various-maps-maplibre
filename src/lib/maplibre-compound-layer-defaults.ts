@@ -1,5 +1,6 @@
 import type * as MaplibreCompondLayerUI from './maplibre-compound-layer-ui';
 
+import osm_liberty_ja from '../../static/assets/map-data/osm-liberty-ja-style.min.json?url';
 import gsi_light from '../../static/assets/map-data/gsi-light.min.json?url';
 import gsi_ort_label from '../../static/assets/map-data/gsi-ort-label.min.json?url';
 import gsi_ort_hybrid_light from '../../static/assets/map-data/gsi-ort-hybrid-light-catin136.min.json?url';
@@ -97,6 +98,12 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 						url: 'https://basemaps.cartocdn.com/gl/voyager-nolabels-gl-style/style.json'
 					}
 				]
+			},
+			{
+				type: 'Layer',
+				id: 'base-osm-liberty-ja',
+				title: 'OSM Liberty JA',
+				url: osm_liberty_ja
 			}
 		]
 	},
