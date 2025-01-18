@@ -201,6 +201,18 @@
 							attribution:
 								'<a href="https://maps.gsi.go.jp/development/ichiran.html#dem" target="_blank">地理院タイル(標高タイル)</a>'
 						}
+					},
+					'terrain-gsj-land': {
+						title: '産総研陸域統合DEM',
+						source: {
+							type: 'raster-dem',
+							tiles: ['https://gbank.gsj.jp/seamless/elev/terrainRGB/land/{z}/{y}/{x}.png'],
+							tileSize: 256,
+							minzoom: 0,
+							maxzoom: 19,
+							attribution:
+								'<a href="https://tiles.gsj.jp/tiles/elev/tiles.html" target="_blank">産業技術総合研究所 シームレス標高タイル(陸域統合DEM)</a>'
+						}
 					}
 				};
 
