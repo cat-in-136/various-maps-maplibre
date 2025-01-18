@@ -300,10 +300,11 @@
         External Maps:
         <ul>
           <li><a href="https://www.google.com/maps/@${lat},${lng},${zoom}z">Google Maps</a></li>
-          <li><a href="https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=${Math.round(zoom)}">OpenStreetMap</a></li>
-          <li><a href="https://maps.gsi.go.jp/#${Math.round(zoom)}/${lat}/${lng}/&base=std&ls=std&disp=1">地理院地図</a></li>
-          <li><a href="https://maps.gsi.go.jp/vector/#${zoom}/${lat}/${lng}/&ls=vstd&disp=1&d=l">地理院地図 Vector</a></li>
-          <li><a href="https://maps.qchizu.xyz/#${Math.round(zoom)}/${lat}/${lng}/&base=std&ls=std&disp=1&vs=c1g1j0h0k0l0u0t0z0r0s0m0f1&d=m">全国Q地図</a></li>
+          <li><a href="https://www.google.com/maps/@?api=1&amp;map_action=pano&amp;viewpoint=${lat},${lng}">Google Maps Street View</a></li>
+          <li><a href="https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&amp;zoom=${Math.round(zoom)}">OpenStreetMap</a></li>
+          <li><a href="https://maps.gsi.go.jp/#${Math.round(zoom)}/${lat}/${lng}/&amp;base=std&amp;ls=std&amp;disp=1">地理院地図</a></li>
+          <li><a href="https://maps.gsi.go.jp/vector/#${zoom}/${lat}/${lng}/&amp;ls=vstd&amp;disp=1&amp;d=l">地理院地図 Vector</a></li>
+          <li><a href="https://maps.qchizu.xyz/#${Math.round(zoom)}/${lat}/${lng}/&amp;base=std&amp;ls=std&amp;disp=1&amp;vs=c1g1j0h0k0l0u0t0z0r0s0m0f1&amp;d=m">全国Q地図</a></li>
         </ul>
       </div>`
 				)
