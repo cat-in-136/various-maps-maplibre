@@ -290,6 +290,12 @@
 			layerswitcher.optionalElement.appendChild(optional);
 		});
 
+		// Globe button
+		map.on('load', () => {
+			map.setProjection({ type: 'globe' }); // Earth is not flat.
+			map.addControl(new maplibregl.GlobeControl());
+		});
+
 		map.on('contextmenu', (e: maplibregl.MapMouseEvent) => {
 			const { lng, lat } = e.lngLat;
 			const zoom = map.getZoom();
