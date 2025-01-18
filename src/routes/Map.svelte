@@ -220,14 +220,17 @@
 
 					terrainCheckbox.addEventListener(
 						'change',
-						(e) => {
+						(_e) => {
 							for (const checkbox of detailsTerrain.querySelectorAll(
 								'.maplibregl-ctrl-compound-layer-layer-entry-visibility input[type=checkbox]'
 							)) {
 								const isTerrainUsed = !!map.getTerrain()?.source;
 								map.setTerrain(null);
-								if (map.getLayer('hills')) {
-									map.removeLayer('hills');
+
+								for (const layer_id of map.getLayersOrder()) {
+									if (map.getLayer(layer_id)?.source === 'terrain') {
+										map.removeLayer(layer_id);
+									}
 								}
 								if (map.getSource('terrain')) {
 									map.removeSource('terrain');
