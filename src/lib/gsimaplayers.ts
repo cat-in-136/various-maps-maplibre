@@ -7,6 +7,10 @@ interface GSIMapLayerConfig {
 	[propName: string]: unknown;
 }
 
+type GSIMapLayersConvFn = (
+	v: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry
+) => MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry | undefined;
+
 const GSIMAPLAYERS: GSIMapLayerConfig[] = [
 	{
 		url: 'https://maps.gsi.go.jp/layers_txt/layers1.txt'
@@ -31,6 +35,19 @@ const GSIMAPLAYERS: GSIMapLayerConfig[] = [
 	}
 ];
 
+const GSIMAPLAYERS_CONV_FN: GSIMapLayersConvFn = (v) => {
+	if (v?.type === 'Layer') {
+		const layer = v as MaplibreCompondLayerUI.LayerConfig.Layer;
+		if (!layer.url.startsWith('https://')) {
+			layer.url = new URL(layer.url, GSIMAPLAYERS[0].url).href;
+		}
+		if (!layer.attribution) {
+			layer.attribution = '国土地理院';
+		}
+	}
+	return v;
+};
+
 export class GSIMapLayers {
 	#data: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[];
 	constructor() {
@@ -47,7 +64,7 @@ export class GSIMapLayers {
 
 	async load(
 		layers: GSIMapLayerConfig[] = GSIMAPLAYERS,
-		convFn: ((v: Object) => Object | undefined) | undefined = undefined
+		convFn: GSIMapLayersConvFn = GSIMAPLAYERS_CONV_FN
 	): Promise<void> {
 		const data = (
 			await Promise.all(
@@ -68,16 +85,14 @@ export class GSIMapLayers {
 				})
 			)
 		).flatMap((v) => v?.layers);
-		if (convFn) {
-			GSIMapLayers.#fixData(data, convFn);
-		}
+		GSIMapLayers.#fixData(data, convFn);
 		this.#data.push(...data);
 	}
 
-	static #fixData(data: any[], convFn: (v: Object) => Object | undefined) {
+	static #fixData(data: any[], convFn: GSIMapLayersConvFn) {
 		const elements_to_remove: any[] = [];
 		for (const d of data) {
-			if (d.type === 'LayerGroup') {
+			if (d?.type === 'LayerGroup') {
 				if (Array.isArray(d.entries)) {
 					GSIMapLayers.#fixData(d.entries, convFn);
 				}

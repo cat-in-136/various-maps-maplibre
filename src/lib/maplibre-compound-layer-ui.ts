@@ -26,6 +26,7 @@ export namespace LayerConfig {
 		maxZoom?: number;
 		minZoom?: number;
 		scheme?: 'xyz' | 'tms';
+		attribution?: string;
 		layerFormat?: LayerFormat;
 		[propName: string]: unknown;
 	}
@@ -707,7 +708,8 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 						let rasterSource: maplibregl.RasterSourceSpecification = {
 							type: 'raster',
 							tiles: [layer.url],
-							scheme: layer.scheme ?? 'xyz'
+							scheme: layer.scheme ?? 'xyz',
+							attribution: layer.attribution
 						};
 						if (layer.maxZoom) {
 							rasterSource.maxzoom = layer.maxZoom;
@@ -737,7 +739,8 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 							let vectorSource: maplibregl.VectorSourceSpecification = {
 								type: 'vector',
 								tiles: [`geojson-tile://${layer.url}`],
-								scheme: layer.scheme ?? 'xyz'
+								scheme: layer.scheme ?? 'xyz',
+								attribution: layer.attribution
 							};
 							if (layer.maxZoom) {
 								vectorSource.maxzoom = layer.maxZoom;
@@ -756,7 +759,8 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 										: layer.url;
 							this.#map.addSource(source, {
 								type: 'geojson',
-								data
+								data,
+								attribution: layer.attribution
 							});
 						}
 

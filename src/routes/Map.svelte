@@ -133,17 +133,12 @@
 						}
 					],
 					(v) => {
-						if (
-							(v as MaplibreCompondLayerUI.LayerConfig.LayerGroup | undefined)?.type ===
-							'LayerGroup'
-						) {
+						if (v?.type === 'LayerGroup') {
 							const layerGroup = v as MaplibreCompondLayerUI.LayerConfig.LayerGroup;
 							if (!layerGroup.entries || layerGroup.entries?.length === 0) {
 								return undefined;
 							}
-						} else if (
-							(v as MaplibreCompondLayerUI.LayerConfig.Layer | undefined)?.type === 'Layer'
-						) {
+						} else if (v?.type === 'Layer') {
 							const layer = v as MaplibreCompondLayerUI.LayerConfig.Layer;
 							if (!layer.url.startsWith('https://')) {
 								return undefined;
