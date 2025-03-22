@@ -20,6 +20,7 @@
 		BASE_LAYER_DEFAULT,
 		OVERLAY_LAYER_DEFAULT
 	} from '../lib/maplibre-compound-layer-defaults';
+	import { getBaseLayerNonfreeFromURL as getBaseLayerNonfreeFromURL } from '../lib/maplibre-compound-layer-nonfree';
 	import { getGsiDemProtocolAction } from '../lib/maplibre-gl-gsi-terrain-qiita';
 
 	const initMap = () => {
@@ -114,6 +115,8 @@
 		const layerswitcher = new MaplibreCompondLayerUI.MapLibreCompondLayerSwitcherControl();
 		map.on('load', async () => {
 			layerswitcher.addBase(BASE_LAYER_DEFAULT);
+			layerswitcher.addBase(getBaseLayerNonfreeFromURL());
+			console.debug({ layerswitcher });
 			map.addControl(layerswitcher);
 			for (const layer of layerswitcher.baseLayerEntriesAll()) {
 				layerswitcher.setBaseLayerEntriesSelected(layer, true);
