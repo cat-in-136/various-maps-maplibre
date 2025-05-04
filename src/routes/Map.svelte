@@ -318,7 +318,7 @@
 		map.getContainer().addEventListener('dragover', (e) => e.preventDefault(), false);
 		map.getContainer().addEventListener(
 			'drop',
-			(e) => {
+			async (e) => {
 				e.preventDefault();
 
 				const files: File[] = [];
@@ -338,12 +338,30 @@
 					});
 				}
 
-				const entries: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [];
+				const base_entries: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [];
+				const overlay_entries: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [];
 				for (const file of files) {
 					const rand = Math.random().toString(32).substring(2);
 					const id = `${file.name.replaceAll(/[-_\.\s]/g, '-')}-${rand}`;
-					if (/\.gpx$/i.test(file.name) || file.type === 'application/gpx+xml') {
-						entries.push({
+
+					if (/\.json$/i.test(file.name)) {
+						const json = await file.text().then(JSON.parse);
+						if (
+							json.version === 8 &&
+							typeof json.sources === 'object' &&
+							typeof json.layers === 'object'
+						) {
+							base_entries.push({
+								type: 'Layer',
+								id: `dndfile-${id}`,
+								title: file.name,
+								url: URL.createObjectURL(file)
+							});
+						} else {
+							console.debug(`Unsupported JSON format: ${file.name}`);
+						}
+					} else if (/\.gpx$/i.test(file.name) || file.type === 'application/gpx+xml') {
+						overlay_entries.push({
 							type: 'Layer',
 							id: `dndfile-${id}`,
 							title: file.name,
@@ -354,7 +372,7 @@
 						/\.kml$/i.test(file.name) ||
 						file.type === 'application/vnd.google-earth.kml+xml'
 					) {
-						entries.push({
+						overlay_entries.push({
 							type: 'Layer',
 							id: `dndfile-${id}`,
 							title: file.name,
@@ -362,25 +380,35 @@
 							layerFormat: { single: 'geojson' }
 						});
 					} else if (/\.geojson$/i.test(file.name)) {
-						entries.push({
+						overlay_entries.push({
 							type: 'Layer',
 							id: `dndfile-${id}`,
 							title: file.name,
 							url: URL.createObjectURL(file),
 							layerFormat: { single: 'geojson' }
 						});
+					} else {
+						console.debug(`Unsupported format: ${file.name}`);
 					}
 				}
 
-				if (entries.length > 0) {
-					const now = new Date();
+				const now = new Date();
+				const title = `Drag and Drop (${now.getHours().toString().padStart(2, '0')}:${now
+					.getMinutes()
+					.toString()
+					.padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')})`;
+				if (base_entries.length > 0) {
+					layerswitcher.addBase({
+						type: 'LayerGroup',
+						title,
+						entries: base_entries
+					});
+				}
+				if (overlay_entries.length > 0) {
 					layerswitcher.addOverlay({
 						type: 'LayerGroup',
-						title: `Drag and Drop (${now.getHours().toString().padStart(2, '0')}:${now
-							.getMinutes()
-							.toString()
-							.padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')})`,
-						entries
+						title,
+						entries: overlay_entries
 					});
 				}
 			},
