@@ -250,7 +250,7 @@ namespace LayerTreeView {
 		}>;
 	};
 	type LayerTreeEventListener<T extends keyof LayerTreeEventType> = (
-		ev: LayerTreeEventType[T] & Object
+		ev: LayerTreeEventType[T] & object
 	) => void;
 
 	type LayerTreeViewEntry = LayerEntry | LayerGroupEntry;
@@ -705,7 +705,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 
 				if (selected) {
 					if ((layerFormat as { tile: 'raster' }).tile === 'raster') {
-						let rasterSource: maplibregl.RasterSourceSpecification = {
+						const rasterSource: maplibregl.RasterSourceSpecification = {
 							type: 'raster',
 							tiles: [layer.url],
 							scheme: layer.scheme ?? 'xyz',
@@ -736,7 +736,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 						const source = `source-${id}-geojson`;
 						let sourceLayer = undefined;
 						if ((layerFormat as { tile: 'geojson' }).tile === 'geojson') {
-							let vectorSource: maplibregl.VectorSourceSpecification = {
+							const vectorSource: maplibregl.VectorSourceSpecification = {
 								type: 'vector',
 								tiles: [`geojson-tile://${layer.url}`],
 								scheme: layer.scheme ?? 'xyz',
@@ -751,7 +751,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 							this.#map.addSource(source, vectorSource);
 							sourceLayer = 'v'; // 変換時、source-layer 名は "v" としている
 						} else if ((layerFormat as { single: 'geojson' }).single === 'geojson') {
-							let data =
+							const data =
 								!/^kml:\/\//.test(layer.url) && /\.kml$/i.test(layer.url)
 									? `kml://${layer.url}`
 									: !/^gpx:\/\//.test(layer.url) && /\.gpx$/i.test(layer.url)
@@ -975,7 +975,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 		this.#map = map;
 		return this.#createElement();
 	}
-	onRemove(map: maplibregl.Map): void {
+	onRemove(): void {
 		this.#element.parentNode?.removeChild(this.#element);
 		this.#map = undefined;
 	}

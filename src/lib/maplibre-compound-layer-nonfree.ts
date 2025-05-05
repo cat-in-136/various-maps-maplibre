@@ -11,7 +11,7 @@ export function getBaseLayerNonfreeFromURL(
 	const searchParams = urlurl.searchParams;
 	const hashParams = new URLSearchParams(urlurl.hash.replace(/^#/, ''));
 
-	let keys: BaseLayerNonFreeKeys = {};
+	const keys: BaseLayerNonFreeKeys = {};
 	if (searchParams.has('maptiler_key')) {
 		keys.maptiler = searchParams.get('maptiler_key') as string;
 	}

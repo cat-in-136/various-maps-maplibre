@@ -342,7 +342,7 @@
 				const overlay_entries: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [];
 				for (const file of files) {
 					const rand = Math.random().toString(32).substring(2);
-					const id = `${file.name.replaceAll(/[-_\.\s]/g, '-')}-${rand}`;
+					const id = `${file.name.replaceAll(/[-_.\s]/g, '-')}-${rand}`;
 
 					if (/\.json$/i.test(file.name)) {
 						const json = await file.text().then(JSON.parse);
