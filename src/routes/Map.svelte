@@ -366,6 +366,7 @@
 							id: `dndfile-${id}`,
 							title: file.name,
 							url: `gpx://${URL.createObjectURL(file)}`,
+							attribution: '', // workaround to avoid attribution error
 							layerFormat: { single: 'geojson' }
 						});
 					} else if (
@@ -377,6 +378,7 @@
 							id: `dndfile-${id}`,
 							title: file.name,
 							url: `kml://${URL.createObjectURL(file)}`,
+							attribution: '', // workaround to avoid attribution error
 							layerFormat: { single: 'geojson' }
 						});
 					} else if (/\.geojson$/i.test(file.name)) {
