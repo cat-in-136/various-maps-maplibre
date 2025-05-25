@@ -2,7 +2,7 @@ import Encoding from 'encoding-japanese';
 //import type Encoding from '@types/encoding-japanese';
 import * as MaplibreCompondLayerUI from '../lib/maplibre-compound-layer-ui';
 
-interface GSIMapLayerConfig {
+export interface GSIMapLayerConfig {
 	url: string;
 	[propName: string]: unknown;
 }
@@ -90,20 +90,20 @@ export class GSIMapLayers {
 	}
 
 	static #fixData(data: any[], convFn: GSIMapLayersConvFn) {
-		const elements_to_remove: any[] = [];
 		for (const d of data) {
 			if (d?.type === 'LayerGroup') {
 				if (Array.isArray(d.entries)) {
 					GSIMapLayers.#fixData(d.entries, convFn);
 				}
 			}
-			if (convFn) {
-				const ret = convFn(d);
-				if (ret === undefined) {
-					elements_to_remove.push(d);
+		}
+
+		if (convFn) {
+			for (let i = data.length - 1; i >= 0; i--) {
+				if (convFn(data[i]) === undefined) {
+					data.splice(i, 1);
 				}
 			}
 		}
-		data.filter((item) => !elements_to_remove.includes(item));
 	}
 }

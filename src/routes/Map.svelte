@@ -14,6 +14,7 @@
 	import '@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css';
 
 	import { GSIMapLayers } from '../lib/gsimaplayers';
+	import { QChizuLayers } from '../lib/qchizulayers';
 	import * as MaplibreCompondLayerUI from '../lib/maplibre-compound-layer-ui';
 	import '../lib/maplibre-compound-layer-ui.css';
 	import {
@@ -126,35 +127,8 @@
 			layerswitcher.addOverlay(OVERLAY_LAYER_DEFAULT);
 
 			const gsimaplayers = new GSIMapLayers();
-			const qchizulayers = new GSIMapLayers();
-			await Promise.all([
-				gsimaplayers.load(),
-				qchizulayers.load(
-					[
-						{
-							url: 'https://qchizu.github.io/qchizu/layers_txt/layers99.txt'
-						}
-					],
-					(v) => {
-						if (v?.type === 'LayerGroup') {
-							const layerGroup = v as MaplibreCompondLayerUI.LayerConfig.LayerGroup;
-							if (!layerGroup.entries || layerGroup.entries?.length === 0) {
-								return undefined;
-							}
-						} else if (v?.type === 'Layer') {
-							const layer = v as MaplibreCompondLayerUI.LayerConfig.Layer;
-							if (!layer.url.startsWith('https://')) {
-								return undefined;
-							}
-							if (!layer.id) {
-								const rand = Math.random().toString(32).substring(2);
-								layer.id = `autoid-${rand}`;
-							}
-						}
-						return v;
-					}
-				)
-			]);
+			const qchizulayers = new QChizuLayers();
+			await Promise.all([gsimaplayers.load(), qchizulayers.load()]);
 			layerswitcher.addOverlay(gsimaplayers.getGroup());
 			layerswitcher.addOverlay(qchizulayers.getGroup('全国Q地図'));
 
