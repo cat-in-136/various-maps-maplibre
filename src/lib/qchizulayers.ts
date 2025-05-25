@@ -29,6 +29,8 @@ export class QChizuLayers extends GSIMapLayers {
 				}
 				if (!layer.url.startsWith('https://')) {
 					layer.url = new URL(layer.url, QCHIZULAYERS[0].url).href;
+				} else if (layer.url.startsWith('./layers_json')) {
+					layer.url = new URL(`../${layer.url}`, QCHIZULAYERS[0].url).href;
 				}
 				if (!layer.id) {
 					const rand = Math.random().toString(32).substring(2);
