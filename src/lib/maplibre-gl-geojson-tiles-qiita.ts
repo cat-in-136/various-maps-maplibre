@@ -5,6 +5,7 @@ import maplibregl from 'maplibre-gl';
 //import Pbf from 'pbf';
 import geojsonvt from 'geojson-vt';
 import { fromGeojsonVt } from 'vt-pbf';
+import { feature } from 'topojson-client';
 
 /*******************************************************
 // MapLibre - addProtocol 関係設定
@@ -25,9 +26,10 @@ async function processGeojsonTile(
 
 	//console.log(url, add);
 
-	const m = url.match(/\/(\d+)\/(\d+)\/(\d+)\.geojson/);
-	if (!m || !m[1] || !m[2] || !m[3]) throw new Error(`wrong URL format: ${url}`);
+	const m = url.match(/\/(\d+)\/(\d+)\/(\d+)\.(geojson|topojson)/);
+	if (!m || !m[1] || !m[2] || !m[3] || !m[4]) throw new Error(`wrong URL format: ${url}`);
 	const [z, x, y] = [+m[1], +m[2], +m[3]];
+	const ext = m[4] as string;
 	//console.log(x, y, z);
 
 	// URL に組み込まれるパラメータは maxNativeZoom しかないことを想定
@@ -40,15 +42,29 @@ async function processGeojsonTile(
 	const nativeX = x >> dz;
 	const nativeY = y >> dz;
 	const nativeUrl = url.replace(
-		/\/(\d+)\/(\d+)\/(\d+)\.geojson/,
-		`/${nativeZ}/${nativeX}/${nativeY}.geojson`
+		/\/(\d+)\/(\d+)\/(\d+)\.(geojson|topojson)/,
+		`/${nativeZ}/${nativeX}/${nativeY}.${ext}`
 	);
 	//console.log(dz, `/${nativeZ}/${nativeX}/${nativeY}`);
 	//console.log(nativeUrl);
 
-	const geoJSON = await fetch(nativeUrl, { signal: abortController.signal }).then((response) => {
-		return response.json();
-	});
+	const geoJSON = await fetch(nativeUrl, { signal: abortController.signal })
+		.then((response) => {
+			return response.json();
+		})
+		.then((json) => {
+			if (ext === 'geojson') {
+				return json;
+			} else if (ext === 'topojson') {
+				const geojsonObjects = {};
+				for (const key of Object.keys(json.objects)) {
+					geojsonObjects[key] = feature(json, json.objects[key]);
+				}
+				return geojsonObjects;
+			} else {
+				throw new Error('Wrong extension');
+			}
+		});
 
 	const tileIndex = geojsonvt(geoJSON, {
 		generateId: true,

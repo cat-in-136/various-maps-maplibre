@@ -409,11 +409,11 @@ namespace LayerTreeView {
 				this.#layerFormat = {
 					tile: /\.(jpg|png|webp|gif)$/i.test(config.url)
 						? 'raster'
-						: /\.(geojson)$/.test(config.url)
+						: /\.(geojson|topojson)$/.test(config.url)
 							? 'geojson'
 							: 'vector'
 				};
-			} else if (/\.(geojson|kml|gpx)$/.test(config.url)) {
+			} else if (/\.(geojson|topojson|kml|gpx)$/.test(config.url)) {
 				this.#layerFormat = { single: 'geojson' };
 			} else {
 				this.#layerFormat = 'style';
@@ -754,9 +754,11 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 							const data =
 								!/^kml:\/\//.test(layer.url) && /\.kml$/i.test(layer.url)
 									? `kml://${layer.url}`
-									: !/^gpx:\/\//.test(layer.url) && /\.gpx$/i.test(layer.url)
-										? `gpx://${layer.url}`
-										: layer.url;
+									: !/^topojson:\/\//.test(layer.url) && /\.topojson/i.test(layer.url)
+										? `topojson://${layer.url}`
+										: !/^gpx:\/\//.test(layer.url) && /\.gpx$/i.test(layer.url)
+											? `gpx://${layer.url}`
+											: layer.url;
 							this.#map.addSource(source, {
 								type: 'geojson',
 								data,
@@ -789,7 +791,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 						];
 
 						for (const l of addLayerObjects) {
-							if (sourceLayer && 'source-layer' in l) {
+							if (sourceLayer && !('source-layer' in l)) {
 								l['source-layer'] = sourceLayer;
 							}
 							this.#map.addLayer(l);
