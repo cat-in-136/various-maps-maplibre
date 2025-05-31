@@ -1,6 +1,7 @@
 import maplibregl from 'maplibre-gl';
 import type * as maplibreglstyle from '@maplibre/maplibre-gl-style-spec';
 import * as VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
+import { GSIMAP_STYLE_OVERRIDE } from '../lib/gsivectorexperimentalstyle';
 
 import { getGeoJsonProtocolAction } from '../lib/maplibre-gl-geojson-tiles-qiita';
 
@@ -43,7 +44,15 @@ export namespace LayerConfig {
 }
 
 namespace Styling {
-	export function createPaintForPolygonFill(
+	export function getPaintForPolygonFill(
+		layer: LayerConfig.Layer
+	): Required<maplibreglstyle.FillLayerSpecification>['paint'] {
+		if (typeof layer.styleurl === 'string') {
+			return GSIMAP_STYLE_OVERRIDE[layer.styleurl]?.fill || getDefaultPaintForPolygonFill(false);
+		}
+		return GSIMAP_STYLE_OVERRIDE[layer.url]?.fill || getDefaultPaintForPolygonFill(false);
+	}
+	export function getDefaultPaintForPolygonFill(
 		forceValue: boolean = false,
 		fillOpacity: number = 0.5,
 		fillColor: string = '#0000ff',
@@ -96,7 +105,16 @@ namespace Styling {
 					]
 		};
 	}
-	export function createPaintForLineLine(
+
+	export function getPaintForLineLine(
+		layer: LayerConfig.Layer
+	): Required<maplibreglstyle.LineLayerSpecification>['paint'] {
+		if (typeof layer.styleurl === 'string') {
+			return GSIMAP_STYLE_OVERRIDE[layer.styleurl]?.line || getDefaultPaintForLineLine(false);
+		}
+		return GSIMAP_STYLE_OVERRIDE[layer.url]?.line || getDefaultPaintForLineLine(false);
+	}
+	export function getDefaultPaintForLineLine(
 		forceValue: boolean = false,
 		lineWidth: number = 3,
 		lineOpacity: number = 0.5,
@@ -144,7 +162,16 @@ namespace Styling {
 					]
 		};
 	}
-	export function createPaintForPointCircle(
+
+	export function getPaintForPointCircle(
+		layer: LayerConfig.Layer
+	): Required<maplibreglstyle.CircleLayerSpecification>['paint'] {
+		if (typeof layer.styleurl === 'string') {
+			return GSIMAP_STYLE_OVERRIDE[layer.styleurl]?.circle || getDefaultPaintForPointCircle(false);
+		}
+		return GSIMAP_STYLE_OVERRIDE[layer.url]?.circle || getDefaultPaintForPointCircle(false);
+	}
+	export function getDefaultPaintForPointCircle(
 		forceValue: boolean = false,
 		circleRadius: number = 8,
 		circleColor: string = '#ff0000',
@@ -771,21 +798,21 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 								id: `layer-${id}-geojson-fill`,
 								type: 'fill',
 								source,
-								paint: Styling.createPaintForPolygonFill(false),
+								paint: Styling.getPaintForPolygonFill(layer),
 								filter: ['==', '$type', 'Polygon']
 							},
 							{
 								id: `layer-${id}-geojson-line`,
 								type: 'line',
 								source,
-								paint: Styling.createPaintForLineLine(false),
+								paint: Styling.getPaintForLineLine(layer),
 								filter: ['==', '$type', 'LineString']
 							},
 							{
 								id: `layer-${id}-geojson-circle`,
 								type: 'circle',
 								source,
-								paint: Styling.createPaintForPointCircle(false),
+								paint: Styling.getPaintForPointCircle(layer),
 								filter: ['==', '$type', 'Point']
 							}
 						];
@@ -795,6 +822,39 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 								l['source-layer'] = sourceLayer;
 							}
 							this.#map.addLayer(l);
+							this.#map.on('click', l.id, (e) => {
+								if (e.features && e.features.length > 0) {
+									const columnSet = new Set<string>();
+									e.features.forEach((f) => {
+										Object.keys(f.properties).forEach((k) => columnSet.add(k));
+									});
+									const rows = Array.from(columnSet); // 属性名の配列
+
+									let table =
+										'<table border="1" style="border-collapse:collapse;"><thead><tr><th>prop</th>';
+									for (let idx = 0; idx < e.features.length; idx++) {
+										table += `<th>#${idx + 1}</th>`;
+									}
+									table += '</tr></thead><tbody>';
+
+									for (const row of rows) {
+										table += `<tr><td>${row}</td>`;
+										for (const feature of e.features) {
+											table += `<td>${feature.properties[row] ?? ''}</td>`;
+										}
+										table += '</tr>';
+									}
+									table += '</tbody></table>';
+
+									new maplibregl.Popup().setLngLat(e.lngLat).setHTML(table).addTo(this.#map);
+								}
+							});
+							this.#map.on('mouseenter', l.id, (e) => {
+								this.#map.getCanvas().style.cursor = 'pointer';
+							});
+							this.#map.on('mouseleave', l.id, (e) => {
+								this.#map.getCanvas().style.cursor = '';
+							});
 						}
 						if (e.detail.layerEntry.opacity !== undefined) {
 							const value = e.detail.layerEntry.opacity;
@@ -857,20 +917,20 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 					(layerFormat as { single: 'geojson' }).single === 'geojson'
 				) {
 					const defaultPaint = {
-						polygonFill: Styling.createPaintForPolygonFill(),
-						lineLine: Styling.createPaintForLineLine(),
-						pointCircle: Styling.createPaintForPointCircle()
+						polygonFill: Styling.getDefaultPaintForPolygonFill(false),
+						lineLine: Styling.getDefaultPaintForLineLine(false),
+						pointCircle: Styling.getDefaultPaintForPointCircle(false)
 					};
 
 					if (e.detail.layerEntry.opacity !== undefined) {
 						const value = e.detail.layerEntry.opacity;
 						this.#map?.setPaintProperty(`layer-${id}-geojson-fill`, 'fill-opacity', value / 255.0);
 						this.#map.setPaintProperty(`layer-${id}-geojson-line`, 'line-opacity', value / 255.0);
-						//this.#map.setPaintProperty(
-						//	`layer-${id}-geojson-circle`,
-						//	'circle-opacity',
-						//	value / 255.0
-						//);
+						this.#map.setPaintProperty(
+							`layer-${id}-geojson-circle`,
+							'circle-opacity',
+							value / 255.0
+						);
 					} else {
 						this.#map?.setPaintProperty(
 							`layer-${id}-geojson-fill`,
@@ -882,11 +942,11 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 							'line-opacity',
 							defaultPaint.lineLine['line-opacity']
 						);
-						//this.#map.setPaintProperty(
-						//	`layer-${id}-geojson-circle`,
-						//	'circle-opacity',
-						//	defaultPaint.pointCircle['circle-opacity']
-						//);
+						this.#map.setPaintProperty(
+							`layer-${id}-geojson-circle`,
+							'circle-opacity',
+							defaultPaint.pointCircle['circle-opacity']
+						);
 					}
 				}
 			}
