@@ -9,6 +9,7 @@ import gsi_h_pale from '../../static/assets/map-data/gsi-h-pale.min.json?url';
 import gsi_railway from '../../static/assets/map-data/gsi-railway.min.json?url';
 import gsi_land from '../../static/assets/map-data/gsi-land.min.json?url';
 import gsi_river from '../../static/assets/map-data/gsi-river.min.json?url';
+import tjmsy_orilibre_global_maptiler from '../../static/assets/map-data/tjmsy-orilibre-global-maptiler.min.json?url';
 
 export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
 	{
@@ -372,6 +373,29 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 				id: 'base-rekichizu-mierune',
 				title: 'れきちず',
 				url: 'https://mierune.github.io/rekichizu-style/styles/street/style.json'
+			},
+			{
+				type: 'Layer',
+				id: 'base-tjmsy-orilibre-global-without-contour',
+				title: 'tjmsy/orilibre Global without Contour',
+				url: tjmsy_orilibre_global_maptiler,
+				html: `<a href="https://github.com/tjmsy/orilibre">tjmsy/orilibre</a>'s Global (without Contour), converted into a maplibre style json.`,
+				styleSwapOptions: {
+					transformStyle: (_previous, next) => {
+						// Remove the source with id 'contours'
+						if (next.sources && next.sources['contours']) {
+							delete next.sources['contours'];
+						}
+
+						// Remove layers that reference the 'contours' source
+						if (next.layers) {
+							next.layers = next.layers.filter((layer) => {
+								return !('source' in layer && layer.source === 'contours');
+							});
+						}
+						return next;
+					}
+				}
 			},
 			{
 				type: 'LayerGroup',
