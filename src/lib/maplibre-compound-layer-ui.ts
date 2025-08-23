@@ -29,6 +29,7 @@ export namespace LayerConfig {
 		scheme?: 'xyz' | 'tms';
 		attribution?: string;
 		layerFormat?: LayerFormat;
+		styleSwapOptions?: maplibregl.StyleSwapOptions;
 		[propName: string]: unknown;
 	}
 
@@ -692,7 +693,8 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 						}, 100);
 					}
 				} else if (layerFormat === 'style') {
-					this.#map.setStyle(layer.url);
+					const setStyleOption = layer.styleSwapOptions || {};
+					this.#map.setStyle(layer.url, setStyleOption);
 					if (layer.maxNativeZoom) {
 						this.#map.setMaxZoom(layer.maxNativeZoom);
 					}

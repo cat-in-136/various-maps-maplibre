@@ -1,4 +1,5 @@
 import type * as MaplibreCompondLayerUI from './maplibre-compound-layer-ui';
+import tjmsy_orilibre_global_maptiler from '../../static/assets/map-data/tjmsy-orilibre-global-maptiler.min.json?url';
 
 type BaseLayerNonFreeKeys = {
 	maptiler?: string;
@@ -180,6 +181,31 @@ export function getBaseLayerNonfree(
 				}
 			]
 		});
+	}
+	{
+		const miscGroup: MaplibreCompondLayerUI.LayerConfig.LayerGroup = {
+			type: 'LayerGroup',
+			title: 'Misc (non free)',
+			entries: []
+		};
+		if (keyes['maptiler']) {
+			const key = keyes['maptiler'];
+			miscGroup.entries.push({
+				type: 'Layer',
+				id: 'base-tjmsy-orilibre-global-maptiler',
+				title: 'tjmsy/orilibre Global with Contour (Maptiler)',
+				url: tjmsy_orilibre_global_maptiler,
+				html: `<a href="https://github.com/tjmsy/orilibre">tjmsy/orilibre</a>'s Global (with Contour) contour replaced with Maptiler's version, converted into a maplibre style json.`,
+				styleSwapOptions: {
+					transformStyle: (_previous, next) => {
+						return JSON.parse(JSON.stringify(next).replaceAll('{key}', `${key}`));
+					}
+				}
+			});
+		}
+		if (miscGroup.entries.length > 0) {
+			entries.push(miscGroup);
+		}
 	}
 	return entries;
 }
