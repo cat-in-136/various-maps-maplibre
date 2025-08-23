@@ -30,7 +30,7 @@
 			center: [138.75, 36],
 			zoom: 4,
 			hash: true,
-			style: BASE_LAYER_DEFAULT[0].entries[0].url as string
+			style: (BASE_LAYER_DEFAULT[0] as any).entries[0].url as string
 		});
 
 		// Navigation (Zoom) control

@@ -6,6 +6,7 @@ import maplibregl from 'maplibre-gl';
 import geojsonvt from 'geojson-vt';
 import { fromGeojsonVt } from 'vt-pbf';
 import { feature } from 'topojson-client';
+import type * as GeoJSON from 'geojson';
 
 /*******************************************************
 // MapLibre - addProtocol 関係設定
@@ -56,7 +57,7 @@ async function processGeojsonTile(
 			if (ext === 'geojson') {
 				return json;
 			} else if (ext === 'topojson') {
-				const geojsonObjects = {};
+				const geojsonObjects: Record<string, GeoJSON.Feature> = {};
 				for (const key of Object.keys(json.objects)) {
 					geojsonObjects[key] = feature(json, json.objects[key]);
 				}

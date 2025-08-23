@@ -795,7 +795,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 							});
 						}
 
-						const addLayerObjects: maplibregl.LayerSpecification[] = [
+						const addLayerObjects: Extract<maplibregl.LayerSpecification, { source: string }>[] = [
 							{
 								id: `layer-${id}-geojson-fill`,
 								type: 'fill',
@@ -848,14 +848,14 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 									}
 									table += '</tbody></table>';
 
-									new maplibregl.Popup().setLngLat(e.lngLat).setHTML(table).addTo(this.#map);
+									new maplibregl.Popup().setLngLat(e.lngLat).setHTML(table).addTo(this.#map!);
 								}
 							});
-							this.#map.on('mouseenter', l.id, (e) => {
-								this.#map.getCanvas().style.cursor = 'pointer';
+							this.#map!.on('mouseenter', l.id, (_e) => {
+								this.#map!.getCanvas().style.cursor = 'pointer';
 							});
-							this.#map.on('mouseleave', l.id, (e) => {
-								this.#map.getCanvas().style.cursor = '';
+							this.#map!.on('mouseleave', l.id, (_e) => {
+								this.#map!.getCanvas().style.cursor = '';
 							});
 						}
 						if (e.detail.layerEntry.opacity !== undefined) {
