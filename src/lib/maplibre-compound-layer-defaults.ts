@@ -428,6 +428,142 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 export const OVERLAY_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
 	{
 		type: 'LayerGroup',
+		title: 'OSM Raster',
+		entries: [
+			{
+				type: 'LayerGroup',
+				title: 'OpenRailwayMap',
+				entries: [
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-standard',
+						title: 'Standard',
+						url: 'https://tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png',
+						minZoom: 2,
+						maxZoom: 19,
+						attribution:
+							'<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>, Style: <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA 2.0</a> <a href="http://www.openrailwaymap.org/">OpenRailwayMap</a> and OpenStreetMap'
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-standard',
+						title: 'Electrification',
+						url: 'https://tiles.openrailwaymap.org/electrification/{z}/{x}/{y}.png',
+						minZoom: 2,
+						maxZoom: 19,
+						attribution:
+							'<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>, Style: <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA 2.0</a> <a href="http://www.openrailwaymap.org/">OpenRailwayMap</a> and OpenStreetMap'
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-maxspeed',
+						title: 'Maxspeed',
+						url: 'https://tiles.openrailwaymap.org/maxspeed/{z}/{x}/{y}.png',
+						minZoom: 2,
+						maxZoom: 19,
+						attribution:
+							'<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>, Style: <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA 2.0</a> <a href="http://www.openrailwaymap.org/">OpenRailwayMap</a> and OpenStreetMap'
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-signals',
+						title: 'Signals',
+						url: 'https://tiles.openrailwaymap.org/signals/{z}/{x}/{y}.png',
+						minZoom: 2,
+						maxZoom: 19,
+						attribution:
+							'<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>, Style: <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA 2.0</a> <a href="http://www.openrailwaymap.org/">OpenRailwayMap</a> and OpenStreetMap'
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-gauge',
+						title: 'Gauge',
+						url: 'https://tiles.openrailwaymap.org/gauge/{z}/{x}/{y}.png',
+						minZoom: 2,
+						maxZoom: 19,
+						attribution:
+							'<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>, Style: <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA 2.0</a> <a href="http://www.openrailwaymap.org/">OpenRailwayMap</a> and OpenStreetMap'
+					}
+				]
+			},
+			{
+				type: 'LayerGroup',
+				title: 'waymarkedtrails',
+				entries: [
+					{
+						type: 'Layer',
+						id: 'overlay-waymarkedtrails-hiking',
+						title: 'Hiking',
+						url: 'https://tile.waymarkedtrails.org/hiking/{z}/{x}/{y}.png',
+						minZoom: 2,
+						maxZoom: 18,
+						attribution:
+							'© <a href="https://www.waymarkedtrails.org">Waymarked Trails</a>, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-waymarkedtrails-cycling',
+						title: 'Cycling',
+						url: 'https://tile.waymarkedtrails.org/cycling/{z}/{x}/{y}.png',
+						minZoom: 2,
+						maxZoom: 18,
+						attribution:
+							'© <a href="https://www.waymarkedtrails.org">Waymarked Trails</a>, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-waymarkedtrails-mtb',
+						title: 'MTB',
+						url: 'https://tile.waymarkedtrails.org/mtb/{z}/{x}/{y}.png',
+						minZoom: 2,
+						maxZoom: 18,
+						attribution:
+							'© <a href="https://www.waymarkedtrails.org">Waymarked Trails</a>, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-waymarkedtrails-skating',
+						title: 'Skating',
+						url: 'https://tile.waymarkedtrails.org/skating/{z}/{x}/{y}.png',
+						minZoom: 2,
+						maxZoom: 18,
+						attribution:
+							'© <a href="https://www.waymarkedtrails.org">Waymarked Trails</a>, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-waymarkedtrails-riding',
+						title: 'Riding',
+						url: 'https://tile.waymarkedtrails.org/riding/{z}/{x}/{y}.png',
+						minZoom: 2,
+						maxZoom: 18,
+						attribution:
+							'© <a href="https://www.waymarkedtrails.org">Waymarked Trails</a>, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-waymarkedtrails-slopes',
+						title: 'Slopes',
+						url: 'https://tile.waymarkedtrails.org/slopes/{z}/{x}/{y}.png',
+						minZoom: 2,
+						maxZoom: 18,
+						attribution:
+							'© <a href="https://www.waymarkedtrails.org">Waymarked Trails</a>, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+					}
+				]
+			},
+			{
+				type: 'Layer',
+				id: 'overlay-opensnowmap-ski-pistes',
+				title: 'OpenSnowMap ski pistes',
+				url: 'https://tiles.opensnowmap.org/pistes/{z}/{x}/{y}.png',
+				attribution:
+					'Map data &copy; <a href="https://www.openstreetmap.org">OpenStreetMap</a> contributors.'
+			}
+		]
+	},
+	{
+		type: 'LayerGroup',
 		title: '古地図',
 		entries: [
 			{

@@ -26,6 +26,7 @@ export namespace LayerConfig {
 		maxNativeZoom?: number;
 		maxZoom?: number;
 		minZoom?: number;
+		tileSize?: number;
 		scheme?: 'xyz' | 'tms';
 		attribution?: string;
 		layerFormat?: LayerFormat;
@@ -668,7 +669,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 							[`source-${id}-raster`]: {
 								type: 'raster',
 								tiles: [layer.url],
-								tileSize: (layer.tileSize ?? 256) as number,
+								tileSize: layer.tileSize ?? 256,
 								scheme: layer.scheme ?? 'xyz',
 								attribution: layer.attribution as string | undefined
 							}
@@ -737,6 +738,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 						const rasterSource: maplibregl.RasterSourceSpecification = {
 							type: 'raster',
 							tiles: [layer.url],
+							tileSize: layer.tileSize ?? 256,
 							scheme: layer.scheme ?? 'xyz',
 							attribution: layer.attribution
 						};
