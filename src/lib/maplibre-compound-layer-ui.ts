@@ -882,6 +882,32 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 								}, 100);
 							}
 						}
+					} else if (layerFormat === 'style') {
+						fetch(layer.url).then(async (response: Response) => {
+							if (!response.ok) return;
+							const json = await response.json();
+							if (
+								json.version === 8 &&
+								typeof json.sources === 'object' &&
+								typeof json.layers === 'object'
+							) {
+								for (const [sourceId, source] of Object.entries(json.sources)) {
+									if (!this.#map!.getSource(sourceId)) {
+										this.#map!.addSource(sourceId, source as maplibregl.SourceSpecification);
+									}
+								}
+
+								for (const layer of json.layers) {
+									const newLayerId = `layer-${id}-${layer.id}`;
+									if (!this.#map!.getLayer(newLayerId)) {
+										const newLayer = { ...layer, id: newLayerId };
+										this.#map!.addLayer(newLayer);
+									}
+								}
+							} else {
+								console.debug(`Unsupported JSON format: ${layer.url}`);
+							}
+						});
 					} else {
 						console.error(`Unsupported layerFormat ${JSON.stringify(layerFormat)}`, e); // TODO
 					}
@@ -897,6 +923,36 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 						this.#map.removeLayer(`layer-${id}-geojson-line`);
 						this.#map.removeLayer(`layer-${id}-geojson-circle`);
 						this.#map.removeSource(`source-${id}-geojson`);
+					} else if (layerFormat === 'style') {
+						// Remove layers and sources associated with this style layer
+						if (this.#map) {
+							// 1. Find and remove layers whose ID starts with `layer-${id}-`
+							const layersToRemove = this.#map
+								.getStyle()
+								.layers.filter((layer) => layer.id.startsWith(`layer-${id}-`));
+
+							// Keep track of sources referenced by these layers
+							const sourcesToCheck = new Set<string>();
+
+							// 2. Remove the layers
+							for (const layer of layersToRemove) {
+								if ('source' in layer && typeof layer.source === 'string') {
+									sourcesToCheck.add(layer.source);
+								}
+								this.#map.removeLayer(layer.id);
+							}
+
+							// 3. Check if sources are still referenced by any other layers
+							for (const sourceId of sourcesToCheck) {
+								const isSourceStillUsed = this.#map
+									.getStyle()
+									.layers.some((layer) => 'source' in layer && layer.source === sourceId);
+								// 4. If not referenced, remove the source
+								if (!isSourceStillUsed) {
+									this.#map.removeSource(sourceId);
+								}
+							}
+						}
 					} else {
 						console.error(`Unsupported layerFormat ${JSON.stringify(layerFormat)}`, e); // TODO
 					}

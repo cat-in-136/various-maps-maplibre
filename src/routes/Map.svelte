@@ -318,7 +318,23 @@
 					const rand = Math.random().toString(32).substring(2);
 					const id = `${file.name.replaceAll(/[-_.\s]/g, '-')}-${rand}`;
 
-					if (/\.json$/i.test(file.name)) {
+					if (/\.overlay\.json$/i.test(file.name)) {
+						const json = await file.text().then(JSON.parse);
+						if (
+							json.version === 8 &&
+							typeof json.sources === 'object' &&
+							typeof json.layers === 'object'
+						) {
+							overlay_entries.push({
+								type: 'Layer',
+								id: `dndfile-${id}`,
+								title: file.name,
+								url: URL.createObjectURL(file)
+							});
+						} else {
+							console.debug(`Unsupported JSON format: ${file.name}`);
+						}
+					} else if (/\.json$/i.test(file.name)) {
 						const json = await file.text().then(JSON.parse);
 						if (
 							json.version === 8 &&
