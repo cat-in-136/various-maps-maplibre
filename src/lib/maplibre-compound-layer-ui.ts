@@ -891,16 +891,38 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 								typeof json.sources === 'object' &&
 								typeof json.layers === 'object'
 							) {
-								for (const [sourceId, source] of Object.entries(json.sources)) {
+								const new_style = json as maplibregl.StyleSpecification;
+
+								let default_text_font: string[] | undefined = undefined;
+								if (!this.#map!.getGlyphs()) {
+									if (new_style.glyphs) {
+										this.#map!.setGlyphs(new_style.glyphs);
+									}
+								} else {
+									default_text_font = this.#map!.getStyle()
+										.layers.map((layer) =>
+											layer.type === 'symbol' &&
+											Array.isArray(layer.layout?.['text-font']) &&
+											layer.layout['text-font'].every((f) => typeof f === 'string')
+												? (layer.layout['text-font'] as string[])
+												: undefined
+										)
+										.find((v) => v);
+								}
+
+								for (const [sourceId, source] of Object.entries(new_style.sources)) {
 									if (!this.#map!.getSource(sourceId)) {
-										this.#map!.addSource(sourceId, source as maplibregl.SourceSpecification);
+										this.#map!.addSource(sourceId, source);
 									}
 								}
 
-								for (const layer of json.layers) {
+								for (const layer of new_style.layers) {
 									const newLayerId = `layer-${id}-${layer.id}`;
 									if (!this.#map!.getLayer(newLayerId)) {
 										const newLayer = { ...layer, id: newLayerId };
+										if (default_text_font && newLayer.type === 'symbol' && newLayer.layout) {
+											newLayer.layout['text-font'] = default_text_font;
+										}
 										this.#map!.addLayer(newLayer);
 									}
 								}
