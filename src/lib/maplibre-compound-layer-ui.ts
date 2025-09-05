@@ -891,7 +891,13 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 								typeof json.sources === 'object' &&
 								typeof json.layers === 'object'
 							) {
-								const new_style = json as maplibregl.StyleSpecification;
+								const new_style: maplibregl.StyleSpecification = layer.styleSwapOptions
+									?.transformStyle
+									? layer.styleSwapOptions.transformStyle(
+											structuredClone(this.#map!.getStyle()),
+											json
+										)
+									: json;
 
 								let default_text_font: string[] | undefined = undefined;
 								if (!this.#map!.getGlyphs()) {

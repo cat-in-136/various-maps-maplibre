@@ -428,6 +428,51 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 export const OVERLAY_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
 	{
 		type: 'LayerGroup',
+		title: 'OSM Vector',
+		entries: [
+			{
+				type: 'LayerGroup',
+				title: 'Tonar',
+				entries: [
+					{
+						type: 'Layer',
+						id: 'overlay-osm-tonar-labels-ja',
+						title: 'OSM Maptiler Toner Labels JA',
+						url: 'https://tile.openstreetmap.jp/styles/maptiler-toner-ja/style.json',
+						styleSwapOptions: {
+							transformStyle: (_previous, next) => {
+								return { ...next, layers: next.layers.filter((v) => v.type === 'symbol') };
+							}
+						}
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-osm-tonar-labels-en',
+						title: 'OSM Maptiler Toner Labels EN',
+						url: 'https://tile.openstreetmap.jp/styles/maptiler-toner-en/style.json',
+						styleSwapOptions: {
+							transformStyle: (_previous, next) => {
+								return { ...next, layers: next.layers.filter((v) => v.type === 'symbol') };
+							}
+						}
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-osm-tonar-lines',
+						title: 'OSM Maptiler Toner Lines',
+						url: 'https://tile.openstreetmap.jp/styles/maptiler-toner-ja/style.json',
+						styleSwapOptions: {
+							transformStyle: (_previous, next) => {
+								return { ...next, layers: next.layers.filter((v) => v.type === 'line') };
+							}
+						}
+					}
+				]
+			}
+		]
+	},
+	{
+		type: 'LayerGroup',
 		title: 'OSM Raster',
 		entries: [
 			{
