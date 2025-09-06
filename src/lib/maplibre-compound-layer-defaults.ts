@@ -10,6 +10,7 @@ import gsi_railway from '../../static/assets/map-data/gsi-railway.min.json?url';
 import gsi_land from '../../static/assets/map-data/gsi-land.min.json?url';
 import gsi_river from '../../static/assets/map-data/gsi-river.min.json?url';
 import tjmsy_orilibre_global_maptiler from '../../static/assets/map-data/tjmsy-orilibre-global-maptiler.min.json?url';
+import arcgis_osm_junction_names from '../../static/assets/map-data/arcgis-OpenStreetMap-v2-junction-names.min.overlay.json?url';
 
 const ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE: maplibregl.TransformStyleFunction = (
 	_previous,
@@ -736,6 +737,12 @@ export const OVERLAY_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConf
 				styleSwapOptions: {
 					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
 				}
+			},
+			{
+				type: 'Layer',
+				id: 'overlay-arcgis-OSM-Junction-Names',
+				title: '交差点名',
+				url: arcgis_osm_junction_names
 			},
 			{
 				type: 'Layer',
