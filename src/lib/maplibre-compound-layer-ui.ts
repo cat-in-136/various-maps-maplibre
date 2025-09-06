@@ -899,6 +899,51 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 										)
 									: json;
 
+								// Merge sprite if exists
+								if (new_style.sprite) {
+									// Standardize new sprite to array if needed
+									const newSprites: Exclude<maplibregl.SpriteSpecification, string> =
+										typeof new_style.sprite === 'string'
+											? [{ id: 'default', url: new_style.sprite }]
+											: new_style.sprite;
+
+									// Apply prefix and add to map
+									const spritePrefix = `layer-${id}-`;
+									const currentSpriteIDs = this.#map!.getSprite().map((v) => v.id);
+									for (const sprite of newSprites) {
+										const spriteId = `${spritePrefix}${sprite.id}`;
+										if (currentSpriteIDs.indexOf(spriteId) >= 0) {
+											this.#map!.removeSprite(spriteId);
+										}
+										this.#map!.addSprite(spriteId, sprite.url);
+									}
+
+									// Update icon-image and pattern references in layers with prefix
+									for (const layer of new_style.layers) {
+										if (layer.type === 'symbol') {
+											if (layer.layout?.['icon-image']) {
+												layer.layout['icon-image'] = [
+													'let',
+													'originalVal',
+													Array.isArray(layer.layout?.['icon-image'])
+														? layer.layout['icon-image']
+														: ['literal', layer.layout['icon-image']],
+													[
+														'concat',
+														[
+															'case',
+															['in', ':', ['to-string', ['var', 'originalVal']]],
+															spritePrefix, // if original value contains a colon
+															`${spritePrefix}default:` // if it doesn't
+														],
+														['var', 'originalVal']
+													]
+												];
+											}
+										}
+									}
+								}
+
 								let default_text_font: string[] | undefined = undefined;
 								if (!this.#map!.getGlyphs()) {
 									if (new_style.glyphs) {

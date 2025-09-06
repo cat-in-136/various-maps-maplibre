@@ -665,6 +665,17 @@ export const OVERLAY_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConf
 						}
 					}
 				]
+			},
+			{
+				type: 'Layer',
+				id: 'overlay-osm-liberty-ja',
+				title: 'OSM Liberty JA Labels',
+				url: osm_liberty_ja,
+				styleSwapOptions: {
+					transformStyle: (_previous, next) => {
+						return { ...next, layers: next.layers.filter((v) => v.type === 'symbol') };
+					}
+				}
 			}
 		]
 	},
