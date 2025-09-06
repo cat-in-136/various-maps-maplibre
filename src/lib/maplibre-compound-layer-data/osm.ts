@@ -1,5 +1,14 @@
 import * as MaplibreCompondLayerUI from '../maplibre-compound-layer-ui';
 
+import openrailwaymap_standard_light from '../../../static/assets/map-data/openrailwaymap-standard-light.min.overlay.json?url';
+import openrailwaymap_speed_light from '../../../static/assets/map-data/openrailwaymap-speed-light.min.overlay.json?url';
+import openrailwaymap_signals_light from '../../../static/assets/map-data/openrailwaymap-signals-light.min.overlay.json?url';
+import openrailwaymap_electrification_light from '../../../static/assets/map-data/openrailwaymap-electrification-light.min.overlay.json?url';
+import openrailwaymap_gauge_light from '../../../static/assets/map-data/openrailwaymap-gauge-light.min.overlay.json?url';
+import openrailwaymap_loading_gauge_light from '../../../static/assets/map-data/openrailwaymap-loading_gauge-light.min.overlay.json?url';
+import openrailwaymap_track_class_light from '../../../static/assets/map-data/openrailwaymap-track_class-light.min.overlay.json?url';
+import openrailwaymap_operator_light from '../../../static/assets/map-data/openrailwaymap-operator-light.min.overlay.json?url';
+
 export const OSM_VECTOR_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
 	{
 		type: 'LayerGroup',
@@ -180,6 +189,60 @@ export const OSM_VECTOR_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.Layer
 						return { ...next, layers: next.layers.filter((v) => v.type === 'symbol') };
 					}
 				}
+			},
+			{
+				type: 'LayerGroup',
+				title: 'OpenRailwayMap',
+				entries: [
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-standard-light',
+						title: 'Standard',
+						url: openrailwaymap_standard_light
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-speed-light',
+						title: 'Speed',
+						url: openrailwaymap_speed_light
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-signals-light',
+						title: 'Signals',
+						url: openrailwaymap_signals_light
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-electrification-light',
+						title: 'Electrification',
+						url: openrailwaymap_electrification_light
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-gauge-light',
+						title: 'Gauge',
+						url: openrailwaymap_gauge_light
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-loading_gauge-light',
+						title: 'Loading Gauge',
+						url: openrailwaymap_loading_gauge_light
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-track_class-light',
+						title: 'Track Class',
+						url: openrailwaymap_track_class_light
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-operator-light',
+						title: 'Operator',
+						url: openrailwaymap_operator_light
+					}
+				]
 			}
 		]
 	}
@@ -206,13 +269,91 @@ export const OSM_RASTER_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.Layer
 					},
 					{
 						type: 'Layer',
-						id: 'overlay-openrailwaymap-standard',
-						title: 'Electrification',
-						url: 'https://tiles.openrailwaymap.org/electrification/{z}/{x}/{y}.png',
-						minZoom: 2,
-						maxZoom: 19,
-						attribution:
-							'<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>, Style: <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA 2.0</a> <a href="http://www.openrailwaymap.org/">OpenRailwayMap</a> and OpenStreetMap'
+						id: 'overlay-openrailwaymap-electrification-light',
+						title: 'Electrification Light',
+						url: '../../../static/assets/map-data/openrailwaymap-electrification-light.min.overlay.json?url',
+						styleSwapOptions: {
+							transformStyle: (_previous, next) => {
+								return { ...next, layers: next.layers.filter((v) => v.type !== 'background') };
+							}
+						}
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-gauge-light',
+						title: 'Gauge Light',
+						url: '../../../static/assets/map-data/openrailwaymap-gauge-light.min.overlay.json?url',
+						styleSwapOptions: {
+							transformStyle: (_previous, next) => {
+								return { ...next, layers: next.layers.filter((v) => v.type !== 'background') };
+							}
+						}
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-loading_gauge-light',
+						title: 'Loading Gauge Light',
+						url: '../../../static/assets/map-data/openrailwaymap-loading_gauge-light.min.overlay.json?url',
+						styleSwapOptions: {
+							transformStyle: (_previous, next) => {
+								return { ...next, layers: next.layers.filter((v) => v.type !== 'background') };
+							}
+						}
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-operator-light',
+						title: 'Operator Light',
+						url: '../../../static/assets/map-data/openrailwaymap-operator-light.min.overlay.json?url',
+						styleSwapOptions: {
+							transformStyle: (_previous, next) => {
+								return { ...next, layers: next.layers.filter((v) => v.type !== 'background') };
+							}
+						}
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-signals-light',
+						title: 'Signals Light',
+						url: '../../../static/assets/map-data/openrailwaymap-signals-light.min.overlay.json?url',
+						styleSwapOptions: {
+							transformStyle: (_previous, next) => {
+								return { ...next, layers: next.layers.filter((v) => v.type !== 'background') };
+							}
+						}
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-speed-light',
+						title: 'Speed Light',
+						url: '../../../static/assets/map-data/openrailwaymap-speed-light.min.overlay.json?url',
+						styleSwapOptions: {
+							transformStyle: (_previous, next) => {
+								return { ...next, layers: next.layers.filter((v) => v.type !== 'background') };
+							}
+						}
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-standard-light',
+						title: 'Standard Light',
+						url: '../../../static/assets/map-data/openrailwaymap-standard-light.min.overlay.json?url',
+						styleSwapOptions: {
+							transformStyle: (_previous, next) => {
+								return { ...next, layers: next.layers.filter((v) => v.type !== 'background') };
+							}
+						}
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-track_class-light',
+						title: 'Track Class Light',
+						url: '../../../static/assets/map-data/openrailwaymap-track_class-light.min.overlay.json?url',
+						styleSwapOptions: {
+							transformStyle: (_previous, next) => {
+								return { ...next, layers: next.layers.filter((v) => v.type !== 'background') };
+							}
+						}
 					},
 					{
 						type: 'Layer',
