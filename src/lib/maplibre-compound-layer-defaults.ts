@@ -35,21 +35,21 @@ const ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE: maplibregl.TransformStyleFunction = 
 				maxzoom: 22,
 				attribution:
 					'Sources: Esri, TomTom, Garmin, FAO, NOAA, USGS, © OpenStreetMap contributors, and the GIS User Community'
-			},
-			contours: {
-				type: 'vector',
-				tiles: [
-					'https://basemaps.arcgis.com/arcgis/rest/services/World_Contours_v2/VectorTileServer/tile/{z}/{y}/{x}.pbf'
-				],
-				maxzoom: 22
-			},
-			hillshade: {
-				type: 'vector',
-				tiles: [
-					'https://basemaps.arcgis.com/arcgis/rest/services/World_Hillshade_v2/VectorTileServer/tile/{z}/{y}/{x}.pbf'
-				],
-				maxzoom: 22
 			}
+			//contours: {
+			//	type: 'vector',
+			//	tiles: [
+			//		'https://basemaps.arcgis.com/arcgis/rest/services/World_Contours_v2/VectorTileServer/tile/{z}/{y}/{x}.pbf'
+			//	],
+			//	maxzoom: 22
+			//},
+			//hillshade: {
+			//	type: 'vector',
+			//	tiles: [
+			//		'https://basemaps.arcgis.com/arcgis/rest/services/World_Hillshade_v2/VectorTileServer/tile/{z}/{y}/{x}.pbf'
+			//	],
+			//	maxzoom: 22
+			//}
 		}
 	};
 };
@@ -331,6 +331,24 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 			},
 			{
 				type: 'Layer',
+				id: 'base-arcgis-Light-Gray-Canvas-Base',
+				title: 'Light Gray Canvas Base',
+				url: 'https://esri.maps.arcgis.com/sharing/rest/content/items/291da5eab3a0412593b66d384379f89f/resources/styles/root.json',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
+			},
+			{
+				type: 'Layer',
+				id: 'base-arcgis-Dark-Gray-Canvas-Base',
+				title: 'Dark Gray Canvas Base',
+				url: 'https://esri.maps.arcgis.com/sharing/rest/content/items/5e9b3685f4c24d8781073dd928ebda50/resources/styles/root.json',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
+			},
+			{
+				type: 'Layer',
 				id: 'base-arcgis-Modern-Antique',
 				title: 'Modern Antique',
 				url: 'https://www.arcgis.com/sharing/rest/content/items/effe3475f05a4d608e66fd6eeb2113c0/resources/styles/root.json',
@@ -342,7 +360,7 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 				type: 'Layer',
 				id: 'base-arcgis-Mid-Centry',
 				title: 'Mid-Century',
-				url: 'https://www.arcgis.com/sharing/rest/content/items/7675d44bb1e4428aa2c30a9b68f97822/resources/styles/root.json?f=pjson',
+				url: 'https://www.arcgis.com/sharing/rest/content/items/7675d44bb1e4428aa2c30a9b68f97822/resources/styles/root.json',
 				styleSwapOptions: {
 					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
 				}
@@ -352,6 +370,15 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 				id: 'base-arcgis-Color-Pencil',
 				title: 'Color Pencil',
 				url: 'https://www.arcgis.com/sharing/rest/content/items/4cf7e1fb9f254dcda9c8fbadb15cf0f8/resources/styles/root.json',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
+			},
+			{
+				type: 'Layer',
+				id: 'base-arcgis-Nova',
+				title: 'Nova',
+				url: 'https://www.arcgis.com/sharing/rest/content/items/75f4dfdff19e445395653121a95a85db/resources/styles/root.json',
 				styleSwapOptions: {
 					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
 				}
@@ -638,6 +665,66 @@ export const OVERLAY_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConf
 						}
 					}
 				]
+			}
+		]
+	},
+	{
+		type: 'LayerGroup',
+		title: 'ArcGIS Vector',
+		entries: [
+			{
+				type: 'Layer',
+				id: 'overlay-arcgis-Hybrid-Reference-Layer',
+				title: 'Hybrid Reference Layer',
+				url: 'https://esri.maps.arcgis.com/sharing/rest/content/items/30d6b8271e1849cd9c3042060001f425/resources/styles/root.json',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
+			},
+			{
+				type: 'Layer',
+				id: 'overlay-arcgis-Hybrid-Reference-Layer',
+				title: 'Hybrid Reference Layer (Local Language)',
+				url: 'https://esri.maps.arcgis.com/sharing/rest/content/items/2a2e806e6e654ea78ecb705149ceae9f/resources/styles/root.json',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
+			},
+			{
+				type: 'Layer',
+				id: 'overlay-arcgis-Light-Gray-Canvas-Reference',
+				title: 'Light Gray Canvas Reference',
+				url: 'https://esri.maps.arcgis.com/sharing/rest/content/items/1768e8369a214dfab4e2167d5c5f2454/resources/styles/root.json',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
+			},
+			{
+				type: 'Layer',
+				id: 'overlay-arcgis-Light-Gray-Canvas-Reference-Local',
+				title: 'Light Gray Canvas Reference (Local Language)',
+				url: 'https://esri.maps.arcgis.com/sharing/rest/content/items/3ffec1551cd14606a286622c634b0bb4/resources/styles/root.json',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
+			},
+			{
+				type: 'Layer',
+				id: 'overlay-arcgis-Dark-Gray-Canvas-Reference',
+				title: 'Dark Gray Canvas Reference',
+				url: 'https://esri.maps.arcgis.com/sharing/rest/content/items/747cb7a5329c478cbe6981076cc879c5/resources/styles/root.json',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
+			},
+			{
+				type: 'Layer',
+				id: 'overlay-arcgis-Dark-Gray-Canvas-Reference-Local',
+				title: 'Dark Gray Canvas Reference (Local Language)',
+				url: 'https://esri.maps.arcgis.com/sharing/rest/content/items/7465191cfa1f425fbe41e4d44450d559/resources/styles/root.json',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
 			}
 		]
 	},
