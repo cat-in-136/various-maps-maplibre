@@ -11,6 +11,49 @@ import gsi_land from '../../static/assets/map-data/gsi-land.min.json?url';
 import gsi_river from '../../static/assets/map-data/gsi-river.min.json?url';
 import tjmsy_orilibre_global_maptiler from '../../static/assets/map-data/tjmsy-orilibre-global-maptiler.min.json?url';
 
+const ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE: maplibregl.TransformStyleFunction = (
+	_previous,
+	next
+) => {
+	const sprite =
+		Array.isArray(next.sprite) || next.sprite?.startsWith('https://')
+			? next.sprite
+			: 'https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer/resources/sprites/sprite';
+	const glyphs = next.glyphs?.startsWith('https://')
+		? next.glyphs
+		: 'https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer/resources/fonts/{fontstack}/{range}.pbf';
+	return {
+		...next,
+		sprite,
+		glyphs,
+		sources: {
+			esri: {
+				type: 'vector',
+				tiles: [
+					'https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer/tile/{z}/{y}/{x}.pbf'
+				],
+				maxzoom: 22,
+				attribution:
+					'Sources: Esri, TomTom, Garmin, FAO, NOAA, USGS, © OpenStreetMap contributors, and the GIS User Community'
+			},
+			contours: {
+				type: 'vector',
+				tiles: [
+					'https://basemaps.arcgis.com/arcgis/rest/services/World_Contours_v2/VectorTileServer/tile/{z}/{y}/{x}.pbf'
+				],
+				maxzoom: 22
+			},
+			hillshade: {
+				type: 'vector',
+				tiles: [
+					'https://basemaps.arcgis.com/arcgis/rest/services/World_Hillshade_v2/VectorTileServer/tile/{z}/{y}/{x}.pbf'
+				],
+				maxzoom: 22
+			}
+		}
+	};
+};
+
 export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
 	{
 		type: 'LayerGroup',
@@ -194,6 +237,84 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 						maxNativeZoom: 17.9
 					}
 				]
+			}
+		]
+	},
+	{
+		type: 'LayerGroup',
+		title: 'ArcGIS Vector',
+		entries: [
+			{
+				type: 'Layer',
+				id: 'base-arcgis-World-Basemap-v2',
+				title: 'World Basemap v2',
+				url: 'https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer/resources/styles/root.json',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
+			},
+			{
+				type: 'Layer',
+				id: 'base-arcgis-World-Street-Map-Local',
+				title: 'World Street Map (Local Language)',
+				url: 'https://www.arcgis.com/sharing/rest/content/items/7549fb39378a485ca0c9d18a2d968c15/resources/styles/root.json',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
+			},
+			{
+				type: 'Layer',
+				id: 'base-arcgis-World-Navigation-Map',
+				title: 'World Navigation Map',
+				url: 'https://www.arcgis.com/sharing/rest/content/items/63c47b7177f946b49902c24129b87252/resources/styles/root.json',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
+			},
+			{
+				type: 'Layer',
+				id: 'base-arcgis-World-Navigation-Map-Local',
+				title: 'World Navigation Map (Local Language)',
+				url: 'https://www.arcgis.com/sharing/rest/content/items/72be31d1fa6a42fc895d9a3c0fd8aeef/resources/styles/root.json',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
+			},
+			{
+				type: 'Layer',
+				id: 'base-arcgis-World-Topographic-Map',
+				title: 'World Topographic Map',
+				url: 'https://esri.maps.arcgis.com/sharing/rest/content/items/7dc6cea0b1764a1f9af2e679f642f0f5/resources/styles/root.json',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
+			},
+			{
+				type: 'Layer',
+				id: 'base-arcgis-Modern-Antique',
+				title: 'Modern Antique',
+				url: 'https://www.arcgis.com/sharing/rest/content/items/effe3475f05a4d608e66fd6eeb2113c0/resources/styles/root.json',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
+			},
+			{
+				type: 'Layer',
+				id: 'base-arcgis-Mid-Centry',
+				title: 'Mid-Century',
+				url: 'https://www.arcgis.com/sharing/rest/content/items/7675d44bb1e4428aa2c30a9b68f97822/resources/styles/root.json?f=pjson',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
+			},
+			{
+				type: 'Layer',
+				id: 'base-arcgis-Color-Pencil',
+				title: 'Color Pencil',
+				url: 'https://www.arcgis.com/sharing/rest/content/items/4cf7e1fb9f254dcda9c8fbadb15cf0f8/resources/styles/root.json',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
 			}
 		]
 	},
