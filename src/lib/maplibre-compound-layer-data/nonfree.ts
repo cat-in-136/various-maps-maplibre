@@ -1,5 +1,5 @@
-import type * as MaplibreCompondLayerUI from './maplibre-compound-layer-ui';
-import tjmsy_orilibre_global_maptiler from '../../static/assets/map-data/tjmsy-orilibre-global-maptiler.min.json?url';
+import type * as MaplibreCompondLayerUI from '../maplibre-compound-layer-ui';
+import tjmsy_orilibre_global_maptiler from '../../../static/assets/map-data/tjmsy-orilibre-global-maptiler.min.json?url';
 
 type BaseLayerNonFreeKeys = {
 	maptiler?: string;

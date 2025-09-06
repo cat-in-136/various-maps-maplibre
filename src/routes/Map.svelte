@@ -20,8 +20,8 @@
 	import {
 		BASE_LAYER_DEFAULT,
 		OVERLAY_LAYER_DEFAULT
-	} from '../lib/maplibre-compound-layer-defaults';
-	import { getBaseLayerNonfreeFromURL as getBaseLayerNonfreeFromURL } from '../lib/maplibre-compound-layer-nonfree';
+	} from '../lib/maplibre-compound-layer-data/free';
+	import { getBaseLayerNonfreeFromURL as getBaseLayerNonfreeFromURL } from '../lib/maplibre-compound-layer-data/nonfree';
 	import { getGsiDemProtocolAction } from '../lib/maplibre-gl-gsi-terrain-qiita';
 
 	const initMap = () => {
