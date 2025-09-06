@@ -416,11 +416,11 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 	},
 	{
 		type: 'LayerGroup',
-		title: 'Esri Raster',
+		title: 'ArcGIS Raster',
 		entries: [
 			{
 				type: 'Layer',
-				id: 'base-enri-raster-topograph',
+				id: 'base-arcgis-esri-raster-topograph',
 				title: 'Esri Topograph',
 				url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
 				layerFormat: { tile: 'raster' },
@@ -431,7 +431,7 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 			},
 			{
 				type: 'Layer',
-				id: 'base-enri-raster-streets',
+				id: 'base-arcgis-esri-raster-streets',
 				title: 'Esri Streets',
 				url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
 				layerFormat: { tile: 'raster' },
@@ -442,7 +442,7 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 			},
 			{
 				type: 'Layer',
-				id: 'base-enri-raster-natgeo',
+				id: 'base-arcgis-esri-raster-natgeo',
 				title: 'Esri National Geographic',
 				url: 'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',
 				layerFormat: { tile: 'raster' },
@@ -453,7 +453,7 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 			},
 			{
 				type: 'Layer',
-				id: 'base-enri-raster-ocean',
+				id: 'base-arcgis-esri-raster-ocean',
 				title: 'Esri Ocean',
 				url: 'https://server.arcgisonline.com/arcgis/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}',
 				layerFormat: { tile: 'raster' },
@@ -464,7 +464,7 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 			},
 			{
 				type: 'Layer',
-				id: 'base-enri-raster-imagery',
+				id: 'base-arcgis-esri-raster-imagery',
 				title: 'Esri Imagery',
 				url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
 				layerFormat: { tile: 'raster' },
@@ -475,7 +475,7 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 			},
 			{
 				type: 'Layer',
-				id: 'base-enri-raster-shadedrelief',
+				id: 'base-arcgis-esri-raster-shadedrelief',
 				title: 'Esri Shaded Relief',
 				url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}',
 				layerFormat: { tile: 'raster' },
