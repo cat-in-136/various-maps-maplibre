@@ -725,6 +725,12 @@ export const OVERLAY_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConf
 				styleSwapOptions: {
 					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
 				}
+			},
+			{
+				type: 'Layer',
+				id: 'overlay-arcgis-Railway-ksj',
+				title: '鉄道路線図タイル',
+				url: 'https://www.arcgis.com/sharing/rest/content/items/cad7c5b698184691ab2a5a7dafcfe2d9/resources/styles/root.json'
 			}
 		]
 	},
