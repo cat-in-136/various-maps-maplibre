@@ -54,6 +54,46 @@ const ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE: maplibregl.TransformStyleFunction = 
 	};
 };
 
+const ARCGIS_OSM_TRANSFORM_STYLE: maplibregl.TransformStyleFunction = (_previous, next) => {
+	const sprite =
+		Array.isArray(next.sprite) || next.sprite?.startsWith('https://')
+			? next.sprite
+			: 'https://basemaps.arcgis.com/arcgis/rest/services/OpenStreetMap_v2/VectorTileServer/resources/sprites/sprite';
+	const glyphs = next.glyphs?.startsWith('https://')
+		? next.glyphs
+		: 'https://basemaps.arcgis.com/arcgis/rest/services/OpenStreetMap_v2/VectorTileServer/resources/fonts/{fontstack}/{range}.pbf';
+	return {
+		...next,
+		sprite,
+		glyphs,
+		sources: {
+			esri: {
+				type: 'vector',
+				tiles: [
+					'https://basemaps.arcgis.com/arcgis/rest/services/OpenStreetMap_v2/VectorTileServer/tile/{z}/{y}/{x}.pbf'
+				],
+				maxzoom: 22,
+				attribution:
+					'Map data © OpenStreetMap contributors, Microsoft, Facebook, Google, Esri Community Maps contributors, Map layer by Esri'
+			},
+			contours: {
+				type: 'vector',
+				tiles: [
+					'https://basemaps.arcgis.com/arcgis/rest/services/World_Contours_v2/VectorTileServer/tile/{z}/{y}/{x}.pbf'
+				],
+				maxzoom: 22
+			},
+			hillshade: {
+				type: 'vector',
+				tiles: [
+					'https://basemaps.arcgis.com/arcgis/rest/services/World_Hillshade_v2/VectorTileServer/tile/{z}/{y}/{x}.pbf'
+				],
+				maxzoom: 22
+			}
+		}
+	};
+};
+
 export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
 	{
 		type: 'LayerGroup',
@@ -314,6 +354,15 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 				url: 'https://www.arcgis.com/sharing/rest/content/items/4cf7e1fb9f254dcda9c8fbadb15cf0f8/resources/styles/root.json',
 				styleSwapOptions: {
 					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
+			},
+			{
+				type: 'Layer',
+				id: 'base-arcgis-OpenStreetMap-v2',
+				title: 'OpenStreetMap_v2',
+				url: 'https://basemaps.arcgis.com/arcgis/rest/services/OpenStreetMap_v2/VectorTileServer/resources/styles/root.json',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_OSM_TRANSFORM_STYLE
 				}
 			}
 		]
