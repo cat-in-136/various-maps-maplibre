@@ -131,6 +131,15 @@ export const ARCGIS_VECTOR_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.Layer
 			},
 			{
 				type: 'Layer',
+				id: 'base-arcgis-Outline',
+				title: 'Outline',
+				url: 'https://esri.maps.arcgis.com/sharing/rest/content/items/ba99a4a4f5ce48debbeca6713e051f1e/resources/styles/root.json',
+				styleSwapOptions: {
+					transformStyle: ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE
+				}
+			},
+			{
+				type: 'Layer',
 				id: 'base-arcgis-Dark-Gray-Canvas-Base',
 				title: 'Dark Gray Canvas Base',
 				url: 'https://esri.maps.arcgis.com/sharing/rest/content/items/5e9b3685f4c24d8781073dd928ebda50/resources/styles/root.json',
