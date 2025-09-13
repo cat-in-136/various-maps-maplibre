@@ -23,6 +23,10 @@
 	} from '../lib/maplibre-compound-layer-data/free';
 	import { getBaseLayerNonfreeFromURL as getBaseLayerNonfreeFromURL } from '../lib/maplibre-compound-layer-data/nonfree';
 	import { getGsiDemProtocolAction } from '../lib/maplibre-gl-gsi-terrain-qiita';
+	import {
+		DynamicAttributionControl,
+		type DynamicAttributionControlAttributionWillUpdateEvent
+	} from '../lib/dynamic_attribution_control';
 
 	const initMap = () => {
 		const map = new maplibregl.Map({
@@ -30,8 +34,19 @@
 			center: [138.75, 36],
 			zoom: 4,
 			hash: true,
+			attributionControl: false,
 			style: (BASE_LAYER_DEFAULT[0] as any).entries[0].url as string
 		});
+
+		// Dynamic Attribution control
+		const attributionCtrl = new DynamicAttributionControl();
+		map.addControl(attributionCtrl);
+		attributionCtrl.on(
+			'attributionwillupdate',
+			(e: DynamicAttributionControlAttributionWillUpdateEvent) => {
+				console.debug('attributionwillupdate', e); // TODO
+			}
+		);
 
 		// Navigation (Zoom) control
 		map.addControl(
