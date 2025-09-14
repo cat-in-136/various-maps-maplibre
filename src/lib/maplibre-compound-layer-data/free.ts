@@ -9,12 +9,7 @@ import {
 	OSM_RASTER_OVERLAY_LAYERS
 } from './osm';
 import { GSI_VECTOR_BASE_LAYERS } from './gsi';
-import {
-	ARCGIS_VECTOR_BASE_LAYERS,
-	ARCGIS_RASTER_BASE_LAYERS,
-	ARCGIS_VECTOR_OVERLAY_LAYERS,
-	hookDynamicAttributionCtrlForArcGISLayers
-} from './arcgis';
+
 import { ICGC_VECTOR_BASE_LAYERS } from './icgc';
 import { MISC_BASE_LAYERS, MISC_OVERLAY_LAYERS } from './free-misc';
 import { ANCIENT_MAPS_OVERRAY_LAYERS } from './ancient-maps';
@@ -37,9 +32,16 @@ export const OVERLAY_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConf
 	...ANCIENT_MAPS_OVERRAY_LAYERS
 ];
 
-export function hookDynamicAttributionCtrlForFreeLayers(
+import {
+	ARCGIS_VECTOR_BASE_LAYERS,
+	ARCGIS_RASTER_BASE_LAYERS,
+	ARCGIS_VECTOR_OVERLAY_LAYERS,
+	setupArcGISAttributionHandling
+} from './arcgis';
+
+export function setupFreeLayersAttributionHandling(
 	map: Map,
 	attributionCtrl: DynamicAttributionControl
 ): void {
-	hookDynamicAttributionCtrlForArcGISLayers(map, attributionCtrl);
+	setupArcGISAttributionHandling(map, attributionCtrl);
 }

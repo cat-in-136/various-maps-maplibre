@@ -20,7 +20,7 @@
 	import {
 		BASE_LAYER_DEFAULT,
 		OVERLAY_LAYER_DEFAULT,
-		hookDynamicAttributionCtrlForFreeLayers
+		setupFreeLayersAttributionHandling
 	} from '../lib/maplibre-compound-layer-data/free';
 	import { getBaseLayerNonfreeFromURL as getBaseLayerNonfreeFromURL } from '../lib/maplibre-compound-layer-data/nonfree';
 	import { getGsiDemProtocolAction } from '../lib/maplibre-gl-gsi-terrain-qiita';
@@ -269,7 +269,7 @@
 				optional.appendChild(detailsTerrain);
 			}
 
-			hookDynamicAttributionCtrlForFreeLayers(map, attributionCtrl);
+			setupFreeLayersAttributionHandling(map, attributionCtrl);
 
 			layerswitcher.optionalElement.appendChild(optional);
 		});

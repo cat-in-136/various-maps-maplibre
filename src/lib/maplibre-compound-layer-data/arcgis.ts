@@ -364,7 +364,7 @@ export const ARCGIS_VECTOR_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.La
 	}
 ];
 
-export function hookDynamicAttributionCtrlForArcGISLayers(
+export function setupArcGISAttributionHandling(
 	map: maplibregl.Map,
 	attributionCtrl: DynamicAttributionControl
 ): void {
