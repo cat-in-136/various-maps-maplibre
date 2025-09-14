@@ -373,28 +373,25 @@ export function setupArcGISAttributionHandling(
 	} = {};
 
 	function getEsriSourceAndURI(): Set<[string, [string, string]]> {
-		const esriURLs = new Set<[string, [string, string]]>();
-		const { sources } = map.getStyle();
-
 		const PATTERN =
 			/^https:\/\/basemaps\.arcgis\.com\/arcgis\/rest\/services\/([^/]+)\/VectorTileServer\/tile\/\{z\}\/\{y\}\/\{x\}\.pbf$/;
-		for (const sourceId of Object.keys(sources)) {
-			const source = sources[sourceId];
-
-			if (
-				source.type === 'vector' &&
-				Array.isArray(source.tiles) &&
-				typeof source.tiles[0] === 'string'
-			) {
-				const url = source.tiles[0];
-				const matches = url.match(PATTERN);
-				if (matches && matches[1]) {
-					esriURLs.add([sourceId, [url, matches[1]]]);
-				}
-			}
-		}
-
-		return esriURLs;
+		return new Set(
+			Object.entries(map.getStyle().sources ?? {})
+				.map(([sourceId, source]) => {
+					if (
+						source.type === 'vector' &&
+						Array.isArray(source.tiles) &&
+						typeof source.tiles[0] === 'string'
+					) {
+						const url = (source.tiles as string[])[0];
+						const match = url.match(PATTERN);
+						return match ? ([sourceId, [url, match[1]]] as [string, [string, string]]) : null;
+					} else {
+						return null;
+					}
+				})
+				.filter((v) => v !== null)
+		);
 	}
 
 	function intersects(bounds1: maplibregl.LngLatBounds, bounds2: maplibregl.LngLatBounds): boolean {
