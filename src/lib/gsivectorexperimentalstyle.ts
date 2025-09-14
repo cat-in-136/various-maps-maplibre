@@ -125,7 +125,10 @@ export const GSIMAP_STYLE_OVERRIDE: {
 		fill?: Required<maplibreglstyle.FillLayerSpecification>['paint'];
 		line?: Required<maplibreglstyle.LineLayerSpecification>['paint'];
 		circle?: Required<maplibreglstyle.CircleLayerSpecification>['paint'];
-		//symbol?: Required<maplibreglstyle.SymbolLayerSpecification>['paint'];
+		layoutAndPaintForIconImageSymbol?: {
+			layout: Required<maplibreglstyle.SymbolLayerSpecification>['layout'];
+			paint: Required<maplibreglstyle.SymbolLayerSpecification>['paint'];
+		};
 	};
 } = {
 	// 地図情報（道路中心線）

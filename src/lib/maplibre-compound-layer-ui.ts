@@ -260,6 +260,49 @@ namespace Styling {
 			]
 		};
 	}
+
+	export function getLayoutAndPaintForIconImageSymbol(layer: LayerConfig.Layer): {
+		layout: Required<maplibreglstyle.SymbolLayerSpecification>['layout'];
+		paint: Required<maplibreglstyle.SymbolLayerSpecification>['paint'];
+	} {
+		if (typeof layer.styleurl === 'string') {
+			return (
+				GSIMAP_STYLE_OVERRIDE[layer.styleurl]?.layoutAndPaintForIconImageSymbol ||
+				getDefaultLayoutAndPaintForPointSymbolIconImage()
+			);
+		}
+		return (
+			GSIMAP_STYLE_OVERRIDE[layer.url]?.layoutAndPaintForIconImageSymbol ||
+			getDefaultLayoutAndPaintForPointSymbolIconImage()
+		);
+	}
+	export function getDefaultLayoutAndPaintForPointSymbolIconImage(): {
+		layout: Required<maplibreglstyle.SymbolLayerSpecification>['layout'];
+		paint: Required<maplibreglstyle.SymbolLayerSpecification>['paint'];
+	} {
+		return {
+			layout: {
+				'icon-image': [
+					'case',
+					// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+					['has', '_iconUrl'],
+					['get', '_iconUrl'],
+					// Default
+					''
+				]
+			},
+			paint: {
+				'icon-opacity': [
+					'case',
+					// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+					['has', '_opacity'],
+					['get', '_opacity'],
+					// Default
+					1
+				]
+			}
+		};
+	}
 }
 
 namespace LayerTreeView {
@@ -793,7 +836,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 							this.#map.addSource(source, {
 								type: 'geojson',
 								data,
-								attribution: layer.attribution
+								attribution: layer.attribution ?? ''
 							});
 						}
 
@@ -817,7 +860,25 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 								type: 'circle',
 								source,
 								paint: Styling.getPaintForPointCircle(layer),
-								filter: ['==', '$type', 'Point']
+								filter: [
+									'all',
+									['==', '$type', 'Point'],
+									// 国土地理院スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+									['!has', '_iconUrl']
+								]
+							},
+							{
+								id: `layer-${id}-geojson-symbol-icon-image`,
+								type: 'symbol',
+								source,
+								paint: Styling.getLayoutAndPaintForIconImageSymbol(layer).paint,
+								layout: Styling.getLayoutAndPaintForIconImageSymbol(layer).layout,
+								filter: [
+									'all',
+									['==', '$type', 'Point'],
+									// 国土地理院スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+									['has', '_markerType']
+								]
 							}
 						];
 
@@ -879,6 +940,11 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 									//	'circle-opacity',
 									//	value / 255.0
 									//);
+									this.#map?.setPaintProperty(
+										`layer-${id}-geojson-symbol-icon-image`,
+										'icon-opacity',
+										value / 255.0
+									);
 								}, 100);
 							}
 						}
@@ -995,6 +1061,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 						this.#map.removeLayer(`layer-${id}-geojson-fill`);
 						this.#map.removeLayer(`layer-${id}-geojson-line`);
 						this.#map.removeLayer(`layer-${id}-geojson-circle`);
+						this.#map.removeLayer(`layer-${id}-geojson-symbol-icon-image`);
 						this.#map.removeSource(`source-${id}-geojson`);
 					} else if (layerFormat === 'style') {
 						// Remove layers and sources associated with this style layer
@@ -1052,7 +1119,8 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 					const defaultPaint = {
 						polygonFill: Styling.getDefaultPaintForPolygonFill(false),
 						lineLine: Styling.getDefaultPaintForLineLine(false),
-						pointCircle: Styling.getDefaultPaintForPointCircle(false)
+						pointCircle: Styling.getDefaultPaintForPointCircle(false),
+						iconImageSymbol: Styling.getDefaultLayoutAndPaintForPointSymbolIconImage().paint
 					};
 
 					if (e.detail.layerEntry.opacity !== undefined) {
@@ -1062,6 +1130,11 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 						this.#map.setPaintProperty(
 							`layer-${id}-geojson-circle`,
 							'circle-opacity',
+							value / 255.0
+						);
+						this.#map.setPaintProperty(
+							`layer-${id}-geojson-symbol-icon-image`,
+							'icon-opacity',
 							value / 255.0
 						);
 					} else {
@@ -1079,6 +1152,11 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 							`layer-${id}-geojson-circle`,
 							'circle-opacity',
 							defaultPaint.pointCircle['circle-opacity']
+						);
+						this.#map.setPaintProperty(
+							`layer-${id}-geojson-symbol-icon-image`,
+							'icon-opacity',
+							defaultPaint.iconImageSymbol['icon-opacity']
 						);
 					}
 				}

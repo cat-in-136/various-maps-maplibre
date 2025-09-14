@@ -271,6 +271,26 @@
 			layerswitcher.optionalElement.appendChild(optional);
 		});
 
+		// Automatically load style images if the ID is URL text
+		const styleImageMissingImageLoader = new Map<string, Promise<void>>();
+		map.on('styleimagemissing', (e) => {
+			const id = String(e.id);
+			if (/https?:\/\//.test(id)) {
+				if (!styleImageMissingImageLoader.has(id)) {
+					styleImageMissingImageLoader.set(
+						id,
+						map
+							.loadImage(id)
+							.then((image) => {
+								map.addImage(id, image.data);
+								styleImageMissingImageLoader.delete(id);
+							})
+							.catch((error) => console.error({ error }))
+					);
+				}
+			}
+		});
+
 		// Globe button
 		map.on('load', () => {
 			map.setProjection({ type: 'globe' }); // Earth is not flat.
