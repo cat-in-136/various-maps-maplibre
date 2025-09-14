@@ -128,6 +128,7 @@ export const GSIMAP_STYLE_OVERRIDE: {
 		layoutAndPaintForIconImageSymbol?: {
 			layout: Required<maplibreglstyle.SymbolLayerSpecification>['layout'];
 			paint: Required<maplibreglstyle.SymbolLayerSpecification>['paint'];
+			filter: maplibreglstyle.FilterSpecification;
 		};
 	};
 } = {
@@ -304,5 +305,77 @@ export const GSIMAP_STYLE_OVERRIDE: {
 	// 地形分類（人工地形）
 	'https://maps.gsi.go.jp/xyz/experimental_landformclassification2/{z}/{x}/{y}.geojson': {
 		fill: LANDFORMCLASSIFICATION_FILL
+	},
+	// 基準点
+	'https://maps.gsi.go.jp/xyz/cp/{z}/{x}/{y}.geojson': {
+		layoutAndPaintForIconImageSymbol: {
+			layout: {
+				'icon-image': [
+					'match',
+					['get', '成果状態'],
+					'正常',
+					[
+						'match',
+						['get', '基準点種別'],
+						'電子基準点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/476.png',
+						'一等三角点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/201.png',
+						'二等三角点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/202.png',
+						'三等三角点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/203.png',
+						'四等三角点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/204.png',
+						'基準水準点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/206.png',
+						'一等水準点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/206.png',
+						'二等水準点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/207.png',
+						'一等道路水準点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/206.png',
+						'二等道路水準点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/207.png',
+						'準基準水準点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/206.png',
+						'一等水準交差点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/206.png',
+						'' // デフォルト値
+					],
+					[
+						'match',
+						['get', '基準点種別'],
+						'電子基準点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/476_None.png',
+						'一等三角点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/201_None.png',
+						'二等三角点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/202_None.png',
+						'三等三角点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/203_None.png',
+						'四等三角点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/204_None.png',
+						'基準水準点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/206_None.png',
+						'一等水準点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/206_None.png',
+						'二等水準点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/207_None.png',
+						'一等道路水準点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/206_None.png',
+						'二等道路水準点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/207_None.png',
+						'準基準水準点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/206_None.png',
+						'一等水準交差点',
+						'https://maps.gsi.go.jp/portal/sys/v4/symbols/206_None.png',
+						'' // デフォルト値
+					]
+				]
+			},
+			paint: {},
+			filter: ['all', ['has', '成果状態'], ['has', '基準点種別']]
+		}
 	}
 };
