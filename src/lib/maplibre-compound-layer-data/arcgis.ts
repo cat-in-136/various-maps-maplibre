@@ -372,8 +372,8 @@ export function setupArcGISAttributionHandling(
 		[propName: string]: Promise<void> | ArcGISAttributionData | undefined;
 	} = {};
 
-	function getEnriSourceAndURI(): Set<[string, [string, string]]> {
-		const enriURLs = new Set<[string, [string, string]]>();
+	function getEsriSourceAndURI(): Set<[string, [string, string]]> {
+		const esriURLs = new Set<[string, [string, string]]>();
 		const { sources } = map.getStyle();
 
 		const PATTERN =
@@ -389,12 +389,12 @@ export function setupArcGISAttributionHandling(
 				const url = source.tiles[0];
 				const matches = url.match(PATTERN);
 				if (matches && matches[1]) {
-					enriURLs.add([sourceId, [url, matches[1]]]);
+					esriURLs.add([sourceId, [url, matches[1]]]);
 				}
 			}
 		}
 
-		return enriURLs;
+		return esriURLs;
 	}
 
 	function intersects(bounds1: maplibregl.LngLatBounds, bounds2: maplibregl.LngLatBounds): boolean {
@@ -415,12 +415,12 @@ export function setupArcGISAttributionHandling(
 
 	const POWERED_BY_ESRI_ATTRIBUTION_STRING = 'Powered by Esri';
 	function updateAttributationText() {
-		const enriURLs = getEnriSourceAndURI();
+		const esriURLs = getEsriSourceAndURI();
 		const zoom = map.getZoom();
 		const mapBounds = map.getBounds();
 
 		let updateNeeded = false;
-		for (const [sourceId, [url, _name]] of enriURLs) {
+		for (const [sourceId, [url, _name]] of esriURLs) {
 			const attributions = attributionData[url];
 			if (
 				attributions &&
@@ -483,15 +483,15 @@ export function setupArcGISAttributionHandling(
 	function onAttributeWillUpdate() {
 		const { sources } = map.getStyle();
 
-		const enriURLs = getEnriSourceAndURI();
+		const esriURLs = getEsriSourceAndURI();
 
-		for (const [_sourceId, [enriURL, name]] of enriURLs) {
+		for (const [_sourceId, [esriURL, name]] of esriURLs) {
 			const attributionURL = `https://static.arcgis.com/attribution/Vector/${name}`;
-			if (attributionData[enriURL] === undefined) {
-				attributionData[enriURL] = fetch(attributionURL)
+			if (attributionData[esriURL] === undefined) {
+				attributionData[esriURL] = fetch(attributionURL)
 					.then((response) => response.json())
 					.then((data) => {
-						attributionData[enriURL] = data as ArcGISAttributionData;
+						attributionData[esriURL] = data as ArcGISAttributionData;
 						attributionCtrl.updateAttributions();
 					})
 					.catch((error) => {
@@ -500,7 +500,7 @@ export function setupArcGISAttributionHandling(
 			}
 		}
 
-		if (enriURLs.size > 0) {
+		if (esriURLs.size > 0) {
 			map.on('moveend', updateAttributationText);
 			updateAttributationText();
 		} else {
