@@ -24,10 +24,7 @@
 	} from '../lib/maplibre-compound-layer-data/free';
 	import { getBaseLayerNonfreeFromURL as getBaseLayerNonfreeFromURL } from '../lib/maplibre-compound-layer-data/nonfree';
 	import { getGsiDemProtocolAction } from '../lib/maplibre-gl-gsi-terrain-qiita';
-	import {
-		DynamicAttributionControl,
-		type DynamicAttributionControlAttributionWillUpdateEvent
-	} from '../lib/dynamic_attribution_control';
+	import { DynamicAttributionControl } from '../lib/dynamic_attribution_control';
 
 	const initMap = () => {
 		const map = new maplibregl.Map({

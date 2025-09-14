@@ -481,8 +481,6 @@ export function setupArcGISAttributionHandling(
 	}
 
 	function onAttributeWillUpdate() {
-		const { sources } = map.getStyle();
-
 		const esriURLs = getEsriSourceAndURI();
 
 		for (const [_sourceId, [esriURL, name]] of esriURLs) {
