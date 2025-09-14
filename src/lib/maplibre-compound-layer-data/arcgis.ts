@@ -1,10 +1,29 @@
+import * as maplibregl from 'maplibre-gl';
+
 import * as MaplibreCompondLayerUI from '../maplibre-compound-layer-ui';
-
-import type { TransformStyleFunction } from 'maplibre-gl';
-
+import { DynamicAttributionControl } from '../dynamic_attribution_control';
 import arcgis_osm_junction_names from '../../../static/assets/map-data/arcgis-OpenStreetMap-v2-junction-names.min.overlay.json?url';
 
-const ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE: TransformStyleFunction = (_previous, next) => {
+type ArcGISCoverageArea = {
+	bbox: [number, number, number, number];
+	score: number;
+	zoomMax: number;
+	zoomMin: number;
+};
+
+type ArcGISContributor = {
+	attribution: string;
+	coverageAreas: ArcGISCoverageArea[];
+};
+
+type ArcGISAttributionData = {
+	contributors: ArcGISContributor[];
+};
+
+const ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE: maplibregl.TransformStyleFunction = (
+	_previous,
+	next
+) => {
 	const sprite =
 		Array.isArray(next.sprite) || next.sprite?.startsWith('https://')
 			? next.sprite
@@ -30,7 +49,7 @@ const ARCGIS_WORLD_BASEMAP_TRANSFORM_STYLE: TransformStyleFunction = (_previous,
 	};
 };
 
-const ARCGIS_OSM_TRANSFORM_STYLE: TransformStyleFunction = (_previous, next) => {
+const ARCGIS_OSM_TRANSFORM_STYLE: maplibregl.TransformStyleFunction = (_previous, next) => {
 	const sprite =
 		Array.isArray(next.sprite) || next.sprite?.startsWith('https://')
 			? next.sprite
@@ -344,3 +363,149 @@ export const ARCGIS_VECTOR_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.La
 		]
 	}
 ];
+
+export function hookDynamicAttributionCtrlForArcGISLayers(
+	map: maplibregl.Map,
+	attributionCtrl: DynamicAttributionControl
+): void {
+	const attributionData: {
+		[propName: string]: Promise<void> | ArcGISAttributionData | undefined;
+	} = {};
+
+	function getEnriSourceAndURI(): Set<[string, [string, string]]> {
+		const enriURLs = new Set<[string, [string, string]]>();
+		const { sources } = map.getStyle();
+
+		const PATTERN =
+			/^https:\/\/basemaps\.arcgis\.com\/arcgis\/rest\/services\/([^/]+)\/VectorTileServer\/tile\/\{z\}\/\{y\}\/\{x\}\.pbf$/;
+		for (const sourceId of Object.keys(sources)) {
+			const source = sources[sourceId];
+
+			if (
+				source.type === 'vector' &&
+				Array.isArray(source.tiles) &&
+				typeof source.tiles[0] === 'string'
+			) {
+				const url = source.tiles[0];
+				const matches = url.match(PATTERN);
+				if (matches && matches[1]) {
+					enriURLs.add([sourceId, [url, matches[1]]]);
+				}
+			}
+		}
+
+		return enriURLs;
+	}
+
+	function intersects(bounds1: maplibregl.LngLatBounds, bounds2: maplibregl.LngLatBounds): boolean {
+		const b1sw = bounds1.getSouthWest();
+		const b1ne = bounds1.getNorthEast();
+
+		const b2sw = bounds2.getSouthWest();
+		const b2ne = bounds2.getNorthEast();
+
+		// If one rectangle is on the left side of the other, they don't intersect.
+		// The same applies to top, bottom, and right sides.
+		const noOverlap =
+			b1sw.lng > b2ne.lng || b1ne.lng < b2sw.lng || b1sw.lat > b2ne.lat || b1ne.lat < b2sw.lat;
+
+		// The intersection is the opposite of a non-overlapping condition.
+		return !noOverlap;
+	}
+
+	const POWERED_BY_ESRI_ATTRIBUTION_STRING = 'Powered by Esri';
+	function updateAttributationText() {
+		const enriURLs = getEnriSourceAndURI();
+		const zoom = map.getZoom();
+		const mapBounds = map.getBounds();
+
+		let updateNeeded = false;
+		for (const [sourceId, [url, _name]] of enriURLs) {
+			const attributions = attributionData[url];
+			if (
+				attributions &&
+				!(attributions instanceof Promise) &&
+				Array.isArray(attributions.contributors)
+			) {
+				const esriAttributions: Array<{ attribution: string; score: number }> =
+					attributions.contributors
+						.map((contributor) => {
+							const maxScore = contributor.coverageAreas
+								.filter(
+									(area) =>
+										zoom >= area.zoomMin &&
+										zoom <= area.zoomMax &&
+										intersects(
+											new maplibregl.LngLatBounds([
+												area.bbox[1],
+												area.bbox[0],
+												area.bbox[3],
+												area.bbox[2]
+											]),
+											mapBounds
+										)
+								)
+								.reduce((max, area) => (area.score > max ? area.score : max), -Infinity);
+
+							return maxScore === -Infinity
+								? null
+								: { attribution: contributor.attribution, score: maxScore };
+						})
+						.filter((v) => !!v);
+
+				if (esriAttributions.length > 0) {
+					esriAttributions.sort((a, b) => b.score - a.score);
+
+					const newAttributions =
+						`${POWERED_BY_ESRI_ATTRIBUTION_STRING} | ` +
+						(esriAttributions.length === 1
+							? `Source: ${esriAttributions[0].attribution}`
+							: `Sources: ${esriAttributions
+									.map((v) => v.attribution)
+									.reduce((acc, curr, i, arr) =>
+										i === arr.length - 1 ? `${acc}, and ${curr}` : `${acc}, ${curr}`
+									)}`);
+
+					const source = map.getSource(sourceId);
+					if (source && source.attribution !== newAttributions) {
+						source.attribution = newAttributions;
+						updateNeeded = true;
+					}
+				}
+			}
+		}
+
+		if (updateNeeded) {
+			attributionCtrl.updateAttributions();
+		}
+	}
+
+	function onAttributeWillUpdate() {
+		const { sources } = map.getStyle();
+
+		const enriURLs = getEnriSourceAndURI();
+
+		for (const [_sourceId, [enriURL, name]] of enriURLs) {
+			const attributionURL = `https://static.arcgis.com/attribution/Vector/${name}`;
+			if (attributionData[enriURL] === undefined) {
+				attributionData[enriURL] = fetch(attributionURL)
+					.then((response) => response.json())
+					.then((data) => {
+						attributionData[enriURL] = data as ArcGISAttributionData;
+						attributionCtrl.updateAttributions();
+					})
+					.catch((error) => {
+						console.error({ error });
+					});
+			}
+		}
+
+		if (enriURLs.size > 0) {
+			map.on('moveend', updateAttributationText);
+			updateAttributationText();
+		} else {
+			map.off('moveend', updateAttributationText);
+		}
+	}
+	attributionCtrl.on('attributionwillupdate', onAttributeWillUpdate);
+}

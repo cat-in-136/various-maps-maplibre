@@ -3,7 +3,7 @@ import * as maplibregl from 'maplibre-gl';
 export type DynamicAttributionControlAttributionWillUpdateEvent = {
 	type: 'attributionwillupdate';
 	map: maplibregl.Map;
-	attributionControl?: DynamicAttributionControl;
+	attributionControl: DynamicAttributionControl;
 	originalEvent: maplibregl.MapDataEvent;
 };
 

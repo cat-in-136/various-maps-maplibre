@@ -19,7 +19,8 @@
 	import '../lib/maplibre-compound-layer-ui.css';
 	import {
 		BASE_LAYER_DEFAULT,
-		OVERLAY_LAYER_DEFAULT
+		OVERLAY_LAYER_DEFAULT,
+		hookDynamicAttributionCtrlForFreeLayers
 	} from '../lib/maplibre-compound-layer-data/free';
 	import { getBaseLayerNonfreeFromURL as getBaseLayerNonfreeFromURL } from '../lib/maplibre-compound-layer-data/nonfree';
 	import { getGsiDemProtocolAction } from '../lib/maplibre-gl-gsi-terrain-qiita';
@@ -41,12 +42,6 @@
 		// Dynamic Attribution control
 		const attributionCtrl = new DynamicAttributionControl();
 		map.addControl(attributionCtrl);
-		attributionCtrl.on(
-			'attributionwillupdate',
-			(e: DynamicAttributionControlAttributionWillUpdateEvent) => {
-				console.debug('attributionwillupdate', e); // TODO
-			}
-		);
 
 		// Navigation (Zoom) control
 		map.addControl(
@@ -273,6 +268,8 @@
 
 				optional.appendChild(detailsTerrain);
 			}
+
+			hookDynamicAttributionCtrlForFreeLayers(map, attributionCtrl);
 
 			layerswitcher.optionalElement.appendChild(optional);
 		});
