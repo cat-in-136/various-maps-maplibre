@@ -1,6 +1,7 @@
 import * as MaplibreCompondLayerUI from '../maplibre-compound-layer-ui';
 
-import osm_liberty_ja_style from '../../../static/assets/map-data/osm-liberty-ja-style.min.json?url';
+import osm_liberty_style from '../../../static/assets/map-data/osm-liberty-style.min.json?url';
+import osm_liberty_en_style from '../../../static/assets/map-data/osm-liberty-en-style.min.json?url';
 import openrailwaymap_standard_light from '../../../static/assets/map-data/openrailwaymap-standard-light.min.overlay.json?url';
 import openrailwaymap_speed_light from '../../../static/assets/map-data/openrailwaymap-speed-light.min.overlay.json?url';
 import openrailwaymap_signals_light from '../../../static/assets/map-data/openrailwaymap-signals-light.min.overlay.json?url';
@@ -100,10 +101,22 @@ export const OSM_VECTOR_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerCon
 				]
 			},
 			{
-				type: 'Layer',
-				id: 'base-osm-liberty-ja',
-				title: 'OSM Liberty JA',
-				url: osm_liberty_ja_style
+				type: 'LayerGroup',
+				title: 'OSM Liberty',
+				entries: [
+					{
+						type: 'Layer',
+						id: 'base-osm-liberty',
+						title: 'OSM Liberty',
+						url: osm_liberty_style
+					},
+					{
+						type: 'Layer',
+						id: 'base-osm-liberty-en',
+						title: 'OSM Liberty English',
+						url: osm_liberty_en_style
+					}
+				]
 			}
 		]
 	}
@@ -181,15 +194,32 @@ export const OSM_VECTOR_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.Layer
 				]
 			},
 			{
-				type: 'Layer',
-				id: 'overlay-osm-liberty-ja',
-				title: 'OSM Liberty JA Labels',
-				url: osm_liberty_ja_style,
-				styleSwapOptions: {
-					transformStyle: (_previous, next) => {
-						return { ...next, layers: next.layers.filter((v) => v.type === 'symbol') };
+				type: 'LayerGroup',
+				title: 'OSM Liberty',
+				entries: [
+					{
+						type: 'Layer',
+						id: 'overlay-osm-liberty',
+						title: 'OSM Liberty Labels',
+						url: osm_liberty_style,
+						styleSwapOptions: {
+							transformStyle: (_previous, next) => {
+								return { ...next, layers: next.layers.filter((v) => v.type === 'symbol') };
+							}
+						}
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-osm-liberty-en',
+						title: 'OSM Liberty English Labels',
+						url: osm_liberty_en_style,
+						styleSwapOptions: {
+							transformStyle: (_previous, next) => {
+								return { ...next, layers: next.layers.filter((v) => v.type === 'symbol') };
+							}
+						}
 					}
-				}
+				]
 			},
 			{
 				type: 'LayerGroup',
