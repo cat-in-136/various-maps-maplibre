@@ -218,6 +218,17 @@ export const OSM_VECTOR_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.Layer
 								return { ...next, layers: next.layers.filter((v) => v.type === 'symbol') };
 							}
 						}
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-osm-liberty-building-3d',
+						title: 'OSM Liberty Building 3D`',
+						url: osm_liberty_style,
+						styleSwapOptions: {
+							transformStyle: (_previous, next) => {
+								return { ...next, layers: next.layers.filter((v) => v.type === 'fill-extrusion') };
+							}
+						}
 					}
 				]
 			},
