@@ -1,18 +1,18 @@
 import type * as MaplibreCompondLayerUI from '../maplibre-compound-layer-ui';
 import tjmsy_orilibre_global_maptiler from '../../../static/assets/map-data/tjmsy-orilibre-global-maptiler.min.json?url';
 
-type BaseLayerNonFreeKeys = {
+type LayerNonfreeKeys = {
 	maptiler?: string;
 };
 
-export function getBaseLayerNonfreeFromURL(
+export function getLayerNonfreeKeysFromURL(
 	url: Location | URL = window.location
-): MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] {
+): LayerNonfreeKeys {
 	const urlurl = url instanceof Location ? new URL(url.href) : url;
 	const searchParams = urlurl.searchParams;
 	const hashParams = new URLSearchParams(urlurl.hash.replace(/^#/, ''));
 
-	const keys: BaseLayerNonFreeKeys = {};
+	const keys: LayerNonfreeKeys = {};
 	if (searchParams.has('maptiler_key')) {
 		keys.maptiler = searchParams.get('maptiler_key') as string;
 	}
@@ -22,11 +22,11 @@ export function getBaseLayerNonfreeFromURL(
 
 	console.debug({ url, keys, searchParams, hashParams });
 
-	return getBaseLayerNonfree(keys);
+	return keys;
 }
 
 export function getBaseLayerNonfree(
-	keyes: BaseLayerNonFreeKeys
+	keyes: LayerNonfreeKeys
 ): MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] {
 	const entries: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [];
 	if (keyes['maptiler']) {
@@ -207,5 +207,57 @@ export function getBaseLayerNonfree(
 			entries.push(miscGroup);
 		}
 	}
+	return entries;
+}
+
+export function getOverlayLayerNonfree(
+	keys: LayerNonfreeKeys
+): MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] {
+	const entries: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [];
+
+	if (keys['maptiler']) {
+		const key = keys['maptiler'];
+		entries.push({
+			type: 'LayerGroup',
+			title: 'Maptiler',
+			entries: [
+				{
+					type: 'Layer',
+					id: 'overlay-maptiler-contours',
+					title: 'Contours',
+					url: `https://api.maptiler.com/maps/topo-v2/style.json?key=${key}`,
+					styleSwapOptions: {
+						transformStyle: (_previous, next) => {
+							return {
+								...next,
+								sources: {
+									contours: next.sources.contours
+								},
+								layers: next.layers.filter((v) => 'source' in v && v.source === 'contours')
+							};
+						}
+					}
+				},
+				{
+					type: 'Layer',
+					id: 'overlay-maptiler-outdoor',
+					title: 'Outdoor',
+					url: `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${key}`,
+					styleSwapOptions: {
+						transformStyle: (_previous, next) => {
+							return {
+								...next,
+								sources: {
+									outdoor: next.sources.outdoor
+								},
+								layers: next.layers.filter((v) => 'source' in v && v.source === 'outdoor')
+							};
+						}
+					}
+				}
+			]
+		});
+	}
+
 	return entries;
 }

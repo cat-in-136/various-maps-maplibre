@@ -222,7 +222,7 @@ export const OSM_VECTOR_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.Layer
 					{
 						type: 'Layer',
 						id: 'overlay-osm-liberty-building-3d',
-						title: 'OSM Liberty Building 3D`',
+						title: 'OSM Liberty Building 3D',
 						url: osm_liberty_style,
 						styleSwapOptions: {
 							transformStyle: (_previous, next) => {

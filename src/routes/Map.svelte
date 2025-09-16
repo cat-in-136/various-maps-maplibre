@@ -22,7 +22,7 @@
 		OVERLAY_LAYER_DEFAULT,
 		setupFreeLayersAttributionHandling
 	} from '../lib/maplibre-compound-layer-data/free';
-	import { getBaseLayerNonfreeFromURL as getBaseLayerNonfreeFromURL } from '../lib/maplibre-compound-layer-data/nonfree';
+	import * as NonfreeLayer from '../lib/maplibre-compound-layer-data/nonfree';
 	import { getGsiDemProtocolAction } from '../lib/maplibre-gl-gsi-terrain-qiita';
 	import { DynamicAttributionControl } from '../lib/dynamic_attribution_control';
 
@@ -122,8 +122,10 @@
 
 		const layerswitcher = new MaplibreCompondLayerUI.MapLibreCompondLayerSwitcherControl();
 		map.on('load', async () => {
+			const nonFreeKeys = NonfreeLayer.getLayerNonfreeKeysFromURL();
+
 			layerswitcher.addBase(BASE_LAYER_DEFAULT);
-			layerswitcher.addBase(getBaseLayerNonfreeFromURL());
+			layerswitcher.addBase(NonfreeLayer.getBaseLayerNonfree(nonFreeKeys));
 			console.debug({ layerswitcher });
 			map.addControl(layerswitcher);
 			for (const layer of layerswitcher.baseLayerEntriesAll()) {
@@ -132,6 +134,7 @@
 			}
 
 			layerswitcher.addOverlay(OVERLAY_LAYER_DEFAULT);
+			layerswitcher.addOverlay(NonfreeLayer.getOverlayLayerNonfree(nonFreeKeys));
 
 			const gsimaplayers = new GSIMapLayers();
 			const qchizulayers = new QChizuLayers();
