@@ -1,5 +1,6 @@
 import type * as MaplibreCompondLayerUI from '../maplibre-compound-layer-ui';
 import tjmsy_orilibre_global_maptiler from '../../../static/assets/map-data/tjmsy-orilibre-global-maptiler.min.json?url';
+import maptiler_ocean_bathymetric_contours from '../../../static/assets/map-data/maptiler-ocean-bathymetric-contours-catin136.min.overlay.json?url';
 
 type LayerNonfreeKeys = {
 	maptiler?: string;
@@ -235,6 +236,17 @@ export function getOverlayLayerNonfree(
 								},
 								layers: next.layers.filter((v) => 'source' in v && v.source === 'contours')
 							};
+						}
+					}
+				},
+				{
+					type: 'Layer',
+					id: 'overlay-maptiler-ocean-bathymetric-contours',
+					title: 'Bathymetric Contours',
+					url: maptiler_ocean_bathymetric_contours,
+					styleSwapOptions: {
+						transformStyle: (_previous, next) => {
+							return JSON.parse(JSON.stringify(next).replaceAll('{key}', `${key}`));
 						}
 					}
 				},
