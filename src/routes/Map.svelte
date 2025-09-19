@@ -197,6 +197,23 @@
 						}
 					}
 				};
+				if (nonFreeKeys.maptiler) {
+					const key = nonFreeKeys.maptiler;
+					TerrainSources['terrain-maptiler-terrain-rgb'] = {
+						title: 'Maptiler Terrain RGB',
+						source: {
+							type: 'raster-dem',
+							url: `https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=${key}`
+						}
+					};
+					TerrainSources['terrain-maptiler-terrain-ocean'] = {
+						title: 'Maptiler Terrain Ocean',
+						source: {
+							type: 'raster-dem',
+							url: `https://api.maptiler.com/tiles/ocean-rgb/tiles.json?key=${key}`
+						}
+					};
+				}
 
 				for (const id in TerrainSources) {
 					const { title, source } = TerrainSources[id];
