@@ -8,7 +8,7 @@ import { getGeoJsonProtocolAction } from '../lib/maplibre-gl-geojson-tiles-qiita
 
 maplibregl.addProtocol('geojson-tile', getGeoJsonProtocolAction());
 
-export namespace Styling {
+namespace Styling {
 	export function getPaintForPolygonFill(
 		layer: LayerConfig.Layer
 	): Required<maplibreglstyle.FillLayerSpecification>['paint'] {
@@ -399,5 +399,44 @@ export namespace GeoJsonLayerConverter {
 		map.removeLayer(`layer-${id}-geojson-circle`);
 		map.removeLayer(`layer-${id}-geojson-symbol-icon-image`);
 		map.removeSource(`source-${id}-geojson`);
+	}
+
+	export function updateOpacity(layer: LayerConfig.Layer, map: maplibregl.Map, opacity?: number) {
+		const id = layer.id;
+		const defaultPaint = {
+			fill: Styling.getDefaultPaintForPolygonFill(false),
+			line: Styling.getDefaultPaintForLineLine(false),
+			circle: Styling.getDefaultPaintForPointCircle(false),
+			symbol: Styling.getDefaultLayerParamsForPointSymbolIconImage().paint
+		};
+
+		if (opacity !== undefined) {
+			const value = opacity / 255.0;
+			map.setPaintProperty(`layer-${id}-geojson-fill`, 'fill-opacity', value);
+			map.setPaintProperty(`layer-${id}-geojson-line`, 'line-opacity', value);
+			map.setPaintProperty(`layer-${id}-geojson-circle`, 'circle-opacity', value);
+			map.setPaintProperty(`layer-${id}-geojson-symbol-icon-image`, 'icon-opacity', value);
+		} else {
+			map.setPaintProperty(
+				`layer-${id}-geojson-fill`,
+				'fill-opacity',
+				defaultPaint.fill['fill-opacity']
+			);
+			map.setPaintProperty(
+				`layer-${id}-geojson-line`,
+				'line-opacity',
+				defaultPaint.line['line-opacity']
+			);
+			map.setPaintProperty(
+				`layer-${id}-geojson-circle`,
+				'circle-opacity',
+				defaultPaint.circle['circle-opacity']
+			);
+			map.setPaintProperty(
+				`layer-${id}-geojson-symbol-icon-image`,
+				'icon-opacity',
+				defaultPaint.symbol['icon-opacity']
+			);
+		}
 	}
 }

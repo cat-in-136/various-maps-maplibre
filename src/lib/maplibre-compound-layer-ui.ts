@@ -1,7 +1,7 @@
 import maplibregl from 'maplibre-gl';
 import * as VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
 
-import { Styling, GeoJsonLayerConverter } from '../lib/geojson-layer-converter';
+import { GeoJsonLayerConverter } from '../lib/geojson-layer-converter';
 
 const ELEMENT_CLASS_PREFIX = 'maplibregl-ctrl-compound-layer';
 
@@ -545,33 +545,14 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 					) {
 						GeoJsonLayerConverter.addToMap(layerFormat, layer, this.#map);
 
-						if (e.detail.layerEntry.opacity !== undefined) {
-							const value = e.detail.layerEntry.opacity;
-							if (value) {
-								window.setTimeout(() => {
-									this.#map?.setPaintProperty(
-										`layer-${id}-geojson-fill`,
-										'fill-opacity',
-										value / 255.0
-									);
-									this.#map?.setPaintProperty(
-										`layer-${id}-geojson-line`,
-										'line-opacity',
-										value / 255.0
-									);
-									//this.#map?.setPaintProperty(
-									//	`layer-${id}-geojson-circle`,
-									//	'circle-opacity',
-									//	value / 255.0
-									//);
-									this.#map?.setPaintProperty(
-										`layer-${id}-geojson-symbol-icon-image`,
-										'icon-opacity',
-										value / 255.0
-									);
-								}, 100);
-							}
-						}
+						window.setTimeout(
+							(map: maplibregl.Map, opacity: number | undefined) => {
+								GeoJsonLayerConverter.updateOpacity(layer, map, opacity);
+							},
+							0,
+							this.#map,
+							e.detail.layerEntry.opacity
+						);
 					} else if (layerFormat === 'style') {
 						fetch(layer.url).then(async (response: Response) => {
 							if (!response.ok) return;
@@ -736,49 +717,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 					(layerFormat as { tile: 'geojson' }).tile === 'geojson' ||
 					(layerFormat as { single: 'geojson' }).single === 'geojson'
 				) {
-					const defaultPaint = {
-						polygonFill: Styling.getDefaultPaintForPolygonFill(false),
-						lineLine: Styling.getDefaultPaintForLineLine(false),
-						pointCircle: Styling.getDefaultPaintForPointCircle(false),
-						symbolIconImage: Styling.getDefaultLayerParamsForPointSymbolIconImage().paint
-					};
-
-					if (e.detail.layerEntry.opacity !== undefined) {
-						const value = e.detail.layerEntry.opacity;
-						this.#map?.setPaintProperty(`layer-${id}-geojson-fill`, 'fill-opacity', value / 255.0);
-						this.#map.setPaintProperty(`layer-${id}-geojson-line`, 'line-opacity', value / 255.0);
-						this.#map.setPaintProperty(
-							`layer-${id}-geojson-circle`,
-							'circle-opacity',
-							value / 255.0
-						);
-						this.#map.setPaintProperty(
-							`layer-${id}-geojson-symbol-icon-image`,
-							'icon-opacity',
-							value / 255.0
-						);
-					} else {
-						this.#map?.setPaintProperty(
-							`layer-${id}-geojson-fill`,
-							'fill-opacity',
-							defaultPaint.polygonFill['fill-opacity']
-						);
-						this.#map.setPaintProperty(
-							`layer-${id}-geojson-line`,
-							'line-opacity',
-							defaultPaint.lineLine['line-opacity']
-						);
-						this.#map.setPaintProperty(
-							`layer-${id}-geojson-circle`,
-							'circle-opacity',
-							defaultPaint.pointCircle['circle-opacity']
-						);
-						this.#map.setPaintProperty(
-							`layer-${id}-geojson-symbol-icon-image`,
-							'icon-opacity',
-							defaultPaint.symbolIconImage['icon-opacity']
-						);
-					}
+					GeoJsonLayerConverter.updateOpacity(layer, this.#map, e.detail.layerEntry.opacity);
 				}
 			}
 		});
