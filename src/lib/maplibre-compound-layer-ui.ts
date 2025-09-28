@@ -2,6 +2,7 @@ import maplibregl from 'maplibre-gl';
 import * as VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
 
 import { GeoJsonLayerConverter } from '../lib/geojson-layer-converter';
+import { VectorOverlayLayerCreator } from './vector-overlay-layer-creater';
 
 const ELEMENT_CLASS_PREFIX = 'maplibregl-ctrl-compound-layer';
 
@@ -554,104 +555,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 							e.detail.layerEntry.opacity
 						);
 					} else if (layerFormat === 'style') {
-						fetch(layer.url).then(async (response: Response) => {
-							if (!response.ok) return;
-							const json = await response.json();
-							if (
-								json.version === 8 &&
-								typeof json.sources === 'object' &&
-								typeof json.layers === 'object'
-							) {
-								const new_style: maplibregl.StyleSpecification = layer.styleSwapOptions
-									?.transformStyle
-									? layer.styleSwapOptions.transformStyle(
-											structuredClone(this.#map!.getStyle()),
-											json
-										)
-									: json;
-
-								// Merge sprite if exists
-								if (new_style.sprite) {
-									// Standardize new sprite to array if needed
-									const newSprites: Exclude<maplibregl.SpriteSpecification, string> =
-										typeof new_style.sprite === 'string'
-											? [{ id: 'default', url: new_style.sprite }]
-											: new_style.sprite;
-
-									// Apply prefix and add to map
-									const spritePrefix = `layer-${id}-`;
-									const currentSpriteIDs = this.#map!.getSprite().map((v) => v.id);
-									for (const sprite of newSprites) {
-										const spriteId = `${spritePrefix}${sprite.id}`;
-										if (currentSpriteIDs.indexOf(spriteId) >= 0) {
-											this.#map!.removeSprite(spriteId);
-										}
-										this.#map!.addSprite(spriteId, sprite.url);
-									}
-
-									// Update icon-image and pattern references in layers with prefix
-									for (const layer of new_style.layers) {
-										if (layer.type === 'symbol') {
-											if (layer.layout?.['icon-image']) {
-												layer.layout['icon-image'] = [
-													'let',
-													'originalVal',
-													Array.isArray(layer.layout?.['icon-image'])
-														? layer.layout['icon-image']
-														: ['literal', layer.layout['icon-image']],
-													[
-														'concat',
-														[
-															'case',
-															['in', ':', ['to-string', ['var', 'originalVal']]],
-															spritePrefix, // if original value contains a colon
-															`${spritePrefix}default:` // if it doesn't
-														],
-														['var', 'originalVal']
-													]
-												];
-											}
-										}
-									}
-								}
-
-								let default_text_font: string[] | undefined = undefined;
-								if (!this.#map!.getGlyphs()) {
-									if (new_style.glyphs) {
-										this.#map!.setGlyphs(new_style.glyphs);
-									}
-								} else {
-									default_text_font = this.#map!.getStyle()
-										.layers.map((layer) =>
-											layer.type === 'symbol' &&
-											Array.isArray(layer.layout?.['text-font']) &&
-											layer.layout['text-font'].every((f) => typeof f === 'string')
-												? (layer.layout['text-font'] as string[])
-												: undefined
-										)
-										.find((v) => v);
-								}
-
-								for (const [sourceId, source] of Object.entries(new_style.sources)) {
-									if (!this.#map!.getSource(sourceId)) {
-										this.#map!.addSource(sourceId, source);
-									}
-								}
-
-								for (const layer of new_style.layers) {
-									const newLayerId = `layer-${id}-${layer.id}`;
-									if (!this.#map!.getLayer(newLayerId)) {
-										const newLayer = { ...layer, id: newLayerId };
-										if (default_text_font && newLayer.type === 'symbol' && newLayer.layout) {
-											newLayer.layout['text-font'] = default_text_font;
-										}
-										this.#map!.addLayer(newLayer);
-									}
-								}
-							} else {
-								console.debug(`Unsupported JSON format: ${layer.url}`);
-							}
-						});
+						VectorOverlayLayerCreator.addToMap(layer, this.#map);
 					} else {
 						console.error(`Unsupported layerFormat ${JSON.stringify(layerFormat)}`, e); // TODO
 					}
@@ -665,35 +569,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 					) {
 						GeoJsonLayerConverter.removeFromMap(layer, this.#map);
 					} else if (layerFormat === 'style') {
-						// Remove layers and sources associated with this style layer
-						if (this.#map) {
-							// 1. Find and remove layers whose ID starts with `layer-${id}-`
-							const layersToRemove = this.#map
-								.getStyle()
-								.layers.filter((layer) => layer.id.startsWith(`layer-${id}-`));
-
-							// Keep track of sources referenced by these layers
-							const sourcesToCheck = new Set<string>();
-
-							// 2. Remove the layers
-							for (const layer of layersToRemove) {
-								if ('source' in layer && typeof layer.source === 'string') {
-									sourcesToCheck.add(layer.source);
-								}
-								this.#map.removeLayer(layer.id);
-							}
-
-							// 3. Check if sources are still referenced by any other layers
-							for (const sourceId of sourcesToCheck) {
-								const isSourceStillUsed = this.#map
-									.getStyle()
-									.layers.some((layer) => 'source' in layer && layer.source === sourceId);
-								// 4. If not referenced, remove the source
-								if (!isSourceStillUsed) {
-									this.#map.removeSource(sourceId);
-								}
-							}
-						}
+						VectorOverlayLayerCreator.removeFromMap(layer, this.#map);
 					} else {
 						console.error(`Unsupported layerFormat ${JSON.stringify(layerFormat)}`, e); // TODO
 					}
