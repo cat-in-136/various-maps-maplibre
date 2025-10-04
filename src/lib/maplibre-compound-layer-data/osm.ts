@@ -10,6 +10,7 @@ import openrailwaymap_gauge_light from '../../../static/assets/map-data/openrail
 import openrailwaymap_loading_gauge_light from '../../../static/assets/map-data/openrailwaymap-loading_gauge-light.min.overlay.json?url';
 import openrailwaymap_track_class_light from '../../../static/assets/map-data/openrailwaymap-track_class-light.min.overlay.json?url';
 import openrailwaymap_operator_light from '../../../static/assets/map-data/openrailwaymap-operator-light.min.overlay.json?url';
+import openrailwaymap_standard_abandoned_light from '../../../static/assets/map-data/openrailwaymap-standard+abandoned-light-catin136.min.overlay.json?url';
 
 export const OSM_VECTOR_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
 	{
@@ -283,6 +284,12 @@ export const OSM_VECTOR_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.Layer
 						id: 'overlay-openrailwaymap-operator-light',
 						title: 'Operator',
 						url: openrailwaymap_operator_light
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-standard-abandoned-light',
+						title: 'Standard w/ Abandoned',
+						url: openrailwaymap_standard_abandoned_light
 					}
 				]
 			}
