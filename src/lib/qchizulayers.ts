@@ -31,7 +31,7 @@ export class QChizuLayers extends GSIMapLayers {
 					layer.url.endsWith('.pm.json') || // pmtiles
 					/{-[xyz]}/.test(layer.url) || // TMS tiles
 					layer.url.includes('/optimal_bvmap/') || // 国土地理院最適化ベクトルタイル
-					layer.url.startsWith('https://mapdata.qchizu.xyz/') || // CORS not allowed
+					layer.url.startsWith('https://mapdata.qchizu.xyz/vector/') || // CORS not allowed
 					layer.url.startsWith('http://gis.biodic.go.jp/') || // CORS not allowed
 					layer.url === './layers_json/54_ksj_kokuyurinya_2018_01.json' // pmtiles
 				) {
