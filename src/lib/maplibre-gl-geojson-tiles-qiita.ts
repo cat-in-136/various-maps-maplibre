@@ -6,6 +6,7 @@ import maplibregl from 'maplibre-gl';
 import geojsonvt from 'geojson-vt';
 import { fromGeojsonVt } from 'vt-pbf';
 import { feature } from 'topojson-client';
+import type { Topology } from 'topojson-specification';
 import type * as GeoJSON from 'geojson';
 
 /*******************************************************
@@ -49,7 +50,9 @@ async function processGeojsonTile(
 	//console.log(dz, `/${nativeZ}/${nativeX}/${nativeY}`);
 	//console.log(nativeUrl);
 
-	const geoJSON = await fetch(nativeUrl, { signal: abortController.signal })
+	const geoJSON: GeoJSON.FeatureCollection = await fetch(nativeUrl, {
+		signal: abortController.signal
+	})
 		.then((response) => {
 			return response.json();
 		})
@@ -57,11 +60,23 @@ async function processGeojsonTile(
 			if (ext === 'geojson') {
 				return json;
 			} else if (ext === 'topojson') {
-				const geojsonObjects: Record<string, GeoJSON.Feature> = {};
-				for (const key of Object.keys(json.objects)) {
-					geojsonObjects[key] = feature(json, json.objects[key]);
+				//const geojsonObjects: Record<string, GeoJSON.Feature> = {};
+				//for (const key of Object.keys(json.objects)) {
+				//	geojsonObjects[key] = feature(json, json.objects[key]);
+				//}
+				//return geojsonObjects;
+				const features: Array<GeoJSON.Feature> = [];
+				for (const [name, obj] of Object.entries((json as Topology).objects)) {
+					const converted = feature(json, obj);
+					if (converted.type === 'FeatureCollection') {
+						features.push(...converted.features);
+					} else if (converted.type === 'Feature') {
+						features.push(converted);
+					} else {
+						throw new Error(`Unknown object (${converted}) in object: ${name}`);
+					}
+					return { type: 'FeatureCollection', features } as GeoJSON.FeatureCollection;
 				}
-				return geojsonObjects;
 			} else {
 				throw new Error('Wrong extension');
 			}

@@ -289,7 +289,11 @@ export namespace GeoJsonLayerConverter {
 		if ((layerFormat as { tile: 'geojson' }).tile === 'geojson') {
 			vectorSource = {
 				type: 'vector',
-				tiles: [`geojson-tile://${layer.url}`],
+				tiles: [
+					'geojson-tile://' +
+						(!!layer.maxNativeZoom ? `maxNativeZoom=${layer.maxNativeZoom};` : '') +
+						layer.url
+				],
 				scheme: layer.scheme ?? 'xyz',
 				attribution: layer.attribution
 			};
