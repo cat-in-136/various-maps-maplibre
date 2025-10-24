@@ -3,6 +3,10 @@
 	overflow-y: auto;
 	max-height: calc(90cqh - 100px);
 
+	details > summary {
+		cursor: default;
+	}
+
 	details > div {
 		margin-left: 0.25em;
 		border-left: solid 0.125em #aaa;
