@@ -3,6 +3,9 @@ import * as MaplibreCompondLayerUI from '../lib/maplibre-compound-layer-ui';
 
 const QCHIZULAYERS: { url: string }[] = [
 	{
+		url: 'https://qchizu.github.io/qchizu/layers_txt/layers98.txt'
+	},
+	{
 		url: 'https://qchizu.github.io/qchizu/layers_txt/layers99.txt'
 	}
 ];
