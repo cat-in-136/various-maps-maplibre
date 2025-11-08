@@ -23,7 +23,7 @@
 		setupFreeLayersAttributionHandling
 	} from '../lib/maplibre-compound-layer-data/free';
 	import * as NonfreeLayer from '../lib/maplibre-compound-layer-data/nonfree';
-	import { getGsiDemProtocolAction } from '../lib/maplibre-gl-gsi-terrain-qiita';
+	import { getGsiDemProtocolAction } from '../lib/maplibre-gsi-dem-protocol';
 	import { DynamicAttributionControl } from '../lib/dynamic_attribution_control';
 
 	const initMap = () => {
