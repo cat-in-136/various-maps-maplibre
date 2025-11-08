@@ -15,6 +15,7 @@
 
 	import { GSIMapLayers } from '../lib/gsimaplayers';
 	import { QChizuLayers } from '../lib/qchizulayers';
+	import { AncientLayers } from '../lib/ancientlayers';
 	import * as MaplibreCompondLayerUI from '../lib/maplibre-compound-layer-ui';
 	import '../lib/maplibre-compound-layer-ui.css';
 	import {
@@ -137,9 +138,11 @@
 			layerswitcher.addOverlay(NonfreeLayer.getOverlayLayerNonfree(nonFreeKeys));
 
 			const gsimaplayers = new GSIMapLayers();
+			const ancientlayers = new AncientLayers();
 			const qchizulayers = new QChizuLayers();
-			await Promise.all([gsimaplayers.load(), qchizulayers.load()]);
+			await Promise.all([gsimaplayers.load(), ancientlayers.load(), qchizulayers.load()]);
 			layerswitcher.addOverlay(gsimaplayers.getGroup());
+			layerswitcher.addOverlay(ancientlayers.getGroup());
 			layerswitcher.addOverlay(qchizulayers.getGroup('全国Q地図'));
 
 			maplibregl.addProtocol('gsidem', getGsiDemProtocolAction('gsidem'));
