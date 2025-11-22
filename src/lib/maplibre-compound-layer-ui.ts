@@ -1,5 +1,4 @@
 import maplibregl from 'maplibre-gl';
-import * as VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
 
 import { GeoJsonLayerConverter } from '../lib/geojson-layer-converter';
 import { VectorOverlayLayerCreator } from './vector-overlay-layer-creater';
@@ -203,8 +202,6 @@ namespace LayerTreeView {
 		readonly #layerFormat: LayerConfig.LayerFormat;
 		#element: HTMLElement;
 		constructor(config: LayerConfig.Layer, owner: LayerTreeView) {
-			VectorTextProtocol.addProtocols(maplibregl);
-
 			this.#config = config;
 			this.#owner = owner;
 

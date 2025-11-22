@@ -12,6 +12,7 @@
 		MaplibreGeocoderFeatureResults
 	} from '@maplibre/maplibre-gl-geocoder';
 	import '@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css';
+	import * as VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
 
 	import { GSIMapLayers } from '../lib/gsimaplayers/gsimaplayers';
 	import { QChizuLayers } from '../lib/gsimaplayers/qchizulayers';
@@ -25,6 +26,7 @@
 	} from '../lib/maplibre-compound-layer-data/free';
 	import * as NonfreeLayer from '../lib/maplibre-compound-layer-data/nonfree';
 	import { getGsiDemProtocolAction } from '../lib/maplibre-gsi-dem-protocol';
+	import { getGeoJsonProtocolAction } from '../lib/maplibre-gl-geojson-tiles-qiita';
 	import { DynamicAttributionControl } from '../lib/dynamic_attribution_control';
 
 	const initMap = () => {
@@ -121,6 +123,13 @@
 			})
 		);
 
+		// Add Protocols
+		map.on('load', () => {
+			maplibregl.addProtocol('geojson-tile', getGeoJsonProtocolAction());
+			VectorTextProtocol.addProtocols(maplibregl);
+			maplibregl.addProtocol('gsidem', getGsiDemProtocolAction('gsidem'));
+		});
+
 		const layerswitcher = new MaplibreCompondLayerUI.MapLibreCompondLayerSwitcherControl();
 		map.on('load', async () => {
 			const nonFreeKeys = NonfreeLayer.getLayerNonfreeKeysFromURL();
@@ -145,7 +154,6 @@
 			layerswitcher.addOverlay(ancientlayers.getGroup());
 			layerswitcher.addOverlay(qchizulayers.getGroup('全国Q地図'));
 
-			maplibregl.addProtocol('gsidem', getGsiDemProtocolAction('gsidem'));
 			const terrainControl = new maplibregl.TerrainControl({
 				source: 'terrain',
 				exaggeration: 1

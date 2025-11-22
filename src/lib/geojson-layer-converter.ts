@@ -1,12 +1,7 @@
 import maplibregl from 'maplibre-gl';
 import type * as maplibreglstyle from '@maplibre/maplibre-gl-style-spec';
-import * as VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
 import { GSIMAP_STYLE_OVERRIDE } from '../lib/gsivectorexperimentalstyle';
 import { type LayerConfig } from '../lib/maplibre-compound-layer-ui';
-
-import { getGeoJsonProtocolAction } from '../lib/maplibre-gl-geojson-tiles-qiita';
-
-maplibregl.addProtocol('geojson-tile', getGeoJsonProtocolAction());
 
 namespace Styling {
 	export function getPaintForPolygonFill(
