@@ -540,6 +540,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 								this.#map?.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
 							}, 100);
 						}
+						this.#map.triggerRepaint();
 					} else if (
 						(layerFormat as { tile: 'geojson' }).tile === 'geojson' ||
 						(layerFormat as { single: 'geojson' }).single === 'geojson'

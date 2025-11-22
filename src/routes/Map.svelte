@@ -13,9 +13,9 @@
 	} from '@maplibre/maplibre-gl-geocoder';
 	import '@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css';
 
-	import { GSIMapLayers } from '../lib/gsimaplayers';
-	import { QChizuLayers } from '../lib/qchizulayers';
-	import { AncientLayers } from '../lib/ancientlayers';
+	import { GSIMapLayers } from '../lib/gsimaplayers/gsimaplayers';
+	import { QChizuLayers } from '../lib/gsimaplayers/qchizulayers';
+	import { AncientLayers } from '../lib/gsimaplayers/ancientlayers';
 	import * as MaplibreCompondLayerUI from '../lib/maplibre-compound-layer-ui';
 	import '../lib/maplibre-compound-layer-ui.css';
 	import {

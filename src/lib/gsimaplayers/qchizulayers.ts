@@ -1,5 +1,5 @@
-import { GSIMapLayers } from '../lib/gsimaplayers';
-import * as MaplibreCompondLayerUI from '../lib/maplibre-compound-layer-ui';
+import { GSIMapLayers } from './gsimaplayers';
+import * as MaplibreCompondLayerUI from '../../lib/maplibre-compound-layer-ui';
 
 const QCHIZULAYERS: { url: string }[] = [
 	{

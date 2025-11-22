@@ -1,6 +1,6 @@
 import Encoding from 'encoding-japanese';
 //import type Encoding from '@types/encoding-japanese';
-import * as MaplibreCompondLayerUI from '../lib/maplibre-compound-layer-ui';
+import * as MaplibreCompondLayerUI from '../../lib/maplibre-compound-layer-ui';
 
 export interface GSIMapLayerConfig {
 	url: string;

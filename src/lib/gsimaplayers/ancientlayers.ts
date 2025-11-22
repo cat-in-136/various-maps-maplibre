@@ -1,6 +1,6 @@
-import { GSIMapLayers } from '../lib/gsimaplayers';
-import * as MaplibreCompondLayerUI from '../lib/maplibre-compound-layer-ui';
-import ANCIENT_LAYERS_TXT_URL from '../../static/assets/layers_txt/layersAncient.txt?url';
+import { GSIMapLayers } from './gsimaplayers';
+import * as MaplibreCompondLayerUI from '../../lib/maplibre-compound-layer-ui';
+import ANCIENT_LAYERS_TXT_URL from '../../../static/assets/layers_txt/layersAncient.txt?url';
 
 const ANCIENTLAYERS: { url: string }[] = [
 	{
