@@ -31,6 +31,16 @@ export const WEATHER_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerCon
 					},
 					{
 						type: 'Layer',
+						id: 'overlay-weather-jma-satimg-B13-TBB-png',
+						title: '赤外画像（透過）',
+						url: 'jma://satimg/B13/TBB/{z}/{x}/{y}.jpg.png',
+						minZoom: 3,
+						maxZoom: 6,
+						attribution:
+							'<a href="https://www.jma.go.jp/jma/kishou/info/coment.html">© Japan Meteorological Agency</a>'
+					},
+					{
+						type: 'Layer',
 						id: 'overlay-weather-jma-satimg-B03-ALBD',
 						title: '可視画像',
 						url: 'jma://satimg/B03/ALBD/{z}/{x}/{y}.jpg',
@@ -41,9 +51,29 @@ export const WEATHER_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerCon
 					},
 					{
 						type: 'Layer',
+						id: 'overlay-weather-jma-satimg-B03-ALBD-png',
+						title: '可視画像（透過）',
+						url: 'jma://satimg/B03/ALBD/{z}/{x}/{y}.jpg.png',
+						minZoom: 3,
+						maxZoom: 6,
+						attribution:
+							'<a href="https://www.jma.go.jp/jma/kishou/info/coment.html">© Japan Meteorological Agency</a>'
+					},
+					{
+						type: 'Layer',
 						id: 'overlay-weather-jma-satimg-B08-TBB',
 						title: '水蒸気画像',
 						url: 'jma://satimg/B08/TBB/{z}/{x}/{y}.jpg',
+						minZoom: 3,
+						maxZoom: 6,
+						attribution:
+							'<a href="https://www.jma.go.jp/jma/kishou/info/coment.html">© Japan Meteorological Agency</a>'
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-weather-jma-satimg-B08-TBB-png',
+						title: '水蒸気画像（透過）',
+						url: 'jma://satimg/B08/TBB/{z}/{x}/{y}.jpg.png',
 						minZoom: 3,
 						maxZoom: 6,
 						attribution:
