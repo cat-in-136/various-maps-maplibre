@@ -7,6 +7,15 @@ type JMA_TARGETTIMES_N1_TYPE = Array<{
 	[propName: string]: unknown;
 }>;
 
+/** Type of https://www.jma.go.jp/bosai/himawari/data/satimg/targetTimes_fd.json */
+type JMA_TARGETTIMES_FD_TYPE = Array<{
+	basetime: string;
+	validtime: string;
+}>;
+
+/** Type of https://www.jma.go.jp/bosai/himawari/data/satimg/targetTimes_jp.json */
+type JMA_TARGETTIMES_JP_TYPE = JMA_TARGETTIMES_FD_TYPE;
+
 class SingletonFetch<T> {
 	#url: string;
 	#fetchPromise: Promise<T> | undefined = undefined;
@@ -63,6 +72,14 @@ const JMA_TARGETTIMES_N1_CACHE = new SingletonFetch<JMA_TARGETTIMES_N1_TYPE>(
 	'https://www.jma.go.jp/bosai/jmatile/data/nowc/targetTimes_N1.json'
 );
 
+const JMA_TARGETTIMES_FD_CACHE = new SingletonFetch<JMA_TARGETTIMES_FD_TYPE>(
+	'https://www.jma.go.jp/bosai/himawari/data/satimg/targetTimes_fd.json'
+);
+
+const JMA_TARGETTIMES_JP_CACHE = new SingletonFetch<JMA_TARGETTIMES_JP_TYPE>(
+	'https://www.jma.go.jp/bosai/himawari/data/satimg/targetTimes_jp.json'
+);
+
 async function getNowCastTile(
 	params: Parameters<maplibregl.AddProtocolAction>[0],
 	abortController: Parameters<maplibregl.AddProtocolAction>[1]
@@ -74,12 +91,43 @@ async function getNowCastTile(
 	const [, z, x, y] = zxyMatch;
 
 	const targetTimes = await JMA_TARGETTIMES_N1_CACHE.fetch(abortController);
-	const { basetime } = targetTimes[0];
-	if (!basetime) {
-		//throw new Error('No basetime found in targetTimes_N1.json');
+	const { basetime, validtime } = targetTimes[0];
+	if (!basetime || !validtime) {
+		//throw new Error('No basetime or validtime found in targetTimes_N1.json');
 		return { data: undefined };
 	}
-	const url = `https://www.jma.go.jp/bosai/jmatile/data/nowc/${basetime}/none/${basetime}/surf/hrpns/${z}/${x}/${y}.png`;
+	const url = `https://www.jma.go.jp/bosai/jmatile/data/nowc/${basetime}/none/${validtime}/surf/hrpns/${z}/${x}/${y}.png`;
+
+	const response = await fetch(url, { signal: abortController.signal });
+	if (!response.ok) {
+		throw new Error(`Network response was not ok for URL: ${url}`);
+	}
+	const arrayBuffer = await response.arrayBuffer();
+	return { data: arrayBuffer };
+}
+
+async function getSatelliteImgTile(
+	params: Parameters<maplibregl.AddProtocolAction>[0],
+	abortController: Parameters<maplibregl.AddProtocolAction>[1]
+): ReturnType<maplibregl.AddProtocolAction> {
+	const zxyMatch = params.url.match(
+		`//satimg/([A-Z0-9]+)/([A-Z0-9]+)/([0-9]+)/([0-9]+)/([0-9]+)\\.`
+	);
+	if (!zxyMatch) {
+		throw new Error(`Invalid URL format: ${params.url}`);
+	}
+	const [, band, prod, z, x, y] = zxyMatch;
+
+	const area = parseInt(z, 10) >= 6 ? 'jp' : 'fd';
+	const targetTimes = await (
+		area === 'jp' ? JMA_TARGETTIMES_JP_CACHE : JMA_TARGETTIMES_FD_CACHE
+	).fetch(abortController);
+	const { basetime, validtime } = targetTimes[targetTimes.length - 1];
+	if (!basetime || !validtime) {
+		//throw new Error('No basetime or validtime found in targetTimes_fd.json');
+		return { data: undefined };
+	}
+	const url = `https://www.jma.go.jp/bosai/himawari/data/satimg/${basetime}/${area}/${validtime}/${band}/${prod}/${z}/${x}/${y}.jpg`;
 
 	const response = await fetch(url, { signal: abortController.signal });
 	if (!response.ok) {
@@ -102,6 +150,8 @@ export function getJmaLayerProtocolAction(protocol: string): maplibregl.AddProto
 
 		if (params.url.startsWith(`${protocol}://nowc/surf/hrpn/`)) {
 			return getNowCastTile(params, abortController);
+		} else if (params.url.startsWith(`${protocol}://satimg/`)) {
+			return getSatelliteImgTile(params, abortController);
 		} else {
 			throw new Error(`Unsupported URL: ${params.url}`);
 		}
