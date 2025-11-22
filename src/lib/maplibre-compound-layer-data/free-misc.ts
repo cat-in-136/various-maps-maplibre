@@ -15,6 +15,18 @@ export const MISC_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerConfigEnt
 			},
 			{
 				type: 'Layer',
+				id: 'base-rekichizu-mierune-hiragana',
+				title: 'れきちず（ひらがな）',
+				url: 'https://mierune.github.io/rekichizu-style/styles/street/style_hira.json'
+			},
+			{
+				type: 'Layer',
+				id: 'base-rekichizu-mierune-hiragana',
+				title: 'れきちず（英語）',
+				url: 'https://mierune.github.io/rekichizu-style/styles/street/style_en.json'
+			},
+			{
+				type: 'Layer',
 				id: 'base-tjmsy-orilibre-global-without-contour',
 				title: 'tjmsy/orilibre Global without Contour',
 				url: tjmsy_orilibre_global_maptiler,
