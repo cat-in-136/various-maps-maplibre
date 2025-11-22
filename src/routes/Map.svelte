@@ -28,6 +28,7 @@
 	import { getGsiDemProtocolAction } from '../lib/maplibre-gsi-dem-protocol';
 	import { getGeoJsonProtocolAction } from '../lib/maplibre-gl-geojson-tiles-qiita';
 	import { DynamicAttributionControl } from '../lib/dynamic_attribution_control';
+	import { getJmaLayerProtocolAction } from '../lib/maplibre-jma-layer-protocol';
 
 	const initMap = () => {
 		const map = new maplibregl.Map({
@@ -127,6 +128,7 @@
 		map.on('load', () => {
 			maplibregl.addProtocol('geojson-tile', getGeoJsonProtocolAction());
 			VectorTextProtocol.addProtocols(maplibregl);
+			maplibregl.addProtocol('jma', getJmaLayerProtocolAction('jma'));
 			maplibregl.addProtocol('gsidem', getGsiDemProtocolAction('gsidem'));
 		});
 

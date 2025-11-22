@@ -11,6 +11,7 @@ import {
 import { GSI_VECTOR_BASE_LAYERS } from './gsi';
 
 import { ICGC_VECTOR_BASE_LAYERS } from './icgc';
+import { WEATHER_OVERLAY_LAYERS } from './weather';
 import { MISC_BASE_LAYERS, MISC_OVERLAY_LAYERS } from './free-misc';
 
 export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
@@ -27,6 +28,7 @@ export const OVERLAY_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConf
 	...OSM_VECTOR_OVERLAY_LAYERS,
 	...ARCGIS_VECTOR_OVERLAY_LAYERS,
 	...OSM_RASTER_OVERLAY_LAYERS,
+	...WEATHER_OVERLAY_LAYERS,
 	...MISC_OVERLAY_LAYERS
 ];
 
