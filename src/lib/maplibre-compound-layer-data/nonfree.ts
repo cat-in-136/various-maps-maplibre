@@ -133,8 +133,20 @@ export function getBaseLayerNonfree(
 						{
 							type: 'Layer',
 							id: 'base-maptiler-jp-mierune-streets',
-							title: 'JP MIERUNE',
+							title: 'JP MIERUNE Streets',
 							url: `https://api.maptiler.com/maps/jp-mierune-streets/style.json?key=${key}`
+						},
+						{
+							type: 'Layer',
+							id: 'base-maptiler-jp-mierune-gray',
+							title: 'JP MIERUNE Gray',
+							url: `https://api.maptiler.com/maps/jp-mierune-gray/style.json?key=${key}`
+						},
+						{
+							type: 'Layer',
+							id: 'base-maptiler-jp-mierune-dark',
+							title: 'JP MIERUNE Dark',
+							url: `https://api.maptiler.com/maps/jp-mierune-dark/style.json?key=${key}`
 						}
 					]
 				},
