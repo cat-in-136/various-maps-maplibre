@@ -40,7 +40,7 @@
 			zoom: 4,
 			hash: true,
 			attributionControl: false,
-			style: (BASE_LAYER_DEFAULT[0] as any).entries[0].url as string
+			style: (BASE_LAYER_DEFAULT[0] as any).entries[0].entries[0].url as string
 		});
 
 		// Dynamic Attribution control

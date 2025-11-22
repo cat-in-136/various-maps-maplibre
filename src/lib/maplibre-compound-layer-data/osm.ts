@@ -18,46 +18,184 @@ export const OSM_VECTOR_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerCon
 		title: 'OSM Vector',
 		entries: [
 			{
-				type: 'Layer',
-				id: 'base-osm-bright',
-				title: 'Bright JA',
-				url: 'https://tile.openstreetmap.jp/styles/osm-bright-ja/style.json'
+				type: 'LayerGroup',
+				title: 'tile.openstreetmap.jp',
+				entries: [
+					{
+						type: 'Layer',
+						id: 'base-osm-bright',
+						title: 'Bright JA',
+						url: 'https://tile.openstreetmap.jp/styles/osm-bright-ja/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-osm-bright',
+						title: 'Bright EN',
+						url: 'https://tile.openstreetmap.jp/styles/osm-bright-en/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-osm-vector',
+						title: 'OSM OpenMapTiles',
+						url: 'https://tile.openstreetmap.jp/styles/openmaptiles/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-osm-maptiler-basic-ja',
+						title: 'Maptiler Basic JA',
+						url: 'https://tile.openstreetmap.jp/styles/maptiler-basic-ja/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-osm-maptiler-basic-en',
+						title: 'Maptiler Basic EN',
+						url: 'https://tile.openstreetmap.jp/styles/maptiler-basic-en/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-osm-tonar-ja',
+						title: 'OSM Maptiler Toner JA',
+						url: 'https://tile.openstreetmap.jp/styles/maptiler-toner-ja/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-osm-tonar-ja',
+						title: 'OSM Maptiler Toner EN',
+						url: 'https://tile.openstreetmap.jp/styles/maptiler-toner-en/style.json'
+					},
+					{
+						type: 'LayerGroup',
+						title: 'OSM Liberty',
+						entries: [
+							{
+								type: 'Layer',
+								id: 'base-osm-liberty',
+								title: 'OSM Liberty',
+								url: osm_liberty_style
+							},
+							{
+								type: 'Layer',
+								id: 'base-osm-liberty-en',
+								title: 'OSM Liberty English',
+								url: osm_liberty_en_style
+							}
+						]
+					}
+				]
 			},
 			{
-				type: 'Layer',
-				id: 'base-osm-bright',
-				title: 'Bright EN',
-				url: 'https://tile.openstreetmap.jp/styles/osm-bright-en/style.json'
-			},
-			{
-				type: 'Layer',
-				id: 'base-osm-vector',
-				title: 'OSM OpenMapTiles',
-				url: 'https://tile.openstreetmap.jp/styles/openmaptiles/style.json'
-			},
-			{
-				type: 'Layer',
-				id: 'base-osm-maptiler-basic-ja',
-				title: 'Maptiler Basic JA',
-				url: 'https://tile.openstreetmap.jp/styles/maptiler-basic-ja/style.json'
-			},
-			{
-				type: 'Layer',
-				id: 'base-osm-maptiler-basic-en',
-				title: 'Maptiler Basic EN',
-				url: 'https://tile.openstreetmap.jp/styles/maptiler-basic-en/style.json'
-			},
-			{
-				type: 'Layer',
-				id: 'base-osm-tonar-ja',
-				title: 'OSM Maptiler Toner JA',
-				url: 'https://tile.openstreetmap.jp/styles/maptiler-toner-ja/style.json'
-			},
-			{
-				type: 'Layer',
-				id: 'base-osm-tonar-ja',
-				title: 'OSM Maptiler Toner EN',
-				url: 'https://tile.openstreetmap.jp/styles/maptiler-toner-en/style.json'
+				type: 'LayerGroup',
+				title: 'Netsyms Basemaps',
+				entries: [
+					{
+						type: 'Layer',
+						id: 'base-netsyms-osm-liberty',
+						title: 'OSM Liberty',
+						url: 'https://maps.netsyms.net/styles/osm-liberty/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-netsyms-klokantech-basic',
+						title: 'Klokantech Basic',
+						url: 'https://maps.netsyms.net/styles/klokantech-basic/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-netsyms-klokantech-3d',
+						title: 'Klokantech 3D',
+						url: 'https://maps.netsyms.net/styles/klokantech-3d/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-netsyms-osm-liberty-printmaps',
+						title: 'OSM Liberty: Print Mode',
+						url: 'https://maps.netsyms.net/styles/osm-liberty-printmaps/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-netsyms-osm-liberty-hillshading',
+						title: 'OSM Liberty with hillshading',
+						url: 'https://maps.netsyms.net/styles/osm-liberty-hillshading/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-netsyms-opentopomap',
+						title: 'OpenTopoMap',
+						url: 'https://maps.netsyms.net/styles/opentopomap/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-netsyms-klokantech-terrain',
+						title: 'Klokantech Terrain',
+						url: 'https://maps.netsyms.net/styles/klokantech-terrain/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-netsyms-klokantech-terrain-freehills',
+						title: 'Klokantech Terrain with Free Hillshading',
+						url: 'https://maps.netsyms.net/styles/klokantech-terrain-freehills/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-netsyms-positron',
+						title: 'Positron',
+						url: 'https://maps.netsyms.net/styles/positron/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-netsyms-toner',
+						title: 'Toner',
+						url: 'https://maps.netsyms.net/styles/toner/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-netsyms-cassini',
+						title: 'Cassini',
+						url: 'https://maps.netsyms.net/styles/cassini/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-netsyms-osm-liberty-dark',
+						title: 'OSM Liberty Dark',
+						url: 'https://maps.netsyms.net/styles/osm-liberty-dark/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-netsyms-dark-matter',
+						title: 'Dark Matter',
+						url: 'https://maps.netsyms.net/styles/dark-matter/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-netsyms-fiord-color',
+						title: 'Fiord Color',
+						url: 'https://maps.netsyms.net/styles/fiord-color/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-netsyms-oled-black',
+						title: 'OLED Black',
+						url: 'https://maps.netsyms.net/styles/oled-black/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-netsyms-terranquest-3d',
+						title: 'TerranQuest 3D',
+						url: 'https://maps.netsyms.net/styles/terranquest-3d/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-netsyms-terranquest-flat',
+						title: 'TerranQuest Flat',
+						url: 'https://maps.netsyms.net/styles/terranquest-flat/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-netsyms-terranquest-simple',
+						title: 'TerranQuest Simple',
+						url: 'https://maps.netsyms.net/styles/terranquest-simple/style.json'
+					}
+				]
 			},
 			{
 				type: 'LayerGroup',
@@ -98,24 +236,6 @@ export const OSM_VECTOR_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerCon
 						id: 'base-cartocdn-voyager-nolabels',
 						title: 'Voyager No Labels',
 						url: 'https://basemaps.cartocdn.com/gl/voyager-nolabels-gl-style/style.json'
-					}
-				]
-			},
-			{
-				type: 'LayerGroup',
-				title: 'OSM Liberty',
-				entries: [
-					{
-						type: 'Layer',
-						id: 'base-osm-liberty',
-						title: 'OSM Liberty',
-						url: osm_liberty_style
-					},
-					{
-						type: 'Layer',
-						id: 'base-osm-liberty-en',
-						title: 'OSM Liberty English',
-						url: osm_liberty_en_style
 					}
 				]
 			}
