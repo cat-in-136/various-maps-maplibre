@@ -100,6 +100,45 @@ export const WEATHER_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerCon
 							'<a href="https://www.jma.go.jp/jma/kishou/info/coment.html">© Japan Meteorological Agency</a>'
 					}
 				]
+			},
+			{
+				type: 'LayerGroup',
+				title: 'NOAA NESDIS',
+				entries: [
+					{
+						type: 'Layer',
+						id: 'overlay-weather-noaa-nesdis-GOES-GOES-current',
+						title: 'NOAA Infrared Satellite Imagery (current)',
+						url: 'https://gis.nnvl.noaa.gov/arcgis/rest/services/GOES/GOES_current/ImageServer/tile/{z}/{y}/{x}',
+						layerFormat: { tile: 'raster' },
+						minZoom: 0,
+						maxZoom: 8,
+						attribution:
+							'<a href="https://www.nesdis.noaa.gov/imagery/interactive-maps/how-use-the-interactive-satellite-maps">NOAA  National Environmental Satellite, Data, and Information Service</a>'
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-weather-noaa-nesdis-GOES-GOES-current',
+						title: 'NOAA Infrared Satellite Imagery (transparent) (current)',
+						url: 'cloud-satellite-png://https://gis.nnvl.noaa.gov/arcgis/rest/services/GOES/GOES_current/ImageServer/tile/{z}/{y}/{x}',
+						layerFormat: { tile: 'raster' },
+						minZoom: 0,
+						maxZoom: 8,
+						attribution:
+							'<a href="https://www.nesdis.noaa.gov/imagery/interactive-maps/how-use-the-interactive-satellite-maps">NOAA  National Environmental Satellite, Data, and Information Service</a>'
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-weather-noaa-nesdis-TRUE-TRUE-current',
+						title: 'Global satellite map - TRUE Color (current)',
+						url: 'https://gis.nnvl.noaa.gov/arcgis/rest/services/TRUE/TRUE_current/ImageServer/tile/{z}/{y}/{x}',
+						layerFormat: { tile: 'raster' },
+						minZoom: 0,
+						maxZoom: 8,
+						attribution:
+							'<a href="https://www.nesdis.noaa.gov/imagery/interactive-maps/how-use-the-interactive-satellite-maps">NOAA  National Environmental Satellite, Data, and Information Service</a>'
+					}
+				]
 			}
 		]
 	}

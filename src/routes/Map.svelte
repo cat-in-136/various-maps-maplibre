@@ -28,7 +28,10 @@
 	import { getGsiDemProtocolAction } from '../lib/maplibre-gsi-dem-protocol';
 	import { getGeoJsonProtocolAction } from '../lib/maplibre-gl-geojson-tiles-qiita';
 	import { DynamicAttributionControl } from '../lib/dynamic_attribution_control';
-	import { getJmaLayerProtocolAction } from '../lib/maplibre-jma-layer-protocol';
+	import {
+		getJmaLayerProtocolAction,
+		getCloudSatelliteToPngProtocolAction
+	} from '../lib/maplibre-live-satellite-layer-protocol';
 
 	const initMap = () => {
 		const map = new maplibregl.Map({
@@ -129,6 +132,10 @@
 			maplibregl.addProtocol('geojson-tile', getGeoJsonProtocolAction());
 			VectorTextProtocol.addProtocols(maplibregl);
 			maplibregl.addProtocol('jma', getJmaLayerProtocolAction('jma'));
+			maplibregl.addProtocol(
+				'cloud-satellite-png',
+				getCloudSatelliteToPngProtocolAction('cloud-satellite-png')
+			);
 			maplibregl.addProtocol('gsidem', getGsiDemProtocolAction('gsidem'));
 		});
 

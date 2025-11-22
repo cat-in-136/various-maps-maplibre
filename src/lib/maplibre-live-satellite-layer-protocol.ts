@@ -206,3 +206,28 @@ export function getJmaLayerProtocolAction(protocol: string): maplibregl.AddProto
 		}
 	};
 }
+
+/** Get MapLibre protocol action for Cloud Satellite PNG tiles
+ *
+ * @param protocol Protocol name (e.g., "cloud-satellite-png")
+ * @returns Protocol action
+ */
+export function getCloudSatelliteToPngProtocolAction(
+	protocol: string
+): maplibregl.AddProtocolAction {
+	return async (params, abortController) => {
+		if (!params.url.startsWith(`${protocol}://`)) {
+			throw new Error(`Tile URL must be starts with ${protocol}://`);
+		}
+
+		const url = params.url.substring(`${protocol}://`.length);
+		const response = await fetch(url, { signal: abortController.signal });
+		if (!response.ok) {
+			throw new Error(`Network response was not ok for URL: ${url}`);
+		}
+		const blob = await response.blob();
+		const pngBlob = await convertCloudSatelliteJpegToPng(blob);
+		const arrayBuffer = await pngBlob.arrayBuffer();
+		return { data: arrayBuffer };
+	};
+}
