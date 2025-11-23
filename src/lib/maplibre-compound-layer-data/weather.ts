@@ -67,7 +67,7 @@ export const WEATHER_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerCon
 						minZoom: 3,
 						maxZoom: 6,
 						attribution:
-							'<a href="https://www.jma.go.jp/jma/kishou/info/coment.html">© Japan Meteorological Agency</a>'
+							'<a href="https://www.jma.go.jp/jma/kishou/info/coment.html">Japan Meteorological Agency</a>'
 					},
 					{
 						type: 'Layer',
@@ -77,7 +77,7 @@ export const WEATHER_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerCon
 						minZoom: 3,
 						maxZoom: 6,
 						attribution:
-							'<a href="https://www.jma.go.jp/jma/kishou/info/coment.html">© Japan Meteorological Agency</a>'
+							'<a href="https://www.jma.go.jp/jma/kishou/info/coment.html">Japan Meteorological Agency</a>'
 					},
 					{
 						type: 'Layer',
@@ -87,7 +87,7 @@ export const WEATHER_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerCon
 						minZoom: 3,
 						maxZoom: 6,
 						attribution:
-							'<a href="https://www.jma.go.jp/jma/kishou/info/coment.html">© Japan Meteorological Agency</a>'
+							'<a href="https://www.jma.go.jp/jma/kishou/info/coment.html">Japan Meteorological Agency</a> | NOAA National Environmental Satellite, Data, and Information Service | Colorado State University-CIRA'
 					},
 					{
 						type: 'Layer',
@@ -97,7 +97,7 @@ export const WEATHER_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerCon
 						minZoom: 3,
 						maxZoom: 6,
 						attribution:
-							'<a href="https://www.jma.go.jp/jma/kishou/info/coment.html">© Japan Meteorological Agency</a>'
+							'<a href="https://www.jma.go.jp/jma/kishou/info/coment.html">Japan Meteorological Agency</a>'
 					}
 				]
 			},
