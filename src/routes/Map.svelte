@@ -33,6 +33,8 @@
 		getCloudSatelliteToPngProtocolAction
 	} from '../lib/maplibre-live-satellite-layer-protocol';
 
+	let isDark = false;
+
 	const initMap = () => {
 		const map = new maplibregl.Map({
 			container: 'map',
@@ -339,6 +341,13 @@
 			map.addControl(new maplibregl.GlobeControl());
 		});
 
+		// Dark mode handling
+		map.on('styledata', () => {
+			const layer_id: string = layerswitcher.baseLayerEntriesSelected().next().value?.id || '';
+			const DARK_ID_REGEX = /(dark|black|hybrid|imagery|satellite|fiord-color|arcgis-Nova)/i;
+			isDark = map.getSky() === undefined && DARK_ID_REGEX.test(layer_id);
+		});
+
 		map.on('contextmenu', (e: maplibregl.MapMouseEvent) => {
 			const { lng, lat } = e.lngLat;
 			const zoom = map.getZoom();
@@ -481,11 +490,14 @@
 	onMount(initMap);
 </script>
 
-<div id="map"></div>
+<div id="map" class:dark={isDark}></div>
 
 <style>
 	#map {
 		width: 100%;
 		height: 100%;
+	}
+	#map:global(.dark) {
+		background-color: #000;
 	}
 </style>

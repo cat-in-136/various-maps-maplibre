@@ -89,7 +89,7 @@ namespace LayerTreeView {
 						yield entry as LayerEntry;
 					}
 				} else if ((entry as LayerGroupEntry).type === 'LayerGroupEntry') {
-					yield* (entry as LayerGroupEntry).layerEntriesAll();
+					yield* (entry as LayerGroupEntry).layerEntriesSelected();
 				} else {
 					throw new Error(`Not implemented type`);
 				}
