@@ -72,9 +72,21 @@ export function getBaseLayerNonfree(
 						},
 						{
 							type: 'Layer',
+							id: 'base-maptiler-dataviz-v4',
+							title: 'Dataviz v4',
+							url: `https://api.maptiler.com/maps/dataviz-v4/style.json?key=${key}`
+						},
+						{
+							type: 'Layer',
 							id: 'base-maptiler-landscape',
 							title: 'Landscape',
 							url: `https://api.maptiler.com/maps/landscape/style.json?key=${key}`
+						},
+						{
+							type: 'Layer',
+							id: 'base-maptiler-landscape-v4',
+							title: 'Landscape v4',
+							url: `https://api.maptiler.com/maps/landscape-v4/style.json?key=${key}`
 						},
 						{
 							type: 'Layer',
@@ -96,6 +108,12 @@ export function getBaseLayerNonfree(
 						},
 						{
 							type: 'Layer',
+							id: 'base-maptiler-outdoor-v4',
+							title: 'Outdoor v4',
+							url: `https://api.maptiler.com/maps/outdoor-v4/style.json?key=${key}`
+						},
+						{
+							type: 'Layer',
 							id: 'base-maptiler-satellite',
 							title: 'Satellite',
 							url: `https://api.maptiler.com/maps/satellite/style.json?key=${key}`
@@ -104,6 +122,12 @@ export function getBaseLayerNonfree(
 							type: 'Layer',
 							id: 'base-maptiler-streets-v2',
 							title: 'Streets',
+							url: `https://api.maptiler.com/maps/streets-v2/style.json?key=${key}`
+						},
+						{
+							type: 'Layer',
+							id: 'base-maptiler-streets-v4',
+							title: 'Streets v4',
 							url: `https://api.maptiler.com/maps/streets-v2/style.json?key=${key}`
 						},
 						{
@@ -120,9 +144,21 @@ export function getBaseLayerNonfree(
 						},
 						{
 							type: 'Layer',
+							id: 'base-maptiler-topo-v4',
+							title: 'Topo v4',
+							url: `https://api.maptiler.com/maps/topo-v4/style.json?key=${key}`
+						},
+						{
+							type: 'Layer',
 							id: 'base-maptiler-winter-v2',
 							title: 'Winter',
 							url: `https://api.maptiler.com/maps/winter-v2/style.json?key=${key}`
+						},
+						{
+							type: 'Layer',
+							id: 'base-maptiler-winter-v4',
+							title: 'Winter v4',
+							url: `https://api.maptiler.com/maps/winter-v4/style.json?key=${key}`
 						}
 					]
 				},
@@ -238,7 +274,7 @@ export function getOverlayLayerNonfree(
 					type: 'Layer',
 					id: 'overlay-maptiler-contours',
 					title: 'Contours',
-					url: `https://api.maptiler.com/maps/topo-v2/style.json?key=${key}`,
+					url: `https://api.maptiler.com/maps/topo-v4/style.json?key=${key}`,
 					styleSwapOptions: {
 						transformStyle: (_previous, next) => {
 							return {
@@ -266,7 +302,7 @@ export function getOverlayLayerNonfree(
 					type: 'Layer',
 					id: 'overlay-maptiler-outdoor',
 					title: 'Outdoor',
-					url: `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${key}`,
+					url: `https://api.maptiler.com/maps/outdoor-v4/style.json?key=${key}`,
 					styleSwapOptions: {
 						transformStyle: (_previous, next) => {
 							return {
