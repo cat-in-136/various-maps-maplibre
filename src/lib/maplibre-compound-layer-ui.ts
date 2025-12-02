@@ -440,27 +440,30 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 				const layer = e.detail.layerEntry.config;
 				const id = layer.id;
 				if ((layerFormat as { tile: 'raster' }).tile === 'raster') {
-					this.#map.setStyle({
-						version: 8,
-						sources: {
-							[`source-${id}-raster`]: {
-								type: 'raster',
-								tiles: [layer.url],
-								tileSize: layer.tileSize ?? 256,
-								scheme: layer.scheme ?? 'xyz',
-								attribution: layer.attribution as string | undefined
-							}
+					this.#map.setStyle(
+						{
+							version: 8,
+							sources: {
+								[`source-${id}-raster`]: {
+									type: 'raster',
+									tiles: [layer.url],
+									tileSize: layer.tileSize ?? 256,
+									scheme: layer.scheme ?? 'xyz',
+									attribution: layer.attribution as string | undefined
+								}
+							},
+							layers: [
+								{
+									id: `layer-${id}-raster`,
+									type: 'raster',
+									source: `source-${id}-raster`,
+									minzoom: layer.minZoom ?? 0,
+									maxzoom: layer.maxZoom ?? 22
+								}
+							]
 						},
-						layers: [
-							{
-								id: `layer-${id}-raster`,
-								type: 'raster',
-								source: `source-${id}-raster`,
-								minzoom: layer.minZoom ?? 0,
-								maxzoom: layer.maxZoom ?? 22
-							}
-						]
-					});
+						{ diff: false }
+					);
 					if (layer.maxNativeZoom ?? layer.maxZoom) {
 						this.#map.setMaxZoom(layer.maxNativeZoom ?? layer.maxZoom);
 					}
@@ -472,7 +475,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 					}
 				} else if (layerFormat === 'style') {
 					const setStyleOption = layer.styleSwapOptions || {};
-					this.#map.setStyle(layer.url, setStyleOption);
+					this.#map.setStyle(layer.url, { ...setStyleOption, diff: false });
 					if (layer.maxNativeZoom) {
 						this.#map.setMaxZoom(layer.maxNativeZoom);
 					}
