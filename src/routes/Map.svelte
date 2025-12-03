@@ -398,7 +398,22 @@
 					const rand = Math.random().toString(32).substring(2);
 					const id = `${file.name.replaceAll(/[-_.\s]/g, '-')}-${rand}`;
 
-					if (/\.overlay\.json$/i.test(file.name)) {
+					if (/layers.*\.txt(\.json)?$/i.test(file.name)) {
+						const json = await file.text().then(JSON.parse);
+						console.debug({ json, file });
+						if (
+							Array.isArray(json.layers) &&
+							(json.layers[0].type === 'Layer' || json.layers[0].type === 'LayerGroup')
+						) {
+							overlay_entries.push({
+								type: 'LayerGroup',
+								title: file.name,
+								entries: json.layers
+							});
+						} else {
+							console.debug(`Unsupported JSON format: ${file.name}`);
+						}
+					} else if (/\.overlay\.json$/i.test(file.name)) {
 						const json = await file.text().then(JSON.parse);
 						if (
 							json.version === 8 &&
