@@ -19,7 +19,7 @@ export const OSM_VECTOR_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerCon
 		entries: [
 			{
 				type: 'LayerGroup',
-				title: 'tile.openstreetmap.jp',
+				title: 'OSMFJ',
 				entries: [
 					{
 						type: 'Layer',
@@ -277,7 +277,7 @@ export const OSM_VECTOR_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.Layer
 		entries: [
 			{
 				type: 'LayerGroup',
-				title: 'Tonar',
+				title: 'OSMFJ',
 				entries: [
 					{
 						type: 'Layer',
@@ -311,13 +311,18 @@ export const OSM_VECTOR_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.Layer
 								return { ...next, layers: next.layers.filter((v) => v.type === 'line') };
 							}
 						}
-					}
-				]
-			},
-			{
-				type: 'LayerGroup',
-				title: 'OSM Liberty',
-				entries: [
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-osm-mountains',
+						title: 'OSM OpenMapTiles Mountain Peaks',
+						url: 'https://tile.openstreetmap.jp/styles/openmaptiles/style.json',
+						styleSwapOptions: {
+							transformStyle: (_previous, next) => {
+								return { ...next, layers: next.layers.filter((v) => v.id === 'mountain_peak') };
+							}
+						}
+					},
 					{
 						type: 'Layer',
 						id: 'overlay-osm-liberty',
