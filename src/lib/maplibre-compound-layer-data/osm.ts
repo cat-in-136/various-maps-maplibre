@@ -2,6 +2,7 @@ import * as MaplibreCompondLayerUI from '../maplibre-compound-layer-ui';
 
 import osm_liberty_style from '../../../static/assets/map-data/osm-liberty-style.min.json?url';
 import osm_liberty_en_style from '../../../static/assets/map-data/osm-liberty-en-style.min.json?url';
+import osm_railways_catin136 from '../../../static/assets/map-data/osm-railways-catin136.min.overlay.json?url';
 import openrailwaymap_standard_light from '../../../static/assets/map-data/openrailwaymap-standard-light.min.overlay.json?url';
 import openrailwaymap_speed_light from '../../../static/assets/map-data/openrailwaymap-speed-light.min.overlay.json?url';
 import openrailwaymap_signals_light from '../../../static/assets/map-data/openrailwaymap-signals-light.min.overlay.json?url';
@@ -355,6 +356,12 @@ export const OSM_VECTOR_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.Layer
 								return { ...next, layers: next.layers.filter((v) => v.type === 'fill-extrusion') };
 							}
 						}
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-osm-railways-catin136',
+						title: 'OSM Railways',
+						url: osm_railways_catin136
 					}
 				]
 			},
