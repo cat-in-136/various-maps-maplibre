@@ -1,6 +1,6 @@
 import * as MaplibreCompondLayerUI from '../maplibre-compound-layer-ui';
 
-import tjmsy_orilibre_global_maptiler from '../../../static/assets/map-data/tjmsy-orilibre-global-maptiler.min.json?url';
+import tjmsy_orilibre_global_osmfj_netsyms from '../../../static/assets/map-data/tjmsy-orilibre-global-osmfj-netsyms.min.json?url';
 
 export const MISC_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
 	{
@@ -27,26 +27,10 @@ export const MISC_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerConfigEnt
 			},
 			{
 				type: 'Layer',
-				id: 'base-tjmsy-orilibre-global-without-contour',
-				title: 'tjmsy/orilibre Global without Contour',
-				url: tjmsy_orilibre_global_maptiler,
-				html: `<a href="https://github.com/tjmsy/orilibre">tjmsy/orilibre</a>'s Global (without Contour), converted into a maplibre style json.`,
-				styleSwapOptions: {
-					transformStyle: (_previous, next) => {
-						// Remove the source with id 'contours'
-						if (next.sources && next.sources['contours']) {
-							delete next.sources['contours'];
-						}
-
-						// Remove layers that reference the 'contours' source
-						if (next.layers) {
-							next.layers = next.layers.filter((layer) => {
-								return !('source' in layer && layer.source === 'contours');
-							});
-						}
-						return next;
-					}
-				}
+				id: 'base-tjmsy-orilibre-global',
+				title: 'tjmsy/orilibre Global (modified)',
+				url: tjmsy_orilibre_global_osmfj_netsyms,
+				html: `<a href="https://github.com/tjmsy/orilibre">tjmsy/orilibre</a>'s Global, converted into a maplibre style json and modified to use OSMFJ and Netsyms.`
 			},
 			{
 				type: 'LayerGroup',
