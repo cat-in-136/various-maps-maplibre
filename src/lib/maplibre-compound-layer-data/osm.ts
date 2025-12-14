@@ -355,6 +355,29 @@ export const OSM_VECTOR_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.Layer
 			},
 			{
 				type: 'LayerGroup',
+				title: 'Netsyms',
+				entries: [
+					{
+						type: 'Layer',
+						id: 'overlay-netsyms-opentopomap-contours',
+						title: 'OpenTopoMap Contours',
+						url: 'https://maps.netsyms.net/styles/opentopomap/style.json',
+						styleSwapOptions: {
+							transformStyle: (_previous, next) => {
+								return {
+									...next,
+									sources: { contours: next.sources['contours'] },
+									layers: next.layers.filter(
+										(v) => (v.type === 'symbol' || v.type === 'line') && v.source === 'contours'
+									)
+								};
+							}
+						}
+					}
+				]
+			},
+			{
+				type: 'LayerGroup',
 				title: 'OpenRailwayMap',
 				entries: [
 					{
