@@ -2,6 +2,7 @@ import * as MaplibreCompondLayerUI from '../maplibre-compound-layer-ui';
 
 import osm_liberty_style from '../../../static/assets/map-data/osm-liberty-style.min.json?url';
 import osm_liberty_en_style from '../../../static/assets/map-data/osm-liberty-en-style.min.json?url';
+import osm_maptiler_3d_style from '../../../static/assets/map-data/osm-maptiler-3d-gl-style.min.json?url';
 import osm_railways_catin136 from '../../../static/assets/map-data/osm-railways-catin136.min.overlay.json?url';
 import openrailwaymap_standard_light from '../../../static/assets/map-data/openrailwaymap-standard-light.min.overlay.json?url';
 import openrailwaymap_speed_light from '../../../static/assets/map-data/openrailwaymap-speed-light.min.overlay.json?url';
@@ -63,6 +64,12 @@ export const OSM_VECTOR_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerCon
 						id: 'base-osm-tonar-ja',
 						title: 'OSM Maptiler Toner EN',
 						url: 'https://tile.openstreetmap.jp/styles/maptiler-toner-en/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-osm-maptiler-3d',
+						title: 'OSM Maptiler 3D',
+						url: osm_maptiler_3d_style
 					},
 					{
 						type: 'LayerGroup',
@@ -351,6 +358,17 @@ export const OSM_VECTOR_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.Layer
 						id: 'overlay-osm-liberty-building-3d',
 						title: 'OSM Liberty Building 3D',
 						url: osm_liberty_style,
+						styleSwapOptions: {
+							transformStyle: (_previous, next) => {
+								return { ...next, layers: next.layers.filter((v) => v.type === 'fill-extrusion') };
+							}
+						}
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-osm-3d-building',
+						title: 'OSM Maptiler 3D Building (Color)',
+						url: osm_maptiler_3d_style,
 						styleSwapOptions: {
 							transformStyle: (_previous, next) => {
 								return { ...next, layers: next.layers.filter((v) => v.type === 'fill-extrusion') };
