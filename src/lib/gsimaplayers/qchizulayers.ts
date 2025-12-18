@@ -3,7 +3,7 @@ import * as MaplibreCompondLayerUI from '../../lib/maplibre-compound-layer-ui';
 
 const QCHIZULAYERS: { url: string }[] = [
 	{
-		url: 'https://qchizu.github.io/qchizu/layers_txt/layers98.txt'
+		url: 'https://qchizu.github.io/qchizu/layers_txt/reinfolib.txt'
 	},
 	{
 		url: 'https://qchizu.github.io/qchizu/layers_txt/layers99.txt'
@@ -38,6 +38,36 @@ export class QChizuLayers extends GSIMapLayers {
 					layer.url === './layers_json/54_ksj_kokuyurinya_2018_01.json' // pmtiles
 				) {
 					return undefined;
+				} else if (layer.url.startsWith('./layers_json/reinfolib_')) {
+					layer.url = `https://qchizu.github.io/qchizu/${layer.url.substring(2)}`;
+					layer.styleSwapOptions = {
+						// Replace Qchizu-API-proxy reinfolib URL with Geolonia CDN URL
+						transformStyle: (_previous, next) => {
+							const QCHIZU_REINFOLIB_PROXY_URI_REGEX =
+								/^https:\/\/api\.qchizu\.jp\/proxy\.php\?url=https:\/\/www\.reinfolib\.mlit\.go\.jp\/ex-api\/external\/([^?]+)\?response_format=pbf&z=\{z\}&x=\{x\}&y=\{y\}$/;
+
+							for (const k in next.sources) {
+								const source = next.sources[k];
+								if (
+									source.type === 'vector' &&
+									Array.isArray(source.tiles) &&
+									(source.tiles as Array<string>).some((v) =>
+										v.match(QCHIZU_REINFOLIB_PROXY_URI_REGEX)
+									)
+								) {
+									source.tiles = (source.tiles as Array<string>).map((v) =>
+										v.replace(
+											QCHIZU_REINFOLIB_PROXY_URI_REGEX,
+											'https://du6jhqfvlioa4.cloudfront.net/ex-api/external/$1/{z}/{x}/{y}.pbf'
+										)
+									);
+									source.attribution +=
+										'| <a href="https://blog.geolonia.com/2025/04/18/mlit-estate-library-proxy-api">Geolonia</a>';
+								}
+							}
+							return next;
+						}
+					};
 				} else if (layer.url.startsWith('./layers_json/')) {
 					layer.url = `https://qchizu.github.io/qchizu/${layer.url.substring(2)}`;
 				} else if (layer.url.startsWith('http://')) {
