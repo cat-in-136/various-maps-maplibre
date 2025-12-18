@@ -1,5 +1,3 @@
-import Encoding from 'encoding-japanese';
-//import type Encoding from '@types/encoding-japanese';
 import * as MaplibreCompondLayerUI from '../../lib/maplibre-compound-layer-ui';
 
 export interface GSIMapLayerConfig {
@@ -72,13 +70,12 @@ export class GSIMapLayers {
 					const url = config.url;
 					const response = await fetch(url);
 					if (response.ok) {
-						const respBuff = await response.bytes();
-						return JSON.parse(
-							Encoding.convert(respBuff, {
-								to: 'UNICODE',
-								type: 'string'
-							})
-						);
+						try {
+							return await response.json();
+						} catch (e) {
+							console.debug(`Failed to load ${url}`, e);
+						}
+						return undefined;
 					} else {
 						return undefined;
 					}
