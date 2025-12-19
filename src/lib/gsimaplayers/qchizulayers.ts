@@ -44,7 +44,7 @@ export class QChizuLayers extends GSIMapLayers {
 						// Replace Qchizu-API-proxy reinfolib URL with Geolonia CDN URL
 						transformStyle: (_previous, next) => {
 							const QCHIZU_REINFOLIB_PROXY_URI_REGEX =
-								/^https:\/\/api\.qchizu\.jp\/proxy\.php\?url=https:\/\/www\.reinfolib\.mlit\.go\.jp\/ex-api\/external\/([^?]+)\?response_format=pbf&z=\{z\}&x=\{x\}&y=\{y\}$/;
+								/^https:\/\/api\.qchizu\.jp\/proxy\.php\?url=https:\/\/www\.reinfolib\.mlit\.go\.jp\/ex-api\/external\/([^?]+)\?response_format=pbf&z=\{z\}&x=\{x\}&y=\{y\}(&?)/;
 
 							for (const k in next.sources) {
 								const source = next.sources[k];
@@ -58,7 +58,10 @@ export class QChizuLayers extends GSIMapLayers {
 									source.tiles = (source.tiles as Array<string>).map((v) =>
 										v.replace(
 											QCHIZU_REINFOLIB_PROXY_URI_REGEX,
-											'https://du6jhqfvlioa4.cloudfront.net/ex-api/external/$1/{z}/{x}/{y}.pbf'
+											(_match: string, p1: string, p2: string) => {
+												const rest = p2 ? '?' : '';
+												return `https://du6jhqfvlioa4.cloudfront.net/ex-api/external/${p1}/{z}/{x}/{y}.pbf${rest}`;
+											}
 										)
 									);
 									source.attribution +=
