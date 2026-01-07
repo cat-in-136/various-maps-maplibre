@@ -92,6 +92,11 @@ async function processGeojsonTile(
 	const tile = tileIndex.getTile(z, x, y);
 	//console.log(tile);
 
+	if (tile === null) {
+		// Return a transparent 1x1 pixel RGBA image if no data is found for this tile
+		return new Uint8Array([0, 0, 0, 0]);
+	}
+
 	const buffer = fromGeojsonVt({ v: tile });
 	return buffer;
 }
