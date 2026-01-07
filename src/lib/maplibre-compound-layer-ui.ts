@@ -50,9 +50,6 @@ namespace LayerTreeView {
 		}>;
 		LayerModificationChanged: CustomEvent<{
 			type: 'LayerModificationChanged';
-			modifyEnabled: boolean;
-			opacity?: number | undefined;
-			color?: string | undefined;
 			layerEntry: LayerEntry;
 			sourceEvent: Event;
 		}>;
@@ -378,8 +375,6 @@ namespace LayerTreeView {
 							detail: {
 								type: 'LayerModificationChanged',
 								modifyEnabled,
-								opacity,
-								color: colorValue,
 								layerEntry: this,
 								sourceEvent: e
 							}
