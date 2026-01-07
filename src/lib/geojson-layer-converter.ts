@@ -438,4 +438,35 @@ export namespace GeoJsonLayerConverter {
 			);
 		}
 	}
+
+	export function updateColor(layer: LayerConfig.Layer, map: maplibregl.Map, color?: string) {
+		const id = layer.id;
+		const defaultPaint = {
+			fill: Styling.getDefaultPaintForPolygonFill(false),
+			line: Styling.getDefaultPaintForLineLine(false),
+			circle: Styling.getDefaultPaintForPointCircle(false)
+		};
+
+		if (color !== undefined) {
+			map.setPaintProperty(`layer-${id}-geojson-fill`, 'fill-color', color);
+			map.setPaintProperty(`layer-${id}-geojson-line`, 'line-color', color);
+			map.setPaintProperty(`layer-${id}-geojson-circle`, 'circle-color', color);
+		} else {
+			map.setPaintProperty(
+				`layer-${id}-geojson-fill`,
+				'fill-color',
+				defaultPaint.fill['fill-color']
+			);
+			map.setPaintProperty(
+				`layer-${id}-geojson-line`,
+				'line-color',
+				defaultPaint.line['line-color']
+			);
+			map.setPaintProperty(
+				`layer-${id}-geojson-circle`,
+				'circle-color',
+				defaultPaint.circle['circle-color']
+			);
+		}
+	}
 }

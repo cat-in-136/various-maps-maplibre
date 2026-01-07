@@ -256,6 +256,24 @@ namespace LayerTreeView {
 				return undefined;
 			}
 		}
+		get color(): string | undefined {
+			if (
+				(this.#layerFormat as { tile: 'raster' }).tile === 'raster' ||
+				(this.#layerFormat as { tile: 'geojson' }).tile === 'geojson' ||
+				(this.#layerFormat as { single: 'geojson' }).single === 'geojson'
+			) {
+				const modifyEnabled = this.#element.querySelector(
+					`.${ELEMENT_CLASS_PREFIX}-layer-entry-modify-enabled input[type=checkbox]`
+				) as HTMLInputElement;
+				const color = this.#element.querySelector(
+					`.${ELEMENT_CLASS_PREFIX}-layer-entry-color input[type=color]`
+				) as HTMLInputElement;
+
+				return modifyEnabled && modifyEnabled.checked && color ? color.value : undefined;
+			} else {
+				return undefined;
+			}
+		}
 		#createElement() {
 			this.#element.innerHTML = '';
 			this.#element.className = `${ELEMENT_CLASS_PREFIX}-layer-entry`;
@@ -317,6 +335,10 @@ namespace LayerTreeView {
           <label class="${ELEMENT_CLASS_PREFIX}-layer-entry-opacity">
             <span>Opacity</span>
             <input type="range" min="0" max="255" value="255" />
+          </label>
+          <label class="${ELEMENT_CLASS_PREFIX}-layer-entry-color">
+            <span>Color</span>
+            <input type="color" value="#ff0000" />
           </label>`;
 
 				const modifyEnabledCheckbox = container.querySelector(
@@ -325,23 +347,31 @@ namespace LayerTreeView {
 				const opacityRange = container.querySelector(
 					`.${ELEMENT_CLASS_PREFIX}-layer-entry-opacity input[type=range]`
 				) as HTMLInputElement;
+				const color = container.querySelector(
+					`.${ELEMENT_CLASS_PREFIX}-layer-entry-color input[type=color]`
+				) as HTMLInputElement;
 				if ((this.#layerFormat as { tile: 'raster' }).tile === 'raster') {
 					modifyEnabledCheckbox.checked = true;
 					modifyEnabledCheckbox.disabled = true;
-				} else if ((this.#layerFormat as { tile: 'geojson' }).tile === 'geojson') {
+					color.disabled = true;
+					color.parentElement!.style.display = 'none';
+				} else if (
+					(this.#layerFormat as { tile: 'geojson' }).tile === 'geojson' ||
+					(this.#layerFormat as { single: 'geojson' }).single === 'geojson'
+				) {
 					modifyEnabledCheckbox.checked = false;
 					opacityRange.disabled = true;
-				} else if ((this.#layerFormat as { single: 'geojson' }).single === 'geojson') {
-					modifyEnabledCheckbox.checked = false;
-					opacityRange.disabled = true;
+					color.disabled = true;
 				}
 				this.#element.appendChild(container);
 
 				const updateLayerModification = (e: Event) => {
 					const modifyEnabled = modifyEnabledCheckbox.checked;
 					const opacity = parseInt(opacityRange.value, 10);
+					const colorValue = color.value;
 
 					opacityRange.disabled = !modifyEnabled;
+					color.disabled = !modifyEnabled;
 
 					this.#owner.fireEvent(
 						new CustomEvent('LayerModificationChanged', {
@@ -349,6 +379,7 @@ namespace LayerTreeView {
 								type: 'LayerModificationChanged',
 								modifyEnabled,
 								opacity,
+								color: colorValue,
 								layerEntry: this,
 								sourceEvent: e
 							}
@@ -357,6 +388,7 @@ namespace LayerTreeView {
 				};
 				modifyEnabledCheckbox.addEventListener('change', updateLayerModification, false);
 				opacityRange.addEventListener('change', updateLayerModification, false);
+				color.addEventListener('change', updateLayerModification, false);
 			}
 		}
 
@@ -595,6 +627,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 					(layerFormat as { single: 'geojson' }).single === 'geojson'
 				) {
 					GeoJsonLayerConverter.updateOpacity(layer, this.#map, e.detail.layerEntry.opacity);
+					GeoJsonLayerConverter.updateColor(layer, this.#map, e.detail.layerEntry.color);
 				}
 			}
 		});
