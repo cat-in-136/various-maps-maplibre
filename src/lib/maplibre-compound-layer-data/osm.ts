@@ -88,6 +88,24 @@ export const OSM_VECTOR_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerCon
 								url: osm_liberty_en_style
 							}
 						]
+					},
+					{
+						type: 'LayerGroup',
+						title: 'tris5572/map-style',
+						entries: [
+							{
+								type: 'Layer',
+								id: 'base-tris5572-dark',
+								title: 'dark',
+								url: 'https://tris5572.github.io/map-style/dark/style.json'
+							},
+							{
+								type: 'Layer',
+								id: 'base-tris5572-light',
+								title: 'light',
+								url: 'https://tris5572.github.io/map-style/light/style.json'
+							}
+						]
 					}
 				]
 			},
