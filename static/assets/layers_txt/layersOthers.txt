@@ -1,0 +1,476 @@
+{
+  "layers": [
+    {
+      "type": "LayerGroup",
+      "title": "空中写真",
+      "entries": [
+        {
+          "type": "LayerGroup",
+          "title": "国交省 PLATEAUオルソ",
+          "entries": [
+            {
+              "type": "Layer",
+              "id": "overlay-others-plateau-ortho-streaming2023",
+              "title": "-2023年 PLATEAUオルソ【国交省】",
+              "url": "https://api.plateauview.mlit.go.jp/tiles/plateau-ortho-2023/{z}/{x}/{y}.png",
+              "attribution": "<a target=\"_blank\"href=\"https://github.com/Project-PLATEAU/plateau-streaming-tutorial/blob/main/ortho/plateau-ortho-streaming.md\">PLATEAUオルソ</a>",
+              "minZoom": 10,
+              "maxZoom": 19,
+              "maxNativeZoom": 18
+            },
+            {
+              "type": "Layer",
+              "id": "overlay-others-plateau-ortho-streaming2020",
+              "title": "-2020年 PLATEAUオルソ【国交省】",
+              "url": "https://gic-plateau.s3.ap-northeast-1.amazonaws.com/2020/ortho/tiles/{z}/{x}/{y}.png",
+              "attribution": "\"<a target=\\\"_blank\\\"href=\\\"https://github.com/Project-PLATEAU/plateau-streaming-tutorial/blob/main/ortho/plateau-ortho-streaming.md\\\">PLATEAUオルソ</a>\"",
+              "minZoom": 10,
+              "maxZoom": 21,
+              "maxNativeZoom": 19
+            }
+          ]
+        },
+        {
+          "type": "LayerGroup",
+          "title": "OSMFJ",
+          "entries": [
+            {
+              "type": "Layer",
+              "id": "overlay-others-osmfj_01p_hokkaido_01",
+              "title": "2012-19年北海道【OSMFJ】",
+              "url": "https://tiles.osmf.jp/hokkaido/{z}/{x}/{y}.png",
+              "attribution": "<a target=\"_blank\"href=\"https://wiki.openstreetmap.org/wiki/OSMFJ/ortho-tiles\">OpenStreetMap Foundation Japan</a>(北海道測量成果)",
+              "maxZoom": 19,
+              "maxNativeZoom": 18
+            },
+            {
+              "type": "Layer",
+              "id": "overlay-others-osmfj_01_muroran_01",
+              "title": "2019年北海道室蘭市【OSMFJ】",
+              "url": "https://tiles.osmf.jp/muroran-shi/{z}/{x}/{y}.png",
+              "attribution": "<a target=\"_blank\"href=\"https://wiki.openstreetmap.org/wiki/OSMFJ/ortho-tiles\">OpenStreetMap Foundation Japan</a>(室蘭市測量成果)",
+              "maxZoom": 19,
+              "maxNativeZoom": 18
+            },
+            {
+              "type": "Layer",
+              "id": "overlay-others-osmfj_13_nerima_01",
+              "title": "2021年東京都練馬区【OSMFJ】",
+              "url": "https://tiles.osmf.jp/nerima-ku/{z}/{x}/{y}.png",
+              "attribution": "<a target=\"_blank\"href=\"https://wiki.openstreetmap.org/wiki/OSMFJ/ortho-tiles\">OpenStreetMap Foundation Japan</a>(<a target=\"_blank\"href=\"https://www.city.nerima.tokyo.jp/kusei/tokei/opendata/opendatasite/tokei_kusei/koku-shashin.html\">練馬区測量成果</a>)",
+              "maxZoom": 20,
+              "maxNativeZoom": 19
+            },
+            {
+              "type": "Layer",
+              "id": "overlay-others-osmfj_15_nagaoka_01",
+              "title": "2018年新潟県長岡市【OSMFJ】",
+              "url": "https://tiles.osmf.jp/nagaoka-shi/{z}/{x}/{y}.png",
+              "attribution": "<a target=\"_blank\"href=\"https://wiki.openstreetmap.org/wiki/OSMFJ/ortho-tiles\">OpenStreetMap Foundation Japan</a>(長岡市測量成果)",
+              "maxZoom": 19,
+              "maxNativeZoom": 18
+            },
+            {
+              "type": "Layer",
+              "id": "overlay-others-osmfj_23_handa_01",
+              "title": "2020年愛知県半田市【OSMFJ】",
+              "url": "https://tiles.osmf.jp/handa-shi/{z}/{x}/{y}.png",
+              "attribution": "<a target=\"_blank\"href=\"https://wiki.openstreetmap.org/wiki/OSMFJ/ortho-tiles\">OpenStreetMap Foundation Japan</a>(半田市測量成果)",
+              "maxZoom": 19,
+              "maxNativeZoom": 18
+            },
+            {
+              "type": "Layer",
+              "id": "overlay-others-osmfj_23_inuyama_01",
+              "title": "2023年愛知県犬山市、江南市、岩倉市、大口町、扶桑町【OSMFJ】",
+              "url": "https://tiles.osmf.jp/inuyama-shi/{z}/{x}/{y}.png",
+              "attribution": "<a target=\"_blank\"href=\"https://wiki.openstreetmap.org/wiki/OSMFJ/ortho-tiles\">OpenStreetMap Foundation Japan</a>(犬山市測量成果)",
+              "maxZoom": 20,
+              "maxNativeZoom": 19
+            },
+            {
+              "type": "Layer",
+              "id": "overlay-others-osmfj_26p_kyoto_01",
+              "title": "2020-21年京都府【OSMFJ】",
+              "url": "https://tiles.osmf.jp/kyoto-fu/{z}/{x}/{y}.png",
+              "attribution": "<a target=\"_blank\"href=\"https://wiki.openstreetmap.org/wiki/OSMFJ/ortho-tiles\">OpenStreetMap Foundation Japan</a>(京都府測量成果)",
+              "maxZoom": 20,
+              "maxNativeZoom": 19
+            },
+            {
+              "type": "Layer",
+              "id": "overlay-others-osmfj_27_osaka_02",
+              "title": "2023年大阪府大阪市【OSMFJ】",
+              "url": "https://tiles.osmf.jp/osaka-shi/{z}/{x}/{y}.png",
+              "attribution": "<a target=\"_blank\"href=\"https://wiki.openstreetmap.org/wiki/OSMFJ/ortho-tiles\">OpenStreetMap Foundation Japan</a>(<a target=\"_blank\"href=\"https://www.geospatial.jp/ckan/dataset/r05-photo\">大阪市測量成果</a>)",
+              "maxZoom": 20,
+              "maxNativeZoom": 19
+            },
+            {
+              "type": "Layer",
+              "id": "overlay-others-osmfj_27_osaka_01",
+              "title": "2022年大阪府大阪市【OSMFJ】",
+              "url": "https://tiles.osmf.jp/osaka-shi-2022/{z}/{x}/{y}.png",
+              "attribution": "<a target=\"_blank\"href=\"https://wiki.openstreetmap.org/wiki/OSMFJ/ortho-tiles\">OpenStreetMap Foundation Japan</a>(<a target=\"_blank\"href=\"https://www.geospatial.jp/ckan/dataset/r04-photo\">大阪市測量成果</a>)",
+              "maxZoom": 19,
+              "maxNativeZoom": 18
+            },
+            {
+              "type": "Layer",
+              "id": "overlay-others-osmfj_28_asago_01",
+              "title": "2020年兵庫県朝来市【OSMFJ】",
+              "url": "https://tiles.osmf.jp/asago-shi/{z}/{x}/{y}.png",
+              "attribution": "<a target=\"_blank\"href=\"https://wiki.openstreetmap.org/wiki/OSMFJ/ortho-tiles\">OpenStreetMap Foundation Japan</a>(<a target=\"_blank\"href=\"https://www.geospatial.jp/ckan/dataset/plateau-28225-asago-shi-2022\">PLATEAU</a>)",
+              "maxZoom": 20,
+              "maxNativeZoom": 19
+            },
+            {
+              "type": "Layer",
+              "id": "overlay-others-osmfj_28_himeji_01",
+              "title": "2020年兵庫県姫路市【OSMFJ】",
+              "url": "https://tiles.osmf.jp/himeji-shi/{z}/{x}/{y}.png",
+              "attribution": "<a target=\"_blank\"href=\"https://wiki.openstreetmap.org/wiki/OSMFJ/ortho-tiles\">OpenStreetMap Foundation Japan</a>(<a target=\"_blank\"href=\"https://city.himeji.gkan.jp/gkan/dataset/k1000\">姫路市測量成果</a>)",
+              "maxZoom": 20,
+              "maxNativeZoom": 19
+            },
+            {
+              "type": "Layer",
+              "id": "overlay-others-osmfj_39_kochi_01",
+              "title": "2020-21年高知県高知市【OSMFJ】",
+              "url": "https://tiles.osmf.jp/kouchi-shi/{z}/{x}/{y}.png",
+              "attribution": "<a target=\"_blank\"href=\"https://wiki.openstreetmap.org/wiki/OSMFJ/ortho-tiles\">OpenStreetMap Foundation Japan</a>(高知市測量成果)",
+              "maxZoom": 19,
+              "maxNativeZoom": 18
+            },
+            {
+              "type": "Layer",
+              "id": "overlay-others-osmfj_46_kagoshima_02",
+              "title": "2020-2021鹿児島県鹿児島市【OSMFJ】",
+              "url": "https://tiles.osmf.jp/kagoshima-shi-2020/{z}/{x}/{y}.png",
+              "attribution": "<a target=\"_blank\"href=\"https://wiki.openstreetmap.org/wiki/OSMFJ/ortho-tiles\">OpenStreetMap Foundation Japan</a>(<a target=\"_blank\"href=\"https://www.city.kagoshima.lg.jp/ict/opendata.html\">鹿児島市測量成果</a>)",
+              "maxZoom": 19,
+              "maxNativeZoom": 18
+            },
+            {
+              "type": "Layer",
+              "id": "overlay-others-osmfj_46_kagoshima_01",
+              "title": "2018年鹿児島県鹿児島市【OSMFJ】",
+              "url": "https://tiles.osmf.jp/kagoshima-shi/{z}/{x}/{y}.png",
+              "attribution": "<a target=\"_blank\"href=\"https://wiki.openstreetmap.org/wiki/OSMFJ/ortho-tiles\">OpenStreetMap Foundation Japan</a>(鹿児島市測量成果)",
+              "maxZoom": 20,
+              "maxNativeZoom": 19
+            }
+          ]
+        },
+        {
+          "type": "LayerGroup",
+          "title": "防災科学技術研究所",
+          "entries": [
+            {
+              "type": "LayerGroup",
+              "title": "1964年新潟地震オルソ画像",
+              "entries": [
+                {
+                  "type": "Layer",
+                  "id": "overlay-others-19640721c-niigata-eq",
+                  "title": "1964年7月21日カラー撮影",
+                  "url": "http://maptile01.bosai.go.jp/19640616-niigata-eq/xyz/19640721c-niigata-eq/{z}/{x}/{y}.png",
+                  "attribution": "<a target=\"_blank\"href=\"http://ecom-plat.jp/19640616-niigata-eq/index.php?gid=10032\">防災科学技術研究所</a>"
+                },
+                {
+                  "type": "Layer",
+                  "id": "overlay-others-19640721c-wide-niigata-eq",
+                  "title": "広域版1964年7月21日カラー撮影",
+                  "url": "http://maptile01.bosai.go.jp/19640616-niigata-eq/xyz/19640721c-wide-niigata-eq/{z}/{x}/{y}.png",
+                  "attribution": "<a target=\"_blank\"href=\"http://ecom-plat.jp/19640616-niigata-eq/index.php?gid=10032\">防災科学技術研究所</a>"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "LayerGroup",
+          "title": "下り専門",
+          "entries": [
+            {
+              "type": "Layer",
+              "id": "overlay-others-koteishisanzei",
+              "title": "2014年度静岡県静岡市【下り専門】",
+              "url": "http://tile.senmon.jpn.com/1.0.0/koteishisanzei/{z}/{x}/{-y}.png",
+              "attribution": "CC BY-SA 4.0 <a target=\"_blank\"href=\"https://dataset.city.shizuoka.jp/dataset/shisanzei20151023-002\">静岡市</a>, <a target=\"_blank\"href=\"https://qiita.com/kudarisenmon\">下り専門</a>"
+            },
+            {
+              "type": "Layer",
+              "id": "overlay-others-dobokukanri",
+              "title": "2011年静岡県静岡市【下り専門】",
+              "url": "http://tile.senmon.jpn.com/1.0.0/dobokukanri/{z}/{x}/{-y}.png",
+              "attribution": "CC BY-SA 4.0 <a target=\"_blank\"href=\"https://dataset.city.shizuoka.jp/dataset/dobokukanri20151023-001\">静岡市</a>, <a target=\"_blank\"href=\"https://qiita.com/kudarisenmon\">下り専門</a>"
+            }
+          ]
+        },
+        {
+          "type": "LayerGroup",
+          "title": "富田林市",
+          "entries": [
+            {
+              "type": "Layer",
+              "id": "overlay-others-tondabayashi1010",
+              "title": "大阪府富田林市【富田林市】",
+              "url": "https://www.city.tondabayashi.lg.jp/map2/tile/1010/{z}/{x}/{y}.png",
+              "attribution": "<a target=\"_blank\"href=\"https://www.city.tondabayashi.lg.jp/map2/1050/download.html\">富田林市</a>",
+              "minZoom": 12,
+              "maxZoom": 18,
+              "html": "この地図は、<a target=\"_blank\" href=https://www.city.tondabayashi.lg.jp/map2/1050/download.html>富田林市</a>が配信している地図タイルを読み込んで表示しています。使用に当たっては、同市の定める規約に従ってください。<br>この地図タイルはズームレベル19まで配信されていますが、本サイトで表示できるのはズームレベル18までです。"
+            }
+          ]
+        },
+        {
+          "type": "LayerGroup",
+          "title": "林野庁",
+          "entries": [
+            {
+              "type": "Layer",
+              "id": "overlay-others-15_niigata_nagaoka_orthophoto_2024",
+              "title": "2024年新潟県長岡【林野庁】",
+              "url": "https://forestgeo.info/opendata/15_niigata/nagaoka/orthophoto_2024/{z}/{x}/{y}.webp",
+              "attribution": "林野庁",
+              "minZoom": 8,
+              "maxZoom": 19,
+              "maxNativeZoom": 18
+            },
+            {
+              "type": "Layer",
+              "id": "overlay-others-rinya_17_ishikawa_noto_orthophoto_2024",
+              "title": "2024年石川県能登【林野庁】",
+              "url": "https://forestgeo.info/opendata/17_ishikawa/noto/orthophoto_2024/{z}/{x}/{y}.webp",
+              "attribution": "林野庁",
+              "minZoom": 8,
+              "maxZoom": 19,
+              "maxNativeZoom": 18
+            }
+          ]
+        },
+        {
+          "type": "LayerGroup",
+          "title": "静岡県/静岡市",
+          "entries": [
+            {
+              "type": "Layer",
+              "id": "overlay-others-shizuoka_city-h30_aerophoto",
+              "title": "2018年度静岡県静岡市【静岡市】",
+              "url": "https://tile.geospatial.jp/shizuoka_city/h30_aerophoto/{z}/{x}/{y}.png",
+              "attribution": "<a target=\"_blank\"href=\"https://www.geospatial.jp/ckan/organization/shizuoka-city\">静岡市(G空間情報センター)</a>"
+            },
+            {
+              "type": "Layer",
+              "id": "overlay-others-shizuoka_city-h29_aerophoto",
+              "title": "2017年度静岡県静岡市【静岡県】",
+              "url": "https://tile.geospatial.jp/shizuoka_city/h29_aerophoto/{z}/{x}/{y}.png",
+              "attribution": "<a target=\"_blank\"href=\"https://www.geospatial.jp/ckan/organization/shizuoka-city\">静岡市(G空間情報センター)</a>"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "LayerGroup",
+      "title": "DRM-PF【日本デジタル道路地図協会】",
+      "entries": [
+        {
+          "type": "Layer",
+          "id": "overlay-others-drm_basic_prv_rd_link",
+          "title": "基本道路リンク",
+          "url": "https://pf.drm.jp/xyz/raster/basic_prv_rd_link/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://pf.drm.jp/FreeViewer/\">日本デジタル道路地図協会</a>",
+          "minZoom": 2,
+          "maxZoom": 18
+        },
+        {
+          "type": "Layer",
+          "id": "overlay-others-drm_basic_prv_rd_node",
+          "title": "基本道路ノード",
+          "url": "https://pf.drm.jp/xyz/raster/basic_prv_rd_node/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://pf.drm.jp/FreeViewer/\">日本デジタル道路地図協会</a>",
+          "minZoom": 2,
+          "maxZoom": 18
+        },
+        {
+          "type": "Layer",
+          "id": "overlay-others-drm_prv_rd_link",
+          "title": "全道路リンク",
+          "url": "https://pf.drm.jp/xyz/raster/prv_rd_link/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://pf.drm.jp/FreeViewer/\">日本デジタル道路地図協会</a>",
+          "minZoom": 2,
+          "maxZoom": 18
+        },
+        {
+          "type": "Layer",
+          "id": "overlay-others-drm_prv_rd_node",
+          "title": "全道路ノード",
+          "url": "https://pf.drm.jp/xyz/raster/prv_rd_node/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://pf.drm.jp/FreeViewer/\">日本デジタル道路地図協会</a>",
+          "minZoom": 2,
+          "maxZoom": 18
+        },
+        {
+          "type": "Layer",
+          "id": "overlay-others-drm_kp_nilim",
+          "title": "国交省道路基準点",
+          "url": "https://pf.drm.jp/xyz/raster/kp_nilim/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://pf.drm.jp/FreeViewer/\">日本デジタル道路地図協会</a>",
+          "minZoom": 2,
+          "maxZoom": 18
+        },
+        {
+          "type": "Layer",
+          "id": "overlay-others-drm_kp_ext_exp",
+          "title": "DRM 距離標（高速道路）",
+          "url": "https://pf.drm.jp/xyz/raster/kp_ext_exp/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://pf.drm.jp/FreeViewer/\">日本デジタル道路地図協会</a>",
+          "minZoom": 2,
+          "maxZoom": 18
+        },
+        {
+          "type": "Layer",
+          "id": "overlay-others-drm_kp_ext_route",
+          "title": "DRM 距離標（一般国道）",
+          "url": "https://pf.drm.jp/xyz/raster/kp_ext_route/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://pf.drm.jp/FreeViewer/\">日本デジタル道路地図協会</a>",
+          "minZoom": 2,
+          "maxZoom": 18
+        }
+      ]
+    },
+    {
+      "type": "LayerGroup",
+      "title": "ハザードマップポータルサイト",
+      "entries": [
+        {
+          "type": "Layer",
+          "id": "overlay-others-daikiboumoritsuzouseichi",
+          "title": "大規模盛土造成地",
+          "url": "https://disaportaldata.gsi.go.jp/raster/daikiboumoritsuzouseichi/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://disaportal.gsi.go.jp/index.html\">ハザードマップポータルサイト</a>",
+          "maxZoom": 18,
+          "maxNativeZoom": 16,
+          "html": "<div class=\"gsi_layerinfo_title\">大規模盛土造成地</div>※この地図は、<a target=\"_blank\"href=\"https://disaportal.gsi.go.jp/index.html\">ハザードマップポータルサイト</a>の地図タイルを読み込んで表示しています。この地図に関する詳細な情報は、同Webサイトで御確認ください。<br>※以下の市町村については、マップをインターネット上に公開していないため、地図タイルが整備されていません。山形県鶴岡市、長野県飯田市、茨城県那珂市<br>※「合成」機能を使うと地図が見やすくなります。<br>※凡例<br>　<font color=\"9BFF9B\">■</font>緑：谷埋め型<br>　<font color=\"9B9BFF\">■</font>紫：腹付け型<br>　<font color=\"FF9B9B\">■</font>赤：区分していない"
+        },
+        {
+          "type": "Layer",
+          "id": "overlay-others-01_flood_l2_shinsuishin_data",
+          "title": "洪水浸水想定区域(想定最大規模)",
+          "url": "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://disaportal.gsi.go.jp/index.html\">ハザードマップポータルサイト</a>",
+          "maxZoom": 18,
+          "maxNativeZoom": 17,
+          "html": "<div class=\"gsi_layerinfo_title\">洪水浸水想定区域(想定最大規模)</div>※この地図は、<a target=\"_blank\"href=\"https://disaportal.gsi.go.jp/index.html\">ハザードマップポータルサイト</a>の地図タイルを読み込んで表示しています。この地図に関する詳細な情報は、同Webサイトで御確認ください。<br>※データ未整備の地域がある点に十分に御留意ください。整備地域の情報は上記のWebサイトで確認できます。<br>※「合成」機能を使うと地図が見やすくなります。<br>※凡例は上記Webサイトで御確認ください。"
+        },
+        {
+          "type": "Layer",
+          "id": "overlay-others-01_flood_l1_shinsuishin_oldlegend",
+          "title": "洪水浸水想定区域(計画規模)",
+          "url": "https://disaportaldata.gsi.go.jp/raster/01_flood_l1_shinsuishin_oldlegend/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://disaportal.gsi.go.jp/index.html\">ハザードマップポータルサイト</a>",
+          "maxZoom": 18,
+          "maxNativeZoom": 17,
+          "html": "<div class=\"gsi_layerinfo_title\">洪水浸水想定区域(計画規模)</div>※この地図は、<a target=\"_blank\"href=\"https://disaportal.gsi.go.jp/index.html\">ハザードマップポータルサイト</a>の地図タイルを読み込んで表示しています。この地図に関する詳細な情報は、同Webサイトで御確認ください。<br>※データ未整備の地域がある点に十分に御留意ください。整備地域の情報は上記のWebサイトで確認できます。<br>※「合成」機能を使うと地図が見やすくなります。<br>※凡例は上記Webサイトで御確認ください。"
+        },
+        {
+          "type": "Layer",
+          "id": "overlay-others-07_tameike",
+          "title": "ため池決壊による浸水想定区域",
+          "url": "https://disaportaldata.gsi.go.jp/raster/07_tameike/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://disaportal.gsi.go.jp/index.html\">ハザードマップポータルサイト</a>",
+          "maxZoom": 18,
+          "maxNativeZoom": 17,
+          "html": "<div class=\"gsi_layerinfo_title\">ため池決壊による浸水想定区域</div>※この地図は、<a target=\"_blank\"href=\"https://disaportal.gsi.go.jp/index.html\">ハザードマップポータルサイト</a>の地図タイルを読み込んで表示しています。この地図に関する詳細な情報は、同Webサイトで御確認ください。<br>※データ未整備の地域がある点に十分に御留意ください。整備地域の情報は上記のWebサイトで確認できます。<br>※「合成」機能を使うと地図が見やすくなります。<br>※凡例<br>　<font color=\"0000FF\">■</font>青：ため池決壊によって浸水が想定される区域"
+        },
+        {
+          "type": "Layer",
+          "id": "overlay-others-04_tsunami_newlegend",
+          "title": "津波浸水想定",
+          "url": "https://disaportaldata.gsi.go.jp/raster/04_tsunami_newlegend/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://disaportal.gsi.go.jp/index.html\">ハザードマップポータルサイト</a>",
+          "maxZoom": 18,
+          "maxNativeZoom": 17,
+          "html": "<div class=\"gsi_layerinfo_title\">津波浸水想定</div>※この地図は、<a target=\"_blank\"href=\"https://disaportal.gsi.go.jp/index.html\">ハザードマップポータルサイト</a>の地図タイルを読み込んで表示しています。この地図に関する詳細な情報は、同Webサイトで御確認ください。<br>※「合成」機能を使うと地図が見やすくなります。<br>※凡例は上記Webサイトで御確認ください。"
+        },
+        {
+          "type": "Layer",
+          "id": "overlay-others-05_kyukeishakeikaikuiki",
+          "title": "土砂災害警戒区域等(急傾斜地の崩壊)",
+          "url": "https://disaportaldata.gsi.go.jp/raster/05_kyukeishakeikaikuiki/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://disaportal.gsi.go.jp/index.html\">ハザードマップポータルサイト</a>",
+          "maxZoom": 18,
+          "maxNativeZoom": 17,
+          "html": "<div class=\"gsi_layerinfo_title\">土砂災害警戒区域等</div>※この地図は、<a target=\"_blank\"href=\"https://disaportal.gsi.go.jp/index.html\">ハザードマップポータルサイト</a>の地図タイルを読み込んで表示しています。この地図に関する詳細な情報は、同Webサイトで御確認ください。<br>※「合成」機能を使うと地図が見やすくなります。<br>※凡例<br>　<font color=\"FA2800\">■</font>赤：特別警戒区域<br>　<font color=\"FAE600\">■</font>黃：警戒区域<br>（点線で囲まれた区域は、警戒区域もしくは特別警戒区域として指定予定であることを示す。）"
+        },
+        {
+          "type": "Layer",
+          "id": "overlay-others-05_dosekiryukeikaikuiki",
+          "title": "土砂災害警戒区域等(土石流)",
+          "url": "https://disaportaldata.gsi.go.jp/raster/05_dosekiryukeikaikuiki/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://disaportal.gsi.go.jp/index.html\">ハザードマップポータルサイト</a>",
+          "maxZoom": 18,
+          "maxNativeZoom": 17,
+          "html": "<div class=\"gsi_layerinfo_title\">土砂災害警戒区域等</div>※この地図は、<a target=\"_blank\"href=\"https://disaportal.gsi.go.jp/index.html\">ハザードマップポータルサイト</a>の地図タイルを読み込んで表示しています。この地図に関する詳細な情報は、同Webサイトで御確認ください。<br>※「合成」機能を使うと地図が見やすくなります。<br>※凡例<br>　<font color=\"A50021\">■</font>濃い赤：特別警戒区域<br>　<font color=\"E6C832\">■</font>黄土色：警戒区域<br>（点線で囲まれた区域は、警戒区域もしくは特別警戒区域として指定予定であることを示す。）"
+        },
+        {
+          "type": "Layer",
+          "id": "overlay-others-05_jisuberikeikaikuiki",
+          "title": "土砂災害警戒区域等(地すべり)",
+          "url": "https://disaportaldata.gsi.go.jp/raster/05_jisuberikeikaikuiki/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://disaportal.gsi.go.jp/index.html\">ハザードマップポータルサイト</a>",
+          "maxZoom": 18,
+          "maxNativeZoom": 17,
+          "html": "<div class=\"gsi_layerinfo_title\">土砂災害警戒区域等</div>※この地図は、<a target=\"_blank\"href=\"https://disaportal.gsi.go.jp/index.html\">ハザードマップポータルサイト</a>の地図タイルを読み込んで表示しています。この地図に関する詳細な情報は、同Webサイトで御確認ください。<br>※「合成」機能を使うと地図が見やすくなります。<br>※凡例<br>　<font color=\"B60C6C\">■</font>紫：特別警戒区域<br>　<font color=\"FF9900\">■</font>オレンジ：警戒区域<br>（点線で囲まれた区域は、警戒区域もしくは特別警戒区域として指定予定であることを示す。）"
+        },
+        {
+          "type": "Layer",
+          "id": "overlay-others-chikeibunrui",
+          "title": "土地分類基本調査（地形分類図）",
+          "url": "https://disaportaldata.gsi.go.jp/raster/chikeibunrui/gazou/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://disaportal.gsi.go.jp/index.html\">ハザードマップポータルサイト</a>",
+          "maxZoom": 18,
+          "maxNativeZoom": 15,
+          "html": "<div class=\"gsi_layerinfo_title\">土地分類基本調査（地形分類図）</div>※この地図は、<a target=\"_blank\"href=\"https://disaportal.gsi.go.jp/index.html\">ハザードマップポータルサイト</a>の地図タイルを読み込んで表示しています。凡例など、この地図に関する詳細な情報は、同Webサイトで御確認ください。"
+        }
+      ]
+    },
+    {
+      "type": "LayerGroup",
+      "title": " 令和6年(2024年)能登半島地震",
+      "entries": [
+        {
+          "type": "Layer",
+          "id": "overlay-others-ffpri_ishikawa_cs",
+          "title": "石川県能登CS立体図(地震前)",
+          "url": "https://www2.ffpri.go.jp/soilmap/tile/cs_noto/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://www2.ffpri.go.jp/soilmap/data-src.html\">森林総合研究所</a>(石川県測量成果)",
+          "maxZoom": 18,
+          "maxNativeZoom": 17
+        },
+        {
+          "type": "Layer",
+          "id": "overlay-others-rinya_ishikawa_slope",
+          "title": "石川県能登傾斜区分図(地震後)",
+          "url": "https://rinya.geospatial.jp/tile/slopetile_noto/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://www.geospatial.jp/ckan/dataset/2024noto_rinya\">林野庁</a>(国土地理院・林野庁測量成果)",
+          "minZoom": 8,
+          "maxZoom": 18,
+          "maxNativeZoom": 17
+        },
+        {
+          "type": "Layer",
+          "id": "overlay-others-rinya_niigata_slope",
+          "title": "新潟県長岡傾斜区分図(地震後)",
+          "url": "https://rinya.geospatial.jp/tile/slopetile_nagaoka/{z}/{x}/{y}.png",
+          "attribution": "<a target=\"_blank\"href=\"https://www.geospatial.jp/ckan/dataset/2024nagaoka_rinya\">林野庁</a>(国土地理院・林野庁測量成果)",
+          "minZoom": 8,
+          "maxZoom": 18,
+          "maxNativeZoom": 17
+        }
+      ]
+    }
+  ]
+}

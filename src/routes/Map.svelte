@@ -15,7 +15,7 @@
 	import * as VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
 
 	import { GSIMapLayers } from '../lib/gsimaplayers/gsimaplayers';
-	import { AncientLayers } from '../lib/gsimaplayers/ancientlayers';
+	import { AncientLayers, OthersLayers } from '../lib/gsimaplayers/variousmapslocallayerstxt';
 	import * as MaplibreCompondLayerUI from '../lib/maplibre-compound-layer-ui';
 	import '../lib/maplibre-compound-layer-ui.css';
 	import {
@@ -158,9 +158,11 @@
 
 			const gsimaplayers = new GSIMapLayers();
 			const ancientlayers = new AncientLayers();
-			await Promise.all([gsimaplayers.load(), ancientlayers.load()]);
+			const otherslayers = new OthersLayers();
+			await Promise.all([gsimaplayers.load(), ancientlayers.load(), otherslayers.load()]);
 			layerswitcher.addOverlay(gsimaplayers.getGroup());
 			layerswitcher.addOverlay(ancientlayers.getGroup());
+			layerswitcher.addOverlay(otherslayers.getGroup());
 
 			const terrainControl = new maplibregl.TerrainControl({
 				source: 'terrain',
