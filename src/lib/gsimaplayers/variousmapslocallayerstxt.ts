@@ -18,7 +18,7 @@ export class AncientLayers extends GSIMapLayers {
 }
 
 export class OthersLayers extends GSIMapLayers {
-	getGroup(title: string = 'その他'): MaplibreCompondLayerUI.LayerConfig.LayerGroup {
+	getGroup(title: string = 'その他の外部地図'): MaplibreCompondLayerUI.LayerConfig.LayerGroup {
 		return super.getGroup(title);
 	}
 

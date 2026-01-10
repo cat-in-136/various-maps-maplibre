@@ -59,21 +59,3 @@ export const MISC_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerConfigEnt
 		]
 	}
 ];
-
-export const MISC_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
-	{
-		type: 'LayerGroup',
-		title: 'その他の外部地図',
-		entries: [
-			{
-				type: 'Layer',
-				id: 'overlay-plateau-ortho',
-				title: 'PLATEAU-Ortho',
-				url: 'https://api.plateauview.mlit.go.jp/tiles/plateau-ortho-2023/{z}/{x}/{y}.png',
-				minZoom: 10,
-				maxZoom: 18,
-				attribution: '<a href="https://www.mlit.go.jp/plateau/">国土交通省Project PLATEAU</a>'
-			}
-		]
-	}
-];
