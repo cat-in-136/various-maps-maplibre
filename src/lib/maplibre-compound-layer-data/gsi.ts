@@ -96,6 +96,30 @@ export const GSI_VECTOR_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerCon
 						maxNativeZoom: 17.9
 					}
 				]
+			},
+			{
+				type: 'LayerGroup',
+				title: 'ベクトルタイルを用いた3D風地図',
+				entries: [
+					{
+						type: 'Layer',
+						id: 'base-gsivectortile-3d-like-building-std',
+						title: '標準地図',
+						url: 'https://gsi-cyberjapan.github.io/gsivectortile-3d-like-building/building3d.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-gsivectortile-3d-like-building-photo',
+						title: '写真+注記',
+						url: 'https://gsi-cyberjapan.github.io/gsivectortile-3d-like-building/building3dphoto.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-gsivectortile-3d-like-building-dark',
+						title: 'ダークモード風',
+						url: 'https://gsi-cyberjapan.github.io/gsivectortile-3d-like-building/building3ddark.json'
+					}
+				]
 			}
 		]
 	}
