@@ -120,6 +120,33 @@ export const GSI_VECTOR_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerCon
 						url: 'https://gsi-cyberjapan.github.io/gsivectortile-3d-like-building/building3ddark.json'
 					}
 				]
+			},
+			{
+				type: 'LayerGroup',
+				title: 'gsi-style-maniawase',
+				entries: [
+					{
+						type: 'Layer',
+						id: 'extra-gsi-ml-maniawase-light',
+						title: 'ライト',
+						url: 'https://cat-in-136.github.io/gsi-style-maniawase/gsi-style-maniawase.json',
+						maxNativeZoom: 17.9
+					},
+					{
+						type: 'Layer',
+						id: 'extra-gsi-ml-maniawase-dark',
+						title: 'ダーク',
+						url: 'https://cat-in-136.github.io/gsi-style-maniawase/gsi-style-maniawase-dark.json',
+						maxNativeZoom: 17.9
+					},
+					{
+						type: 'Layer',
+						id: 'extra-gsi-ml-maniawase-pale',
+						title: 'ペール',
+						url: 'https://cat-in-136.github.io/gsi-style-maniawase/gsi-style-maniawase-pale.json',
+						maxNativeZoom: 17.9
+					}
+				]
 			}
 		]
 	}
