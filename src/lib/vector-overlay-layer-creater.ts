@@ -1,5 +1,5 @@
 import maplibregl from 'maplibre-gl';
-import type { LayerConfig } from '../lib/maplibre-compound-layer-ui';
+import { LayerConfig } from '../lib/maplibre-compound-layer-ui';
 
 export namespace VectorOverlayLayerCreator {
 	export async function addToMap(layer: LayerConfig.Layer, map: maplibregl.Map): Promise<void> {
@@ -8,8 +8,9 @@ export namespace VectorOverlayLayerCreator {
 		if (!response.ok) return;
 		const json = await response.json();
 		if (json.version === 8 && typeof json.sources === 'object' && typeof json.layers === 'object') {
-			const new_style: maplibregl.StyleSpecification = layer.styleSwapOptions?.transformStyle
-				? layer.styleSwapOptions.transformStyle(structuredClone(map.getStyle()), json)
+			const transformStyleFunc = LayerConfig.createStyleSwapOption(layer)?.transformStyle;
+			const new_style: maplibregl.StyleSpecification = transformStyleFunc
+				? transformStyleFunc(structuredClone(map.getStyle()), json)
 				: json;
 
 			// Replace source name if required

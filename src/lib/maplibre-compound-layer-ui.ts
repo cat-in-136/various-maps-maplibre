@@ -2,6 +2,7 @@ import maplibregl from 'maplibre-gl';
 
 import { GeoJsonLayerConverter } from '../lib/geojson-layer-converter';
 import { VectorOverlayLayerCreator } from './vector-overlay-layer-creater';
+import { PetitLogic } from './petitlogic';
 
 const ELEMENT_CLASS_PREFIX = 'maplibregl-ctrl-compound-layer';
 
@@ -26,7 +27,9 @@ export namespace LayerConfig {
 		scheme?: 'xyz' | 'tms';
 		attribution?: string;
 		layerFormat?: LayerFormat;
-		styleSwapOptions?: maplibregl.StyleSwapOptions;
+		styleSwapOptions?: maplibregl.StyleSwapOptions & {
+			transformStyleByExpression?: any;
+		};
 		[propName: string]: unknown;
 	}
 
@@ -39,6 +42,29 @@ export namespace LayerConfig {
 	}
 
 	export type LayerConfigEntry = LayerGroup | Layer;
+
+	export function createStyleSwapOption(layer: Layer): maplibregl.StyleSwapOptions {
+		if (layer.styleSwapOptions?.transformStyleByExpression) {
+			const r = new PetitLogic();
+			const styleSwapOptions: maplibregl.StyleSwapOptions = {
+				transformStyle: (previous, next) =>
+					r.evaluate([
+						'let',
+						'previous',
+						previous,
+						'next',
+						next,
+						layer.styleSwapOptions?.transformStyleByExpression
+					])
+			};
+			if (layer.styleSwapOptions?.diff) {
+				styleSwapOptions.diff = layer.styleSwapOptions?.diff;
+			}
+			return styleSwapOptions;
+		} else {
+			return layer.styleSwapOptions || {};
+		}
+	}
 }
 
 namespace LayerTreeView {
@@ -501,8 +527,8 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 						}, 100);
 					}
 				} else if (layerFormat === 'style') {
-					const setStyleOption = layer.styleSwapOptions || {};
-					this.#map.setStyle(layer.url, { ...setStyleOption, diff: false });
+					const setStyleOption = { ...LayerConfig.createStyleSwapOption(layer), diff: false };
+					this.#map.setStyle(layer.url, setStyleOption);
 					if (layer.maxNativeZoom) {
 						this.#map.setMaxZoom(layer.maxNativeZoom);
 					}
