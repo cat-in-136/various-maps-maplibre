@@ -13,7 +13,7 @@
 		"lint": "prettier --check . && eslint ."
 	},
 	"devDependencies": {
-		"@eslint/compat": "^1.4.1",
+		"@eslint/compat": "^2.0.3",
 		"@maplibre/maplibre-gl-geocoder": "^1.9.1",
 		"@sveltejs/adapter-static": "^3.0.10",
 		"@sveltejs/kit": "^2.48.4",
@@ -21,11 +21,11 @@
 		"@types/geojson-vt": "^3.2.5",
 		"@types/topojson-client": "^3.1.5",
 		"@types/vt-pbf": "^3.1.1",
-		"eslint": "^9.39.1",
+		"eslint": "^10.0.3",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.13.0",
 		"geojson-vt": "^4.0.2",
-		"globals": "^16.5.0",
+		"globals": "^17.4.0",
 		"maplibre-gl": "^5.11.0",
 		"maplibre-gl-vector-text-protocol": "^0.0.5",
 		"prettier": "^3.6.2",
