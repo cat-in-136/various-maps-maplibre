@@ -1,4 +1,4 @@
-import type * as MaplibreCompondLayerUI from '../maplibre-compound-layer-ui';
+import { type LayerConfig } from '../layer-config';
 import maptiler_ocean_bathymetric_contours from '../../../static/assets/map-data/maptiler-ocean-bathymetric-contours-catin136.min.overlay.json?url';
 
 type LayerNonfreeKeys = {
@@ -25,10 +25,8 @@ export function getLayerNonfreeKeysFromURL(
 	return keys;
 }
 
-export function getBaseLayerNonfree(
-	keyes: LayerNonfreeKeys
-): MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] {
-	const entries: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [];
+export function getBaseLayerNonfree(keyes: LayerNonfreeKeys): LayerConfig.LayerConfigEntry[] {
+	const entries: LayerConfig.LayerConfigEntry[] = [];
 	if (keyes['maptiler']) {
 		const key = keyes['maptiler'];
 		entries.push({
@@ -231,7 +229,7 @@ export function getBaseLayerNonfree(
 		});
 	}
 	//{
-	//	const miscGroup: MaplibreCompondLayerUI.LayerConfig.LayerGroup = {
+	//	const miscGroup: LayerConfig.LayerGroup = {
 	//		type: 'LayerGroup',
 	//		title: 'Misc (non free)',
 	//		entries: []
@@ -247,10 +245,8 @@ export function getBaseLayerNonfree(
 	return entries;
 }
 
-export function getOverlayLayerNonfree(
-	keys: LayerNonfreeKeys
-): MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] {
-	const entries: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [];
+export function getOverlayLayerNonfree(keys: LayerNonfreeKeys): LayerConfig.LayerConfigEntry[] {
+	const entries: LayerConfig.LayerConfigEntry[] = [];
 
 	if (keys['maptiler']) {
 		const key = keys['maptiler'];

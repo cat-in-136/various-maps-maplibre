@@ -1,4 +1,4 @@
-import * as MaplibreCompondLayerUI from '../maplibre-compound-layer-ui';
+import { type LayerConfig } from '../layer-config';
 
 import osm_liberty_style from '../../../static/assets/map-data/osm-liberty-style.min.json?url';
 import osm_liberty_en_style from '../../../static/assets/map-data/osm-liberty-en-style.min.json?url';
@@ -14,7 +14,7 @@ import openrailwaymap_track_class_light from '../../../static/assets/map-data/op
 import openrailwaymap_operator_light from '../../../static/assets/map-data/openrailwaymap-operator-light.min.overlay.json?url';
 import openrailwaymap_standard_abandoned_light from '../../../static/assets/map-data/openrailwaymap-standard+abandoned-light-catin136.min.overlay.json?url';
 
-export const OSM_VECTOR_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
+export const OSM_VECTOR_BASE_LAYERS: LayerConfig.LayerConfigEntry[] = [
 	{
 		type: 'LayerGroup',
 		title: 'OSM Vector',
@@ -269,7 +269,7 @@ export const OSM_VECTOR_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerCon
 	}
 ];
 
-export const OSM_RASTER_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
+export const OSM_RASTER_BASE_LAYERS: LayerConfig.LayerConfigEntry[] = [
 	{
 		type: 'LayerGroup',
 		title: 'OSM Raster',
@@ -296,7 +296,7 @@ export const OSM_RASTER_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerCon
 	}
 ];
 
-export const OSM_VECTOR_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
+export const OSM_VECTOR_OVERLAY_LAYERS: LayerConfig.LayerConfigEntry[] = [
 	{
 		type: 'LayerGroup',
 		title: 'OSM Vector',
@@ -488,7 +488,7 @@ export const OSM_VECTOR_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.Layer
 	}
 ];
 
-export const OSM_RASTER_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
+export const OSM_RASTER_OVERLAY_LAYERS: LayerConfig.LayerConfigEntry[] = [
 	{
 		type: 'LayerGroup',
 		title: 'OSM Raster',

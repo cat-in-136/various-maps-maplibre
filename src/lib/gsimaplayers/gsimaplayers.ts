@@ -1,4 +1,4 @@
-import * as MaplibreCompondLayerUI from '../../lib/maplibre-compound-layer-ui';
+import { type LayerConfig } from '../layer-config';
 
 export interface GSIMapLayerConfig {
 	url: string;
@@ -6,8 +6,8 @@ export interface GSIMapLayerConfig {
 }
 
 type GSIMapLayersConvFn = (
-	v: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry
-) => MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry | undefined;
+	v: LayerConfig.LayerConfigEntry
+) => LayerConfig.LayerConfigEntry | undefined;
 
 const GSIMAPLAYERS: GSIMapLayerConfig[] = [
 	{
@@ -35,7 +35,7 @@ const GSIMAPLAYERS: GSIMapLayerConfig[] = [
 
 const GSIMAPLAYERS_CONV_FN: GSIMapLayersConvFn = (v) => {
 	if (v?.type === 'Layer') {
-		const layer = v as MaplibreCompondLayerUI.LayerConfig.Layer;
+		const layer = v as LayerConfig.Layer;
 		if (!layer.url.startsWith('https://')) {
 			layer.url = new URL(layer.url, GSIMAPLAYERS[0].url).href;
 		}
@@ -47,12 +47,12 @@ const GSIMAPLAYERS_CONV_FN: GSIMapLayersConvFn = (v) => {
 };
 
 export class GSIMapLayers {
-	#data: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[];
+	#data: LayerConfig.LayerConfigEntry[];
 	constructor() {
 		this.#data = [];
 	}
 
-	getGroup(title: string = '国土地理院レイヤー'): MaplibreCompondLayerUI.LayerConfig.LayerGroup {
+	getGroup(title: string = '国土地理院レイヤー'): LayerConfig.LayerGroup {
 		return {
 			type: 'LayerGroup',
 			title,

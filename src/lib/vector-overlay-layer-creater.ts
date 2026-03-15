@@ -1,5 +1,5 @@
 import maplibregl from 'maplibre-gl';
-import { LayerConfig } from '../lib/maplibre-compound-layer-ui';
+import { LayerConfig } from './layer-config';
 
 export namespace VectorOverlayLayerCreator {
 	export async function addToMap(layer: LayerConfig.Layer, map: maplibregl.Map): Promise<void> {

@@ -1,4 +1,4 @@
-import * as MaplibreCompondLayerUI from '../maplibre-compound-layer-ui';
+import { type LayerConfig } from '../layer-config';
 
 import gsi_light from '../../../static/assets/map-data/gsi-light.min.json?url';
 import gsi_ort_label from '../../../static/assets/map-data/gsi-ort-label.min.json?url';
@@ -9,7 +9,7 @@ import gsi_railway from '../../../static/assets/map-data/gsi-railway.min.json?ur
 import gsi_land from '../../../static/assets/map-data/gsi-land.min.json?url';
 import gsi_river from '../../../static/assets/map-data/gsi-river.min.json?url';
 
-export const GSI_VECTOR_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
+export const GSI_VECTOR_BASE_LAYERS: LayerConfig.LayerConfigEntry[] = [
 	{
 		type: 'LayerGroup',
 		title: '地理院地図Vector',

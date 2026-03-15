@@ -17,6 +17,7 @@
 	import { GSIMapLayers } from '../lib/gsimaplayers/gsimaplayers';
 	import { AncientLayers, OthersLayers } from '../lib/gsimaplayers/variousmapslocallayerstxt';
 	import * as MaplibreCompondLayerUI from '../lib/maplibre-compound-layer-ui';
+	import { type LayerConfig } from '../lib/layer-config';
 	import '../lib/maplibre-compound-layer-ui.css';
 	import {
 		BASE_LAYER_DEFAULT,
@@ -391,8 +392,8 @@
 					});
 				}
 
-				const base_entries: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [];
-				const overlay_entries: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [];
+				const base_entries: LayerConfig.LayerConfigEntry[] = [];
+				const overlay_entries: LayerConfig.LayerConfigEntry[] = [];
 				for (const file of files) {
 					const rand = Math.random().toString(32).substring(2);
 					const id = `${file.name.replaceAll(/[-_.\s]/g, '-')}-${rand}`;
