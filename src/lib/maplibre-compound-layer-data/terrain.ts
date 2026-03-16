@@ -1,9 +1,5 @@
 import type maplibregl from 'maplibre-gl';
-
-export type TerrainSource = {
-	title: string;
-	source: maplibregl.RasterDEMSourceSpecification;
-};
+import type { TerrainSource } from '../layer-config';
 
 export type TerrainSources = {
 	[id: string]: TerrainSource;

@@ -38,6 +38,11 @@ export interface LayerGroup {
 
 export type LayerConfigEntry = LayerGroup | Layer;
 
+export type TerrainSource = {
+	title: string;
+	source: maplibregl.RasterDEMSourceSpecification;
+};
+
 export function createStyleSwapOption(layer: Layer): maplibregl.StyleSwapOptions {
 	if (layer.styleSwapOptions?.transformStyleByExpression) {
 		const r = new PetitLogic();
