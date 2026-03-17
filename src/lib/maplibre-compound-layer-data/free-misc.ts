@@ -1,4 +1,4 @@
-import { type LayerConfig } from '../layer-config';
+import { type LayerConfig } from '$lib/layer-config';
 
 import tjmsy_orilibre_global_osmfj_netsyms from '../../../static/assets/map-data/tjmsy-orilibre-global-osmfj-netsyms.min.json?url';
 

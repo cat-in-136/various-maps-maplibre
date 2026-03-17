@@ -1,5 +1,5 @@
 import type maplibregl from 'maplibre-gl';
-import type { TerrainSource } from '../layer-config';
+import type { TerrainSource } from '$lib/layer-config';
 
 export type TerrainSources = {
 	[id: string]: TerrainSource;

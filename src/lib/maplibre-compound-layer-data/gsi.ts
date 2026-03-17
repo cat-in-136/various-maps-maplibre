@@ -1,4 +1,4 @@
-import { type LayerConfig } from '../layer-config';
+import { type LayerConfig } from '$lib/layer-config';
 
 import gsi_light from '../../../static/assets/map-data/gsi-light.min.json?url';
 import gsi_ort_label from '../../../static/assets/map-data/gsi-ort-label.min.json?url';

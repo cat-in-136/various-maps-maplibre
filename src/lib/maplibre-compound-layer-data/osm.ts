@@ -1,4 +1,4 @@
-import { type LayerConfig } from '../layer-config';
+import { type LayerConfig } from '$lib/layer-config';
 
 import osm_liberty_style from '../../../static/assets/map-data/osm-liberty-style.min.json?url';
 import osm_liberty_en_style from '../../../static/assets/map-data/osm-liberty-en-style.min.json?url';

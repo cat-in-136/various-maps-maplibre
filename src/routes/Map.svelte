@@ -14,25 +14,25 @@
 	import '@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css';
 	import * as VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
 
-	import { GSIMapLayers } from '../lib/gsimaplayers/gsimaplayers';
-	import { AncientLayers, OthersLayers } from '../lib/gsimaplayers/variousmapslocallayerstxt';
-	import * as MaplibreCompondLayerUI from '../lib/maplibre-compound-layer-ui';
-	import { type LayerConfig } from '../lib/layer-config';
-	import '../lib/maplibre-compound-layer-ui.css';
+	import { GSIMapLayers } from '$lib/gsimaplayers/gsimaplayers';
+	import { AncientLayers, OthersLayers } from '$lib/gsimaplayers/variousmapslocallayerstxt';
+	import * as MaplibreCompondLayerUI from '$lib/maplibre-compound-layer-ui';
+	import { type LayerConfig } from '$lib/layer-config';
+	import '$lib/maplibre-compound-layer-ui.css';
 	import {
 		BASE_LAYER_DEFAULT,
 		OVERLAY_LAYER_DEFAULT,
 		setupFreeLayersAttributionHandling
-	} from '../lib/maplibre-compound-layer-data/free';
-	import * as NonfreeLayer from '../lib/maplibre-compound-layer-data/nonfree';
-	import { getTerrainSources } from '../lib/maplibre-compound-layer-data/terrain';
-	import { getGsiDemProtocolAction } from '../lib/maplibre-gsi-dem-protocol';
-	import { getGeoJsonProtocolAction } from '../lib/maplibre-gl-geojson-tiles-qiita';
-	import { DynamicAttributionControl } from '../lib/dynamic_attribution_control';
+	} from '$lib/maplibre-compound-layer-data/free';
+	import * as NonfreeLayer from '$lib/maplibre-compound-layer-data/nonfree';
+	import { getTerrainSources } from '$lib/maplibre-compound-layer-data/terrain';
+	import { getGsiDemProtocolAction } from '$lib/maplibre-gsi-dem-protocol';
+	import { getGeoJsonProtocolAction } from '$lib/maplibre-gl-geojson-tiles-qiita';
+	import { DynamicAttributionControl } from '$lib/dynamic_attribution_control';
 	import {
 		getJmaLayerProtocolAction,
 		getCloudSatelliteToPngProtocolAction
-	} from '../lib/maplibre-live-satellite-layer-protocol';
+	} from '$lib/maplibre-live-satellite-layer-protocol';
 
 	let isDark = false;
 

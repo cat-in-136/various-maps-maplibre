@@ -1,5 +1,5 @@
-import { GSIMapLayers } from './gsimaplayers';
-import { type LayerConfig } from '../layer-config';
+import { GSIMapLayers } from '$lib/gsimaplayers/gsimaplayers';
+import { type LayerConfig } from '$lib/layer-config';
 import ANCIENT_LAYERS_TXT_URL from '../../../static/assets/layers_txt/layersAncient.txt?url';
 import OTHERS_LAYERS_TXT_URL from '../../../static/assets/layers_txt/layersOthers.txt?url';
 

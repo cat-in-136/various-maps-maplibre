@@ -1,4 +1,4 @@
-import { type LayerConfig } from '../layer-config';
+import { type LayerConfig } from '$lib/layer-config';
 
 export const ICGC_VECTOR_BASE_LAYERS: LayerConfig.LayerConfigEntry[] = [
 	{

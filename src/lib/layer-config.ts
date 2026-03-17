@@ -1,6 +1,6 @@
 import maplibregl from 'maplibre-gl';
 
-import { PetitLogic } from './petitlogic';
+import { PetitLogic } from '$lib/petitlogic';
 
 export type LayerFormat =
 	| 'style'

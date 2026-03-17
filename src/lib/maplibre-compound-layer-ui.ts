@@ -1,9 +1,9 @@
 import maplibregl from 'maplibre-gl';
 
-import { GeoJsonLayerConverter } from '../lib/geojson-layer-converter';
-import { VectorOverlayLayerCreator } from './vector-overlay-layer-creater';
-import { LayerConfig } from './layer-config';
-import type { TerrainSources } from './maplibre-compound-layer-data/terrain';
+import { GeoJsonLayerConverter } from '$lib/geojson-layer-converter';
+import { VectorOverlayLayerCreator } from '$lib/vector-overlay-layer-creater';
+import { LayerConfig } from '$lib/layer-config';
+import type { TerrainSources } from '$lib/maplibre-compound-layer-data/terrain';
 
 const ELEMENT_CLASS_PREFIX = 'maplibregl-ctrl-compound-layer';
 
