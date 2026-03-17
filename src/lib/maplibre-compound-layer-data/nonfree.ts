@@ -1,5 +1,5 @@
 import { type LayerConfig } from '$lib/layer-config';
-import maptiler_ocean_bathymetric_contours from '../../../static/assets/map-data/maptiler-ocean-bathymetric-contours-catin136.min.overlay.json?url';
+import maptiler_ocean_bathymetric_contours from '$lib/static/assets/map-data/maptiler-ocean-bathymetric-contours-catin136.min.overlay.json?url';
 
 type LayerNonfreeKeys = {
 	maptiler?: string;

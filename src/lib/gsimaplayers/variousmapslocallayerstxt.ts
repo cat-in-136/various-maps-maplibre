@@ -1,7 +1,7 @@
 import { GSIMapLayers } from '$lib/gsimaplayers/gsimaplayers';
 import { type LayerConfig } from '$lib/layer-config';
-import ANCIENT_LAYERS_TXT_URL from '../../../static/assets/layers_txt/layersAncient.txt?url';
-import OTHERS_LAYERS_TXT_URL from '../../../static/assets/layers_txt/layersOthers.txt?url';
+import ANCIENT_LAYERS_TXT_URL from '$lib/static/assets/layers_txt/layersAncient.txt?url';
+import OTHERS_LAYERS_TXT_URL from '$lib/static/assets/layers_txt/layersOthers.txt?url';
 
 export class AncientLayers extends GSIMapLayers {
 	getGroup(title: string = '古地図'): LayerConfig.LayerGroup {

@@ -2,7 +2,7 @@ import * as maplibregl from 'maplibre-gl';
 
 import { type LayerConfig } from '$lib/layer-config';
 import { DynamicAttributionControl } from '$lib/dynamic_attribution_control';
-import arcgis_osm_junction_names from '../../../static/assets/map-data/arcgis-OpenStreetMap-v2-junction-names.min.overlay.json?url';
+import arcgis_osm_junction_names from '$lib/static/assets/map-data/arcgis-OpenStreetMap-v2-junction-names.min.overlay.json?url';
 
 type ArcGISCoverageArea = {
 	bbox: [number, number, number, number];

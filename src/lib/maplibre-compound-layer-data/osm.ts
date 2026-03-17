@@ -1,18 +1,18 @@
 import { type LayerConfig } from '$lib/layer-config';
 
-import osm_liberty_style from '../../../static/assets/map-data/osm-liberty-style.min.json?url';
-import osm_liberty_en_style from '../../../static/assets/map-data/osm-liberty-en-style.min.json?url';
-import osm_maptiler_3d_style from '../../../static/assets/map-data/osm-maptiler-3d-gl-style.min.json?url';
-import osm_railways_catin136 from '../../../static/assets/map-data/osm-railways-catin136.min.overlay.json?url';
-import openrailwaymap_standard_light from '../../../static/assets/map-data/openrailwaymap-standard-light.min.overlay.json?url';
-import openrailwaymap_speed_light from '../../../static/assets/map-data/openrailwaymap-speed-light.min.overlay.json?url';
-import openrailwaymap_signals_light from '../../../static/assets/map-data/openrailwaymap-signals-light.min.overlay.json?url';
-import openrailwaymap_electrification_light from '../../../static/assets/map-data/openrailwaymap-electrification-light.min.overlay.json?url';
-import openrailwaymap_gauge_light from '../../../static/assets/map-data/openrailwaymap-gauge-light.min.overlay.json?url';
-import openrailwaymap_loading_gauge_light from '../../../static/assets/map-data/openrailwaymap-loading_gauge-light.min.overlay.json?url';
-import openrailwaymap_track_class_light from '../../../static/assets/map-data/openrailwaymap-track_class-light.min.overlay.json?url';
-import openrailwaymap_operator_light from '../../../static/assets/map-data/openrailwaymap-operator-light.min.overlay.json?url';
-import openrailwaymap_standard_abandoned_light from '../../../static/assets/map-data/openrailwaymap-standard+abandoned-light-catin136.min.overlay.json?url';
+import osm_liberty_style from '$lib/static/assets/map-data/osm-liberty-style.min.json?url';
+import osm_liberty_en_style from '$lib/static/assets/map-data/osm-liberty-en-style.min.json?url';
+import osm_maptiler_3d_style from '$lib/static/assets/map-data/osm-maptiler-3d-gl-style.min.json?url';
+import osm_railways_catin136 from '$lib/static/assets/map-data/osm-railways-catin136.min.overlay.json?url';
+import openrailwaymap_standard_light from '$lib/static/assets/map-data/openrailwaymap-standard-light.min.overlay.json?url';
+import openrailwaymap_speed_light from '$lib/static/assets/map-data/openrailwaymap-speed-light.min.overlay.json?url';
+import openrailwaymap_signals_light from '$lib/static/assets/map-data/openrailwaymap-signals-light.min.overlay.json?url';
+import openrailwaymap_electrification_light from '$lib/static/assets/map-data/openrailwaymap-electrification-light.min.overlay.json?url';
+import openrailwaymap_gauge_light from '$lib/static/assets/map-data/openrailwaymap-gauge-light.min.overlay.json?url';
+import openrailwaymap_loading_gauge_light from '$lib/static/assets/map-data/openrailwaymap-loading_gauge-light.min.overlay.json?url';
+import openrailwaymap_track_class_light from '$lib/static/assets/map-data/openrailwaymap-track_class-light.min.overlay.json?url';
+import openrailwaymap_operator_light from '$lib/static/assets/map-data/openrailwaymap-operator-light.min.overlay.json?url';
+import openrailwaymap_standard_abandoned_light from '$lib/static/assets/map-data/openrailwaymap-standard+abandoned-light-catin136.min.overlay.json?url';
 
 export const OSM_VECTOR_BASE_LAYERS: LayerConfig.LayerConfigEntry[] = [
 	{
