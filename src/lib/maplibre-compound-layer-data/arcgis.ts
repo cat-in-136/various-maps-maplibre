@@ -1,8 +1,8 @@
 import * as maplibregl from 'maplibre-gl';
 
-import * as MaplibreCompondLayerUI from '../maplibre-compound-layer-ui';
-import { DynamicAttributionControl } from '../dynamic_attribution_control';
-import arcgis_osm_junction_names from '../../../static/assets/map-data/arcgis-OpenStreetMap-v2-junction-names.min.overlay.json?url';
+import { type LayerConfig } from '$lib/layer-config';
+import { DynamicAttributionControl } from '$lib/dynamic_attribution_control';
+import arcgis_osm_junction_names from '$lib/static/assets/map-data/arcgis-OpenStreetMap-v2-junction-names.min.overlay.json?url';
 
 type ArcGISCoverageArea = {
 	bbox: [number, number, number, number];
@@ -89,7 +89,7 @@ const ARCGIS_OSM_TRANSFORM_STYLE: maplibregl.TransformStyleFunction = (_previous
 	};
 };
 
-export const ARCGIS_VECTOR_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
+export const ARCGIS_VECTOR_BASE_LAYERS: LayerConfig.LayerConfigEntry[] = [
 	{
 		type: 'LayerGroup',
 		title: 'ArcGIS Vector',
@@ -215,7 +215,7 @@ export const ARCGIS_VECTOR_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.Layer
 	}
 ];
 
-export const ARCGIS_RASTER_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
+export const ARCGIS_RASTER_BASE_LAYERS: LayerConfig.LayerConfigEntry[] = [
 	{
 		type: 'LayerGroup',
 		title: 'ArcGIS Raster',
@@ -289,7 +289,7 @@ export const ARCGIS_RASTER_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.Layer
 	}
 ];
 
-export const ARCGIS_VECTOR_OVERLAY_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
+export const ARCGIS_VECTOR_OVERLAY_LAYERS: LayerConfig.LayerConfigEntry[] = [
 	{
 		type: 'LayerGroup',
 		title: 'ArcGIS Vector',

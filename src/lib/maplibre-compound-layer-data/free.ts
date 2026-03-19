@@ -1,20 +1,20 @@
-import * as MaplibreCompondLayerUI from '../maplibre-compound-layer-ui';
+import { type LayerConfig } from '$lib/layer-config';
 import { Map } from 'maplibre-gl';
-import { DynamicAttributionControl } from '../dynamic_attribution_control';
+import { DynamicAttributionControl } from '$lib/dynamic_attribution_control';
 
 import {
 	OSM_VECTOR_BASE_LAYERS,
 	OSM_RASTER_BASE_LAYERS,
 	OSM_VECTOR_OVERLAY_LAYERS,
 	OSM_RASTER_OVERLAY_LAYERS
-} from './osm';
-import { GSI_VECTOR_BASE_LAYERS } from './gsi';
+} from '$lib/maplibre-compound-layer-data/osm';
+import { GSI_VECTOR_BASE_LAYERS } from '$lib/maplibre-compound-layer-data/gsi';
 
-import { ICGC_VECTOR_BASE_LAYERS } from './icgc';
-import { WEATHER_OVERLAY_LAYERS } from './weather';
-import { MISC_BASE_LAYERS } from './free-misc';
+import { ICGC_VECTOR_BASE_LAYERS } from '$lib/maplibre-compound-layer-data/icgc';
+import { WEATHER_OVERLAY_LAYERS } from '$lib/maplibre-compound-layer-data/weather';
+import { MISC_BASE_LAYERS } from '$lib/maplibre-compound-layer-data/free-misc';
 
-export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
+export const BASE_LAYER_DEFAULT: LayerConfig.LayerConfigEntry[] = [
 	...OSM_VECTOR_BASE_LAYERS,
 	...GSI_VECTOR_BASE_LAYERS,
 	...ARCGIS_VECTOR_BASE_LAYERS,
@@ -24,7 +24,7 @@ export const BASE_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigE
 	...MISC_BASE_LAYERS
 ];
 
-export const OVERLAY_LAYER_DEFAULT: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
+export const OVERLAY_LAYER_DEFAULT: LayerConfig.LayerConfigEntry[] = [
 	...OSM_VECTOR_OVERLAY_LAYERS,
 	...ARCGIS_VECTOR_OVERLAY_LAYERS,
 	...OSM_RASTER_OVERLAY_LAYERS,
@@ -36,7 +36,7 @@ import {
 	ARCGIS_RASTER_BASE_LAYERS,
 	ARCGIS_VECTOR_OVERLAY_LAYERS,
 	setupArcGISAttributionHandling
-} from './arcgis';
+} from '$lib/maplibre-compound-layer-data/arcgis';
 
 export function setupFreeLayersAttributionHandling(
 	map: Map,

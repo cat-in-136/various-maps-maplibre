@@ -1,15 +1,15 @@
-import * as MaplibreCompondLayerUI from '../maplibre-compound-layer-ui';
+import { type LayerConfig } from '$lib/layer-config';
 
-import gsi_light from '../../../static/assets/map-data/gsi-light.min.json?url';
-import gsi_ort_label from '../../../static/assets/map-data/gsi-ort-label.min.json?url';
-import gsi_ort_hybrid_light from '../../../static/assets/map-data/gsi-ort-hybrid-light-catin136.min.json?url';
-import gsi_h_std from '../../../static/assets/map-data/gsi-h-std.min.json?url';
-import gsi_h_pale from '../../../static/assets/map-data/gsi-h-pale.min.json?url';
-import gsi_railway from '../../../static/assets/map-data/gsi-railway.min.json?url';
-import gsi_land from '../../../static/assets/map-data/gsi-land.min.json?url';
-import gsi_river from '../../../static/assets/map-data/gsi-river.min.json?url';
+import gsi_light from '$lib/static/assets/map-data/gsi-light.min.json?url';
+import gsi_ort_label from '$lib/static/assets/map-data/gsi-ort-label.min.json?url';
+import gsi_ort_hybrid_light from '$lib/static/assets/map-data/gsi-ort-hybrid-light-catin136.min.json?url';
+import gsi_h_std from '$lib/static/assets/map-data/gsi-h-std.min.json?url';
+import gsi_h_pale from '$lib/static/assets/map-data/gsi-h-pale.min.json?url';
+import gsi_railway from '$lib/static/assets/map-data/gsi-railway.min.json?url';
+import gsi_land from '$lib/static/assets/map-data/gsi-land.min.json?url';
+import gsi_river from '$lib/static/assets/map-data/gsi-river.min.json?url';
 
-export const GSI_VECTOR_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
+export const GSI_VECTOR_BASE_LAYERS: LayerConfig.LayerConfigEntry[] = [
 	{
 		type: 'LayerGroup',
 		title: '地理院地図Vector',

@@ -1,71 +1,11 @@
 import maplibregl from 'maplibre-gl';
 
-import { GeoJsonLayerConverter } from '../lib/geojson-layer-converter';
-import { VectorOverlayLayerCreator } from './vector-overlay-layer-creater';
-import { PetitLogic } from './petitlogic';
+import { GeoJsonLayerConverter } from '$lib/geojson-layer-converter';
+import { VectorOverlayLayerCreator } from '$lib/vector-overlay-layer-creater';
+import { LayerConfig } from '$lib/layer-config';
+import type { TerrainSources } from '$lib/maplibre-compound-layer-data/terrain';
 
 const ELEMENT_CLASS_PREFIX = 'maplibregl-ctrl-compound-layer';
-
-export namespace LayerConfig {
-	export type LayerFormat =
-		| 'style'
-		| { tile: 'raster' | 'vector' | 'geojson' }
-		| { single: 'geojson' };
-
-	export interface Layer {
-		type: string;
-		id: string;
-		title: string;
-		url: string;
-		html?: string;
-		description?: string;
-		legendUrl?: string;
-		maxNativeZoom?: number;
-		maxZoom?: number;
-		minZoom?: number;
-		tileSize?: number;
-		scheme?: 'xyz' | 'tms';
-		attribution?: string;
-		layerFormat?: LayerFormat;
-		styleSwapOptions?: maplibregl.StyleSwapOptions & {
-			transformStyleByExpression?: any;
-		};
-		[propName: string]: unknown;
-	}
-
-	export interface LayerGroup {
-		type: 'LayerGroup';
-		title: string;
-		html?: string;
-		entries: LayerConfigEntry[];
-		[propName: string]: unknown;
-	}
-
-	export type LayerConfigEntry = LayerGroup | Layer;
-
-	export function createStyleSwapOption(layer: Layer): maplibregl.StyleSwapOptions {
-		if (layer.styleSwapOptions?.transformStyleByExpression) {
-			const r = new PetitLogic();
-			const styleSwapOptions: maplibregl.StyleSwapOptions = {
-				transformStyle: (previous, next) =>
-					r.evaluate([
-						'let',
-						'previous',
-						previous,
-						'next',
-						next,
-						layer.styleSwapOptions?.transformStyleByExpression
-					])
-			};
-			if (layer.styleSwapOptions?.diff) {
-				styleSwapOptions.diff = layer.styleSwapOptions?.diff;
-			}
-			return styleSwapOptions;
-		} else {
-			return layer.styleSwapOptions || {};
-		}
-	}
-}
 
 namespace LayerTreeView {
 	type LayerTreeEventType = {
@@ -683,6 +623,94 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 
 	addOverlay(config: LayerConfig.LayerConfigEntry | LayerConfig.LayerConfigEntry[]): this {
 		this.#overlay.addConfig(config);
+		return this;
+	}
+
+	addTerrain(terrainSources: TerrainSources): this {
+		const map = this.#map;
+		if (!map) return this;
+
+		const terrainControl = new maplibregl.TerrainControl({
+			source: 'terrain',
+			exaggeration: 1
+		});
+
+		const detailsTerrain = document.createElement('details');
+		const summaryTerrain = document.createElement('summary');
+		const divTerrainEntries = document.createElement('div');
+		summaryTerrain.textContent = 'Terrain';
+		detailsTerrain.appendChild(summaryTerrain);
+		detailsTerrain.appendChild(divTerrainEntries);
+
+		for (const id in terrainSources) {
+			const { title, source } = terrainSources[id];
+
+			const entryDiv = document.createElement('div');
+			entryDiv.className = `${ELEMENT_CLASS_PREFIX}-layer-entry-visibility`;
+			const terrainEntryLabel = document.createElement('label');
+			const terrainCheckbox = document.createElement('input');
+			terrainCheckbox.type = 'checkbox';
+			const spanElement = document.createElement('span');
+			spanElement.textContent = title;
+			terrainEntryLabel.appendChild(terrainCheckbox);
+			terrainEntryLabel.appendChild(spanElement);
+			entryDiv.appendChild(terrainEntryLabel);
+
+			terrainCheckbox.addEventListener(
+				'change',
+				(_e) => {
+					for (const checkbox of detailsTerrain.querySelectorAll(
+						`.${ELEMENT_CLASS_PREFIX}-layer-entry-visibility input[type=checkbox]`
+					)) {
+						const isTerrainUsed = !!map.getTerrain()?.source;
+						map.setTerrain(null);
+
+						for (const layer_id of map.getLayersOrder()) {
+							if (map.getLayer(layer_id)?.source === 'terrain') {
+								map.removeLayer(layer_id);
+							}
+						}
+						if (map.getSource('terrain')) {
+							map.removeSource('terrain');
+						}
+						if (checkbox !== terrainCheckbox) {
+							(checkbox as HTMLInputElement).checked = false;
+						}
+
+						if ((terrainCheckbox as HTMLInputElement).checked) {
+							map.addSource('terrain', source);
+							map.addLayer({
+								id: 'hills',
+								type: 'hillshade',
+								source: 'terrain',
+								paint: {
+									'hillshade-illumination-anchor': 'map',
+									'hillshade-exaggeration': 0.2
+								}
+							});
+							if (!map.hasControl(terrainControl)) {
+								map.addControl(terrainControl);
+							}
+							if (isTerrainUsed) {
+								map.setTerrain({ source: 'terrain' });
+							}
+						} else {
+							if (map.getLayer('hills')) {
+								map.removeLayer('hills');
+							}
+							if (map.hasControl(terrainControl)) {
+								map.removeControl(terrainControl);
+							}
+						}
+					}
+				},
+				false
+			);
+
+			detailsTerrain.appendChild(entryDiv);
+		}
+
+		this.#optional.appendChild(detailsTerrain);
 		return this;
 	}
 

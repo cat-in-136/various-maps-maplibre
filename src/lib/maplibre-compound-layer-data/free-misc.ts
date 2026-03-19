@@ -1,8 +1,8 @@
-import * as MaplibreCompondLayerUI from '../maplibre-compound-layer-ui';
+import { type LayerConfig } from '$lib/layer-config';
 
-import tjmsy_orilibre_global_osmfj_netsyms from '../../../static/assets/map-data/tjmsy-orilibre-global-osmfj-netsyms.min.json?url';
+import tjmsy_orilibre_global_osmfj_netsyms from '$lib/static/assets/map-data/tjmsy-orilibre-global-osmfj-netsyms.min.json?url';
 
-export const MISC_BASE_LAYERS: MaplibreCompondLayerUI.LayerConfig.LayerConfigEntry[] = [
+export const MISC_BASE_LAYERS: LayerConfig.LayerConfigEntry[] = [
 	{
 		type: 'LayerGroup',
 		title: 'Misc',
