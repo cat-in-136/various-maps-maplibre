@@ -25,361 +25,106 @@ export function getLayerNonfreeKeysFromURL(
 	return keys;
 }
 
-export function getBaseLayerNonfree(keyes: LayerNonfreeKeys): LayerConfig.LayerConfigEntry[] {
+type MaptilerLayerDef = { mapId: string; title: string };
+type MaptilerGroupDef = { title: string; layers: MaptilerLayerDef[] };
+
+const maptilerGroups: MaptilerGroupDef[] = [
+	{
+		title: 'Standard maps',
+		layers: [
+			{ mapId: 'aquarelle', title: 'Aquarelle' },
+			{ mapId: 'aquarelle-v4', title: 'Aquarelle v4' },
+			{ mapId: 'backdrop', title: 'Backdrop' },
+			{ mapId: 'backdrop-v4', title: 'Backdrop v4' },
+			{ mapId: 'backdrop-v4-dark', title: 'Backdrop Dark v4' },
+			{ mapId: 'backdrop-v4-light', title: 'Backdrop Light v4' },
+			{ mapId: 'basic-v2', title: 'Basic' },
+			{ mapId: 'bright-v2', title: 'Bright' },
+			{ mapId: 'base-v4', title: 'Base v4' },
+			{ mapId: 'dataviz', title: 'Dataviz' },
+			{ mapId: 'dataviz-v4', title: 'Dataviz v4' },
+			{ mapId: 'dataviz-v4-dark', title: 'Dataviz Dark v4' },
+			{ mapId: 'dataviz-v4-light', title: 'Dataviz Light v4' },
+			{ mapId: 'landscape', title: 'Landscape' },
+			{ mapId: 'landscape-v4', title: 'Landscape v4' },
+			{ mapId: 'landscape-v4-dark', title: 'Landscape Dark v4' },
+			{ mapId: 'landscape-v4-vivid', title: 'Landscape Vivid v4' },
+			{ mapId: 'ocean', title: 'Ocean' },
+			{ mapId: 'ocean-v4', title: 'Ocean v4' },
+			{ mapId: 'ocean-v4-dark', title: 'Ocean Dark v4' },
+			{ mapId: 'openstreetmap', title: 'OpenStreetMap' },
+			{ mapId: 'openstreetmap-dark', title: 'OpenStreetMap Dark' },
+			{ mapId: 'outdoor-v2', title: 'Outdoor' },
+			{ mapId: 'outdoor-v4', title: 'Outdoor v4' },
+			{ mapId: 'outdoor-v4-dark', title: 'Outdoor Dark v4' },
+			{ mapId: 'hybrid-v4', title: 'Satellite Hybrid v4' },
+			{ mapId: 'hybrid-v4-dark', title: 'Satellite Hybrid Dark v4' },
+			{ mapId: 'satellite', title: 'Satellite' },
+			{ mapId: 'satellite-v4', title: 'Satellite v4' },
+			{ mapId: 'streets-v2', title: 'Streets' },
+			{ mapId: 'streets-v4', title: 'Streets v4' },
+			{ mapId: 'streets-v4-dark', title: 'Streets Dark v4' },
+			{ mapId: 'streets-v4-pastel', title: 'Streets Pastel v4' },
+			{ mapId: 'toner-v2', title: 'Toner' },
+			{ mapId: 'topo-v2', title: 'Topo' },
+			{ mapId: 'topo-v4', title: 'Topo v4' },
+			{ mapId: 'topo-v4-dark', title: 'Topo Dark v4' },
+			{ mapId: 'topo-v4-pastel', title: 'Topo Pastel v4' },
+			{ mapId: 'topo-v4-topographique', title: 'Topo Topographique v4' },
+			{ mapId: 'winter-v2', title: 'Winter' },
+			{ mapId: 'winter-v4', title: 'Winter v4' },
+			{ mapId: 'winter-v4-dark', title: 'Winter Dark v4' }
+		]
+	},
+	{
+		title: 'Japan',
+		layers: [
+			{ mapId: 'jp-gsi-standard', title: 'JP GSI Standard' },
+			{ mapId: 'jp-mierune-streets', title: 'JP MIERUNE Streets' },
+			{ mapId: 'jp-mierune-gray', title: 'JP MIERUNE Gray' },
+			{ mapId: 'jp-mierune-dark', title: 'JP MIERUNE Dark' }
+		]
+	},
+	{
+		title: 'Netherlands',
+		layers: [{ mapId: 'nl-cartiqo-topo', title: 'NL Cartiqo' }]
+	},
+	{
+		title: 'Switzerland',
+		layers: [
+			{ mapId: 'cadastre', title: 'CH Cadastre' },
+			{ mapId: 'ch-swisstopo-lbm', title: 'CH swisstopo LBM' }
+		]
+	},
+	{
+		title: 'United Kingdom',
+		layers: [{ mapId: 'uk-openzoomstack-road', title: 'UK OS Open Zoomstack' }]
+	}
+];
+
+function createMaptilerLayer(key: string, def: MaptilerLayerDef): LayerConfig.LayerConfigEntry {
+	return {
+		type: 'Layer',
+		id: `base-maptiler-${def.mapId}`,
+		title: def.title,
+		url: `https://api.maptiler.com/maps/${def.mapId}/style.json?key=${key}`
+	};
+}
+
+export function getBaseLayerNonfree(keys: LayerNonfreeKeys): LayerConfig.LayerConfigEntry[] {
 	const entries: LayerConfig.LayerConfigEntry[] = [];
-	if (keyes['maptiler']) {
-		const key = keyes['maptiler'];
+	if (keys['maptiler']) {
+		const key = keys['maptiler'];
 		entries.push({
 			type: 'LayerGroup',
 			title: 'Maptiler',
-			entries: [
-				{
-					type: 'LayerGroup',
-					title: 'Standard maps',
-					entries: [
-						{
-							type: 'Layer',
-							id: 'base-maptiler-aquarelle',
-							title: 'Aquarelle',
-							url: `https://api.maptiler.com/maps/aquarelle/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-aquarelle-v4',
-							title: 'Aquarelle v4',
-							url: `https://api.maptiler.com/maps/aquarelle-v4/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-backdrop',
-							title: 'Backdrop',
-							url: `https://api.maptiler.com/maps/backdrop/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-backdrop-v4',
-							title: 'Backdrop v4',
-							url: `https://api.maptiler.com/maps/backdrop-v4/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-backdrop-v4-dark',
-							title: 'Backdrop Dark v4',
-							url: `https://api.maptiler.com/maps/backdrop-v4-dark/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-backdrop-v4-light',
-							title: 'Backdrop Light v4',
-							url: `https://api.maptiler.com/maps/backdrop-v4-light/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-basic-v2',
-							title: 'Basic',
-							url: `https://api.maptiler.com/maps/basic-v2/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-bright-v2',
-							title: 'Bright',
-							url: `https://api.maptiler.com/maps/bright-v2/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-base-v4',
-							title: 'Base v4',
-							url: `https://api.maptiler.com/maps/base-v4/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-dataviz',
-							title: 'Dataviz',
-							url: `https://api.maptiler.com/maps/dataviz/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-dataviz-v4',
-							title: 'Dataviz v4',
-							url: `https://api.maptiler.com/maps/dataviz-v4/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-dataviz-v4-dark',
-							title: 'Dataviz Dark v4',
-							url: `https://api.maptiler.com/maps/dataviz-v4-dark/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-dataviz-v4-light',
-							title: 'Dataviz Light v4',
-							url: `https://api.maptiler.com/maps/dataviz-v4-light/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-landscape',
-							title: 'Landscape',
-							url: `https://api.maptiler.com/maps/landscape/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-landscape-v4',
-							title: 'Landscape v4',
-							url: `https://api.maptiler.com/maps/landscape-v4/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-landscape-v4-dark',
-							title: 'Landscape Dark v4',
-							url: `https://api.maptiler.com/maps/landscape-v4-dark/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-landscape-v4-vivid',
-							title: 'Landscape Vivid v4',
-							url: `https://api.maptiler.com/maps/landscape-v4-vivid/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-ocean',
-							title: 'Ocean',
-							url: `https://api.maptiler.com/maps/ocean/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-ocean-v4',
-							title: 'Ocean v4',
-							url: `https://api.maptiler.com/maps/ocean-v4/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-ocean-v4-dark',
-							title: 'Ocean Dark v4',
-							url: `https://api.maptiler.com/maps/ocean-v4-dark/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-openstreetmap',
-							title: 'OpenStreetMap',
-							url: `https://api.maptiler.com/maps/openstreetmap/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-openstreetmap-dark',
-							title: 'OpenStreetMap Dark',
-							url: `https://api.maptiler.com/maps/openstreetmap-dark/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-outdoor-v2',
-							title: 'Outdoor',
-							url: `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-outdoor-v4',
-							title: 'Outdoor v4',
-							url: `https://api.maptiler.com/maps/outdoor-v4/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-outdoor-v4-dark',
-							title: 'Outdoor Dark v4',
-							url: `https://api.maptiler.com/maps/outdoor-v4-dark/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-hybrid-v4',
-							title: 'Satellite Hybrid v4',
-							url: `https://api.maptiler.com/maps/hybrid-v4/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-hybrid-v4-dark',
-							title: 'Satellite Hybrid Dark v4',
-							url: `https://api.maptiler.com/maps/hybrid-v4-dark/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-satellite',
-							title: 'Satellite',
-							url: `https://api.maptiler.com/maps/satellite/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-satellite-v4',
-							title: 'Satellite v4',
-							url: `https://api.maptiler.com/maps/satellite-v4/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-streets-v2',
-							title: 'Streets',
-							url: `https://api.maptiler.com/maps/streets-v2/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-streets-v4',
-							title: 'Streets v4',
-							url: `https://api.maptiler.com/maps/streets-v4/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-streets-v4-dark',
-							title: 'Streets Dark v4',
-							url: `https://api.maptiler.com/maps/streets-v4-dark/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-streets-v4-pastel',
-							title: 'Streets Pastel v4',
-							url: `https://api.maptiler.com/maps/streets-v4-pastel/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-toner-v2',
-							title: 'Toner',
-							url: `https://api.maptiler.com/maps/toner-v2/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-topo-v2',
-							title: 'Topo',
-							url: `https://api.maptiler.com/maps/topo-v2/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-topo-v4',
-							title: 'Topo v4',
-							url: `https://api.maptiler.com/maps/topo-v4/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-topo-v4-dark',
-							title: 'Topo Dark v4',
-							url: `https://api.maptiler.com/maps/topo-v4-dark/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-topo-v4-pastel',
-							title: 'Topo Pastel v4',
-							url: `https://api.maptiler.com/maps/topo-v4-pastel/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-topo-v4-topographique',
-							title: 'Topo Topographique v4',
-							url: `https://api.maptiler.com/maps/topo-v4-topographique'/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-winter-v2',
-							title: 'Winter',
-							url: `https://api.maptiler.com/maps/winter-v2/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-winter-v4',
-							title: 'Winter v4',
-							url: `https://api.maptiler.com/maps/winter-v4/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-winter-v4-dark',
-							title: 'Winter Dark v4',
-							url: `https://api.maptiler.com/maps/winter-v4-dark/style.json?key=${key}`
-						}
-					]
-				},
-				{
-					type: 'LayerGroup',
-					title: 'Japan',
-					entries: [
-						{
-							type: 'Layer',
-							id: 'base-maptiler-jp-gsi-standard',
-							title: 'JP GSI Standard',
-							url: `https://api.maptiler.com/maps/jp-gsi-standard/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-jp-mierune-streets',
-							title: 'JP MIERUNE Streets',
-							url: `https://api.maptiler.com/maps/jp-mierune-streets/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-jp-mierune-gray',
-							title: 'JP MIERUNE Gray',
-							url: `https://api.maptiler.com/maps/jp-mierune-gray/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-jp-mierune-dark',
-							title: 'JP MIERUNE Dark',
-							url: `https://api.maptiler.com/maps/jp-mierune-dark/style.json?key=${key}`
-						}
-					]
-				},
-				{
-					type: 'LayerGroup',
-					title: 'Netherlands',
-					entries: [
-						{
-							type: 'Layer',
-							id: 'base-maptiler-nl-cartiqo-topo',
-							title: 'NL Cartiqo',
-							url: `https://api.maptiler.com/maps/nl-cartiqo-topo/style.json?key=${key}`
-						}
-					]
-				},
-				{
-					type: 'LayerGroup',
-					title: 'Switzerland',
-					entries: [
-						{
-							type: 'Layer',
-							id: 'base-maptiler-cadastre',
-							title: 'CH Cadastre',
-							url: `https://api.maptiler.com/maps/cadastre/style.json?key=${key}`
-						},
-						{
-							type: 'Layer',
-							id: 'base-maptiler-ch-swisstopo-lbm',
-							title: 'CH swisstopo LBM',
-							url: `https://api.maptiler.com/maps/ch-swisstopo-lbm/style.json?key=${key}`
-						}
-					]
-				},
-				{
-					type: 'LayerGroup',
-					title: 'United Kingdom',
-					entries: [
-						{
-							type: 'Layer',
-							id: 'base-maptiler-uk-openzoomstack-road',
-							title: 'UK OS Open Zoomstack',
-							url: `https://api.maptiler.com/maps/uk-openzoomstack-road/style.json?key=${key}`
-						}
-					]
-				}
-			]
+			entries: maptilerGroups.map((group) => ({
+				type: 'LayerGroup' as const,
+				title: group.title,
+				entries: group.layers.map((layer) => createMaptilerLayer(key, layer))
+			}))
 		});
 	}
-	//{
-	//	const miscGroup: LayerConfig.LayerGroup = {
-	//		type: 'LayerGroup',
-	//		title: 'Misc (non free)',
-	//		entries: []
-	//	};
-	//	if (keyes['maptiler']) {
-	//		const key = keyes['maptiler'];
-	//		miscGroup.entries.push();
-	//	}
-	//	if (miscGroup.entries.length > 0) {
-	//		entries.push(miscGroup);
-	//	}
-	//}
 	return entries;
 }
 
