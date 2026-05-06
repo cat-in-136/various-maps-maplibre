@@ -3,4 +3,4 @@ package-lock.json
 pnpm-lock.yaml
 yarn.lock
 
-static/assets/map-data/*.json
+src/lib/static/assets/map-data/*.json
