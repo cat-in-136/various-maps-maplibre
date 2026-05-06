@@ -106,6 +106,30 @@ export const OSM_VECTOR_BASE_LAYERS: LayerConfig.LayerConfigEntry[] = [
 								url: 'https://tris5572.github.io/map-style/light/style.json'
 							}
 						]
+					},
+					{
+						type: 'LayerGroup',
+						title: 'optgeo/openmaptiles',
+						entries: [
+							{
+								type: 'Layer',
+								id: 'base-optgeo-openmaptiles-build',
+								title: '3D Building',
+								url: 'https://optgeo.github.io/openmaptiles/build.json'
+							},
+							{
+								type: 'Layer',
+								id: 'base-optgeo-openmaptiles-green',
+								title: 'Green',
+								url: 'https://optgeo.github.io/openmaptiles/green.json'
+							},
+							{
+								type: 'Layer',
+								id: 'base-optgeo-openmaptiles-style',
+								title: 'Plain',
+								url: 'https://optgeo.github.io/openmaptiles/style.json'
+							}
+						]
 					}
 				]
 			},
