@@ -135,6 +135,78 @@ export const OSM_VECTOR_BASE_LAYERS: LayerConfig.LayerConfigEntry[] = [
 			},
 			{
 				type: 'LayerGroup',
+				title: 'KotobaMedia Tileserver',
+				entries: [
+					{
+						type: 'Layer',
+						id: 'base-kotobamedia-osm-ja-light',
+						title: 'OSM Japan Light',
+						url: 'https://tiles.kmproj.com/styles/osm-ja-light.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-kotobamedia-osm-ja-dark',
+						title: 'OSM Japan Dark',
+						url: 'https://tiles.kmproj.com/styles/osm-ja-dark.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-kotobamedia-osm-ja-grayscale',
+						title: 'OSM Japan Grayscale',
+						url: 'https://tiles.kmproj.com/styles/osm-ja-grayscale.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-kotobamedia-osm-ja-black',
+						title: 'OSM Japan Black',
+						url: 'https://tiles.kmproj.com/styles/osm-ja-black.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-kotobamedia-osm-ja-white',
+						title: 'OSM Japan White',
+						url: 'https://tiles.kmproj.com/styles/osm-ja-white.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-kotobamedia-osm-en-light',
+						title: 'OSM Japan EN Light',
+						url: 'https://tiles.kmproj.com/styles/osm-en-light.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-kotobamedia-osm-en-dark',
+						title: 'OSM Japan EN Dark',
+						url: 'https://tiles.kmproj.com/styles/osm-en-dark.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-kotobamedia-osm-en-grayscale',
+						title: 'OSM Japan EN Grayscale',
+						url: 'https://tiles.kmproj.com/styles/osm-en-grayscale.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-kotobamedia-osm-en-black',
+						title: 'OSM Japan EN Black',
+						url: 'https://tiles.kmproj.com/styles/osm-en-black.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-kotobamedia-osm-en-white',
+						title: 'OSM Japan EN White',
+						url: 'https://tiles.kmproj.com/styles/osm-en-white.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-kotobamedia-print-handwriting',
+						title: 'Print Handwriting',
+						url: 'https://tiles.kmproj.com/styles/print-handwriting.json'
+					}
+				]
+			},
+			{
+				type: 'LayerGroup',
 				title: 'Netsyms Basemaps',
 				entries: [
 					{
