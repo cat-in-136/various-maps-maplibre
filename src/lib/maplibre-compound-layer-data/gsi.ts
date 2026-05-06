@@ -147,6 +147,19 @@ export const GSI_VECTOR_BASE_LAYERS: LayerConfig.LayerConfigEntry[] = [
 						maxNativeZoom: 17.9
 					}
 				]
+			},
+			{
+				type: 'LayerGroup',
+				title: 'GSI最適化ベクトルタイル',
+				entries: [
+					{
+						type: 'Layer',
+						id: 'extra-gsi-optbv-std',
+						title: '最適化ベクトルタイル（標準地図風）',
+						url: 'https://gsi-cyberjapan.github.io/optimal_bvmap/style/std.json',
+						maxNativeZoom: 16
+					}
+				]
 			}
 		]
 	}

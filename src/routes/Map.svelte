@@ -28,6 +28,7 @@
 	import { getTerrainSources } from '$lib/maplibre-compound-layer-data/terrain';
 	import { getGsiDemProtocolAction } from '$lib/maplibre-gsi-dem-protocol';
 	import { getGeoJsonProtocolAction } from '$lib/maplibre-gl-geojson-tiles-qiita';
+	import { getPmtilesProtocol } from '$lib/maplibre-pmtiles-protocol';
 	import { DynamicAttributionControl } from '$lib/dynamic_attribution_control';
 	import {
 		getJmaLayerProtocolAction,
@@ -140,6 +141,7 @@
 				getCloudSatelliteToPngProtocolAction('cloud-satellite-png')
 			);
 			maplibregl.addProtocol('gsidem', getGsiDemProtocolAction('gsidem'));
+			maplibregl.addProtocol('pmtiles', getPmtilesProtocol());
 		});
 
 		const layerswitcher = new MaplibreCompondLayerUI.MapLibreCompondLayerSwitcherControl();
