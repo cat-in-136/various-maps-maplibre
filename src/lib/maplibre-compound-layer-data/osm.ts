@@ -360,6 +360,36 @@ export const OSM_VECTOR_BASE_LAYERS: LayerConfig.LayerConfigEntry[] = [
 						url: 'https://basemaps.cartocdn.com/gl/voyager-nolabels-gl-style/style.json'
 					}
 				]
+			},
+			{
+				type: 'LayerGroup',
+				title: 'Overture Maps',
+				entries: [
+					{
+						type: 'Layer',
+						id: 'base-overture-default',
+						title: 'Default',
+						url: 'https://cholmes.github.io/overture-pmtiles-styles/style.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-overture-satellite',
+						title: 'Satellite',
+						url: 'https://cholmes.github.io/overture-pmtiles-styles/style-satellite.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-overture-dark',
+						title: 'Dark',
+						url: 'https://cholmes.github.io/overture-pmtiles-styles/style-dark.json'
+					},
+					{
+						type: 'Layer',
+						id: 'base-overture-positron',
+						title: 'Positron',
+						url: 'https://cholmes.github.io/overture-pmtiles-styles/style-positron.json'
+					}
+				]
 			}
 		]
 	}
