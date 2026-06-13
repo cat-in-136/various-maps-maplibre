@@ -1,4 +1,5 @@
 import type { Layer, LayerConfigEntry, LayerGroup } from '$lib/layer-config';
+import { isLayerGroup, isLayerTextJson } from '$lib/layer-config';
 
 export interface GSIMapLayerConfig {
 	url: string;
@@ -62,26 +63,80 @@ export class GSIMapLayers {
 		layers: GSIMapLayerConfig[] = GSIMAPLAYERS,
 		convFn: GSIMapLayersConvFn = GSIMAPLAYERS_CONV_FN
 	): Promise<void> {
-		const data = (
-			await Promise.all(
-				layers.map(async (config) => {
-					const url = config.url;
-					const response = await fetch(url);
-					if (response.ok) {
-						try {
-							return await response.json();
-						} catch (e) {
-							console.debug(`Failed to load ${url}`, e);
-						}
-						return undefined;
-					} else {
-						return undefined;
+		const results = await Promise.all(
+			layers.map(async (config) => {
+				const url = config.url;
+				const response = await fetch(url);
+				if (response.ok) {
+					try {
+						const json = await response.json();
+						return { json, url };
+					} catch (e) {
+						console.debug(`Failed to load ${url}`, e);
 					}
-				})
-			)
-		).flatMap((v) => v?.layers);
+					return undefined;
+				} else {
+					return undefined;
+				}
+			})
+		);
+
+		const data = results.flatMap((v) => v?.json?.layers);
+
+		for (const result of results) {
+			if (result?.json?.layers) {
+				await GSIMapLayers.#resolveSrc(result.json.layers, result.url);
+			}
+		}
+
 		GSIMapLayers.#fixData(data, convFn);
 		this.#data.push(...data);
+	}
+
+	static async #resolveSrc(
+		data: LayerConfigEntry[],
+		baseUrl: string,
+		visited: Set<string> = new Set()
+	): Promise<void> {
+		const srcMap = new Map<LayerGroup, string>();
+
+		const tasks: Promise<void>[] = [];
+
+		for (const d of data) {
+			if (isLayerGroup(d) && typeof d.src === 'string') {
+				const srcUrl = new URL(d.src, baseUrl).href;
+				if (visited.has(srcUrl)) {
+					console.debug(`Skipped circular src ${srcUrl}`);
+					continue;
+				}
+				visited.add(srcUrl);
+				tasks.push(
+					fetch(srcUrl)
+						.then((response) => {
+							if (!response.ok) return undefined;
+							return response.json();
+						})
+						.then((json) => {
+							if (isLayerTextJson(json)) {
+								d.entries = json.layers;
+								srcMap.set(d, srcUrl);
+							}
+						})
+						.catch((e) => {
+							console.debug(`Failed to load src ${srcUrl}`, e);
+						})
+				);
+			}
+		}
+
+		await Promise.all(tasks);
+
+		for (const d of data) {
+			if (isLayerGroup(d) && Array.isArray(d.entries)) {
+				const childBaseUrl = srcMap.get(d) ?? baseUrl;
+				await GSIMapLayers.#resolveSrc(d.entries, childBaseUrl, visited);
+			}
+		}
 	}
 
 	static #fixData(data: LayerConfigEntry[], convFn: GSIMapLayersConvFn) {
