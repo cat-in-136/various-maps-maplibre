@@ -1,4 +1,4 @@
-import { type LayerConfig } from '$lib/layer-config';
+import type { LayerConfigEntry } from '$lib/layer-config';
 import maptiler_ocean_bathymetric_contours from '$lib/static/assets/map-data/maptiler-ocean-bathymetric-contours-catin136.min.overlay.json?url';
 
 type LayerNonfreeKeys = {
@@ -102,7 +102,7 @@ const maptilerGroups: MaptilerGroupDef[] = [
 	}
 ];
 
-function createMaptilerLayer(key: string, def: MaptilerLayerDef): LayerConfig.LayerConfigEntry {
+function createMaptilerLayer(key: string, def: MaptilerLayerDef): LayerConfigEntry {
 	return {
 		type: 'Layer',
 		id: `base-maptiler-${def.mapId}`,
@@ -111,8 +111,8 @@ function createMaptilerLayer(key: string, def: MaptilerLayerDef): LayerConfig.La
 	};
 }
 
-export function getBaseLayerNonfree(keys: LayerNonfreeKeys): LayerConfig.LayerConfigEntry[] {
-	const entries: LayerConfig.LayerConfigEntry[] = [];
+export function getBaseLayerNonfree(keys: LayerNonfreeKeys): LayerConfigEntry[] {
+	const entries: LayerConfigEntry[] = [];
 	if (keys['maptiler']) {
 		const key = keys['maptiler'];
 		entries.push({
@@ -128,8 +128,8 @@ export function getBaseLayerNonfree(keys: LayerNonfreeKeys): LayerConfig.LayerCo
 	return entries;
 }
 
-export function getOverlayLayerNonfree(keys: LayerNonfreeKeys): LayerConfig.LayerConfigEntry[] {
-	const entries: LayerConfig.LayerConfigEntry[] = [];
+export function getOverlayLayerNonfree(keys: LayerNonfreeKeys): LayerConfigEntry[] {
+	const entries: LayerConfigEntry[] = [];
 
 	if (keys['maptiler']) {
 		const key = keys['maptiler'];

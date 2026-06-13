@@ -1,13 +1,11 @@
-import { type LayerConfig } from '$lib/layer-config';
+import type { Layer, LayerConfigEntry, LayerGroup } from '$lib/layer-config';
 
 export interface GSIMapLayerConfig {
 	url: string;
 	[propName: string]: unknown;
 }
 
-type GSIMapLayersConvFn = (
-	v: LayerConfig.LayerConfigEntry
-) => LayerConfig.LayerConfigEntry | undefined;
+type GSIMapLayersConvFn = (v: LayerConfigEntry) => LayerConfigEntry | undefined;
 
 const GSIMAPLAYERS: GSIMapLayerConfig[] = [
 	{
@@ -35,7 +33,7 @@ const GSIMAPLAYERS: GSIMapLayerConfig[] = [
 
 const GSIMAPLAYERS_CONV_FN: GSIMapLayersConvFn = (v) => {
 	if (v?.type === 'Layer') {
-		const layer = v as LayerConfig.Layer;
+		const layer = v as Layer;
 		if (!layer.url.startsWith('https://')) {
 			layer.url = new URL(layer.url, GSIMAPLAYERS[0].url).href;
 		}
@@ -47,12 +45,12 @@ const GSIMAPLAYERS_CONV_FN: GSIMapLayersConvFn = (v) => {
 };
 
 export class GSIMapLayers {
-	#data: LayerConfig.LayerConfigEntry[];
+	#data: LayerConfigEntry[];
 	constructor() {
 		this.#data = [];
 	}
 
-	getGroup(title: string = '国土地理院レイヤー'): LayerConfig.LayerGroup {
+	getGroup(title: string = '国土地理院レイヤー'): LayerGroup {
 		return {
 			type: 'LayerGroup',
 			title,
@@ -86,7 +84,7 @@ export class GSIMapLayers {
 		this.#data.push(...data);
 	}
 
-	static #fixData(data: any[], convFn: GSIMapLayersConvFn) {
+	static #fixData(data: LayerConfigEntry[], convFn: GSIMapLayersConvFn) {
 		for (const d of data) {
 			if (d?.type === 'LayerGroup') {
 				if (Array.isArray(d.entries)) {

@@ -97,7 +97,7 @@ async function processGeojsonTile(
 		return new Uint8Array([0, 0, 0, 0]);
 	}
 
-	const buffer = fromGeojsonVt({ v: tile } as any);
+	const buffer = fromGeojsonVt({ v: tile } as unknown as Parameters<typeof fromGeojsonVt>[0]);
 	return buffer;
 }
 

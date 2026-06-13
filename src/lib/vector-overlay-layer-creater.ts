@@ -1,14 +1,15 @@
 import maplibregl from 'maplibre-gl';
-import { LayerConfig } from '$lib/layer-config';
+import { createStyleSwapOption } from '$lib/layer-config';
+import type { Layer } from '$lib/layer-config';
 
-export namespace VectorOverlayLayerCreator {
-	export async function addToMap(layer: LayerConfig.Layer, map: maplibregl.Map): Promise<void> {
+export const VectorOverlayLayerCreator = {
+	async addToMap(layer: Layer, map: maplibregl.Map): Promise<void> {
 		const id = layer.id;
 		const response = await fetch(layer.url);
 		if (!response.ok) return;
 		const json = await response.json();
 		if (json.version === 8 && typeof json.sources === 'object' && typeof json.layers === 'object') {
-			const transformStyleFunc = LayerConfig.createStyleSwapOption(layer)?.transformStyle;
+			const transformStyleFunc = createStyleSwapOption(layer)?.transformStyle;
 			const new_style: maplibregl.StyleSpecification = transformStyleFunc
 				? transformStyleFunc(structuredClone(map.getStyle()), json)
 				: json;
@@ -121,9 +122,9 @@ export namespace VectorOverlayLayerCreator {
 		} else {
 			console.debug(`Unsupported JSON format: ${layer.url}`);
 		}
-	}
+	},
 
-	export function removeFromMap(layer: LayerConfig.Layer, map: maplibregl.Map): void {
+	removeFromMap(layer: Layer, map: maplibregl.Map): void {
 		const id = layer.id;
 		// Remove layers and sources associated with this style layer
 		if (map) {
@@ -155,4 +156,4 @@ export namespace VectorOverlayLayerCreator {
 			}
 		}
 	}
-}
+};

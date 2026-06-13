@@ -1,282 +1,276 @@
 import maplibregl from 'maplibre-gl';
 import type * as maplibreglstyle from '@maplibre/maplibre-gl-style-spec';
 import { GSIMAP_STYLE_OVERRIDE } from '$lib/gsivectorexperimentalstyle';
-import { type LayerConfig } from '$lib/layer-config';
+import type { Layer, LayerFormat } from '$lib/layer-config';
 
-namespace Styling {
-	export function getPaintForPolygonFill(
-		layer: LayerConfig.Layer
-	): Required<maplibreglstyle.FillLayerSpecification>['paint'] {
-		if (typeof layer.styleurl === 'string') {
-			return GSIMAP_STYLE_OVERRIDE[layer.styleurl]?.fill || getDefaultPaintForPolygonFill(false);
-		}
-		return GSIMAP_STYLE_OVERRIDE[layer.url]?.fill || getDefaultPaintForPolygonFill(false);
+function getPaintForPolygonFill(
+	layer: Layer
+): Required<maplibreglstyle.FillLayerSpecification>['paint'] {
+	if (typeof layer.styleurl === 'string') {
+		return GSIMAP_STYLE_OVERRIDE[layer.styleurl]?.fill || getDefaultPaintForPolygonFill(false);
 	}
-	export function getDefaultPaintForPolygonFill(
-		forceValue: boolean = false,
-		fillOpacity: number = 0.5,
-		fillColor: string = '#0000ff',
-		fillOutlineColor: string = 'rgba(0,0,0,0)'
-	): Required<maplibreglstyle.FillLayerSpecification>['paint'] {
-		return {
-			'fill-antialias': true,
-			'fill-opacity': forceValue
-				? fillOpacity
-				: [
-						'case',
-						// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
-						['has', '_fillOpacity'],
-						['get', '_fillOpacity'],
-						['has', '_opacity'],
-						['get', '_opacity'],
-						// mapbox/simplestyle-spec
-						['has', 'fill-opacity'],
-						['get', 'fill-opacity'],
-						// Default
-						fillOpacity
-					],
-			'fill-color': forceValue
-				? fillColor
-				: [
-						'case',
-						// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
-						['has', '_fillColor'],
-						['get', '_fillColor'],
-						['has', '_color'],
-						['get', '_color'],
-						// mapbox/simplestyle-spec
-						['has', 'fill'],
-						['get', 'fill'],
-						// Default
-						fillColor
-					],
-			'fill-outline-color': forceValue
-				? fillOutlineColor
-				: [
-						'case',
-						// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
-						['has', '_color'],
-						['get', '_color'],
-						// mapbox/simplestyle-spec
-						['has', 'stroke'],
-						['get', 'stroke'],
-						// Default
-						fillOutlineColor
-					]
-		};
-	}
-
-	export function getPaintForLineLine(
-		layer: LayerConfig.Layer
-	): Required<maplibreglstyle.LineLayerSpecification>['paint'] {
-		if (typeof layer.styleurl === 'string') {
-			return GSIMAP_STYLE_OVERRIDE[layer.styleurl]?.line || getDefaultPaintForLineLine(false);
-		}
-		return GSIMAP_STYLE_OVERRIDE[layer.url]?.line || getDefaultPaintForLineLine(false);
-	}
-	export function getDefaultPaintForLineLine(
-		forceValue: boolean = false,
-		lineWidth: number = 3,
-		lineOpacity: number = 0.5,
-		lineColor: string = '#ff00ff'
-	): Required<maplibreglstyle.LineLayerSpecification>['paint'] {
-		return {
-			'line-width': forceValue
-				? lineWidth
-				: [
-						'case',
-						// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
-						['has', '_weight'],
-						['get', '_weight'],
-						// mapbox/simplestyle-spec
-						['has', 'stroke-width'],
-						['get', 'stroke-width'],
-						// Default
-						lineWidth
-					],
-			'line-opacity': forceValue
-				? lineOpacity
-				: [
-						'case',
-						// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
-						['has', '_opacity'],
-						['get', '_opacity'],
-						// mapbox/simplestyle-spec
-						['has', 'stroke-opacity'],
-						['get', 'stroke-opacity'],
-						// Default
-						lineOpacity
-					],
-			'line-color': forceValue
-				? lineColor
-				: [
-						'case',
-						// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
-						['has', '_color'],
-						['get', '_color'],
-						// mapbox/simplestyle-spec
-						['has', 'stroke'],
-						['get', 'stroke'],
-						// Default
-						lineColor
-					]
-		};
-	}
-
-	export function getPaintForPointCircle(
-		layer: LayerConfig.Layer
-	): Required<maplibreglstyle.CircleLayerSpecification>['paint'] {
-		if (typeof layer.styleurl === 'string') {
-			return GSIMAP_STYLE_OVERRIDE[layer.styleurl]?.circle || getDefaultPaintForPointCircle(false);
-		}
-		return GSIMAP_STYLE_OVERRIDE[layer.url]?.circle || getDefaultPaintForPointCircle(false);
-	}
-	export function getDefaultPaintForPointCircle(
-		forceValue: boolean = false,
-		circleRadius: number = 8,
-		circleColor: string = '#ff0000',
-		circleOpacity: number = 0.5
-	): Required<maplibreglstyle.CircleLayerSpecification>['paint'] {
-		return {
-			'circle-radius': forceValue
-				? circleRadius
-				: [
-						'case',
-						// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
-						['has', '_radius'],
-						['get', '_radius'],
-						// mapbox/simplestyle-spec
-						['has', 'marker-size'],
-						['match', ['get', 'marker-size'], 'small', 5, 'medium', 8, 'large', 10, circleRadius],
-						// Default
-						circleRadius
-					],
-			'circle-color': forceValue
-				? circleColor
-				: [
-						'case',
-						// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
-						['has', '_fillColor'],
-						['get', '_fillColor'],
-						['has', '_color'],
-						['get', '_color'],
-						// mapbox/simplestyle-spec
-						['has', 'marker-color'],
-						['get', 'marker-color'],
-						['has', 'fill'],
-						['get', 'fill'],
-						// Default
-						circleColor
-					],
-			'circle-opacity': forceValue
-				? circleOpacity
-				: [
-						'case',
-						// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
-						['has', '_fillOpacity'],
-						['get', '_fillOpacity'],
-						['has', '_opacity'],
-						['get', '_opacity'],
-						// mapbox/simplestyle-spec
-						['has', 'fill-opacity'],
-						['get', 'fill-opacity'],
-						// Default
-						circleOpacity
-					],
-			'circle-stroke-width': [
-				'case',
-				// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
-				['has', '_weight'],
-				['get', '_weight'],
-				// mapbox/simplestyle-spec
-				['has', 'stroke-width'],
-				['get', 'stroke-width'],
-				// Default
-				3
-			],
-			'circle-stroke-color': [
-				'case',
-				// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
-				['has', '_color'],
-				['get', '_color'],
-				// mapbox/simplestyle-spec
-				['has', 'stroke'],
-				['get', 'stroke'],
-				// Default
-				'rgba(0,0,0,0)'
-			],
-			'circle-stroke-opacity': [
-				'case',
-				// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
-				['has', '_opacity'],
-				['get', '_opacity'],
-				// mapbox/simplestyle-spec
-				['has', 'stroke-opacity'],
-				['get', 'stroke-opacity'],
-				// Default
-				0
-			]
-		};
-	}
-
-	export function getLayerParamsForIconImageSymbol(layer: LayerConfig.Layer): {
-		layout: Required<maplibreglstyle.SymbolLayerSpecification>['layout'];
-		paint: Required<maplibreglstyle.SymbolLayerSpecification>['paint'];
-		filter: maplibreglstyle.FilterSpecification;
-	} {
-		if (typeof layer.styleurl === 'string') {
-			return (
-				GSIMAP_STYLE_OVERRIDE[layer.styleurl]?.layoutAndPaintForIconImageSymbol ||
-				getDefaultLayerParamsForPointSymbolIconImage()
-			);
-		}
-		return (
-			GSIMAP_STYLE_OVERRIDE[layer.url]?.layoutAndPaintForIconImageSymbol ||
-			getDefaultLayerParamsForPointSymbolIconImage()
-		);
-	}
-	export function getDefaultLayerParamsForPointSymbolIconImage(): {
-		layout: Required<maplibreglstyle.SymbolLayerSpecification>['layout'];
-		paint: Required<maplibreglstyle.SymbolLayerSpecification>['paint'];
-		filter: maplibreglstyle.FilterSpecification;
-	} {
-		return {
-			layout: {
-				'icon-image': [
+	return GSIMAP_STYLE_OVERRIDE[layer.url]?.fill || getDefaultPaintForPolygonFill(false);
+}
+function getDefaultPaintForPolygonFill(
+	forceValue: boolean = false,
+	fillOpacity: number = 0.5,
+	fillColor: string = '#0000ff',
+	fillOutlineColor: string = 'rgba(0,0,0,0)'
+): Required<maplibreglstyle.FillLayerSpecification>['paint'] {
+	return {
+		'fill-antialias': true,
+		'fill-opacity': forceValue
+			? fillOpacity
+			: [
 					'case',
 					// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
-					['has', '_iconUrl'],
-					['get', '_iconUrl'],
+					['has', '_fillOpacity'],
+					['get', '_fillOpacity'],
+					['has', '_opacity'],
+					['get', '_opacity'],
+					// mapbox/simplestyle-spec
+					['has', 'fill-opacity'],
+					['get', 'fill-opacity'],
 					// Default
-					''
+					fillOpacity
+				],
+		'fill-color': forceValue
+			? fillColor
+			: [
+					'case',
+					// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+					['has', '_fillColor'],
+					['get', '_fillColor'],
+					['has', '_color'],
+					['get', '_color'],
+					// mapbox/simplestyle-spec
+					['has', 'fill'],
+					['get', 'fill'],
+					// Default
+					fillColor
+				],
+		'fill-outline-color': forceValue
+			? fillOutlineColor
+			: [
+					'case',
+					// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+					['has', '_color'],
+					['get', '_color'],
+					// mapbox/simplestyle-spec
+					['has', 'stroke'],
+					['get', 'stroke'],
+					// Default
+					fillOutlineColor
 				]
-			},
-			paint: {
-				'icon-opacity': [
+	};
+}
+
+function getPaintForLineLine(
+	layer: Layer
+): Required<maplibreglstyle.LineLayerSpecification>['paint'] {
+	if (typeof layer.styleurl === 'string') {
+		return GSIMAP_STYLE_OVERRIDE[layer.styleurl]?.line || getDefaultPaintForLineLine(false);
+	}
+	return GSIMAP_STYLE_OVERRIDE[layer.url]?.line || getDefaultPaintForLineLine(false);
+}
+function getDefaultPaintForLineLine(
+	forceValue: boolean = false,
+	lineWidth: number = 3,
+	lineOpacity: number = 0.5,
+	lineColor: string = '#ff00ff'
+): Required<maplibreglstyle.LineLayerSpecification>['paint'] {
+	return {
+		'line-width': forceValue
+			? lineWidth
+			: [
+					'case',
+					// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+					['has', '_weight'],
+					['get', '_weight'],
+					// mapbox/simplestyle-spec
+					['has', 'stroke-width'],
+					['get', 'stroke-width'],
+					// Default
+					lineWidth
+				],
+		'line-opacity': forceValue
+			? lineOpacity
+			: [
 					'case',
 					// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
 					['has', '_opacity'],
 					['get', '_opacity'],
+					// mapbox/simplestyle-spec
+					['has', 'stroke-opacity'],
+					['get', 'stroke-opacity'],
 					// Default
-					1
+					lineOpacity
+				],
+		'line-color': forceValue
+			? lineColor
+			: [
+					'case',
+					// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+					['has', '_color'],
+					['get', '_color'],
+					// mapbox/simplestyle-spec
+					['has', 'stroke'],
+					['get', 'stroke'],
+					// Default
+					lineColor
 				]
-			},
-			filter: [
-				'all',
-				['==', '$type', 'Point'],
-				// 国土地理院スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
-				['has', '_iconUrl']
-			]
-		};
-	}
+	};
 }
 
-export namespace GeoJsonLayerConverter {
-	export function addToMap(
-		layerFormat: LayerConfig.LayerFormat,
-		layer: LayerConfig.Layer,
-		map: maplibregl.Map
-	) {
+function getPaintForPointCircle(
+	layer: Layer
+): Required<maplibreglstyle.CircleLayerSpecification>['paint'] {
+	if (typeof layer.styleurl === 'string') {
+		return GSIMAP_STYLE_OVERRIDE[layer.styleurl]?.circle || getDefaultPaintForPointCircle(false);
+	}
+	return GSIMAP_STYLE_OVERRIDE[layer.url]?.circle || getDefaultPaintForPointCircle(false);
+}
+function getDefaultPaintForPointCircle(
+	forceValue: boolean = false,
+	circleRadius: number = 8,
+	circleColor: string = '#ff0000',
+	circleOpacity: number = 0.5
+): Required<maplibreglstyle.CircleLayerSpecification>['paint'] {
+	return {
+		'circle-radius': forceValue
+			? circleRadius
+			: [
+					'case',
+					// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+					['has', '_radius'],
+					['get', '_radius'],
+					// mapbox/simplestyle-spec
+					['has', 'marker-size'],
+					['match', ['get', 'marker-size'], 'small', 5, 'medium', 8, 'large', 10, circleRadius],
+					// Default
+					circleRadius
+				],
+		'circle-color': forceValue
+			? circleColor
+			: [
+					'case',
+					// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+					['has', '_fillColor'],
+					['get', '_fillColor'],
+					['has', '_color'],
+					['get', '_color'],
+					// mapbox/simplestyle-spec
+					['has', 'marker-color'],
+					['get', 'marker-color'],
+					['has', 'fill'],
+					['get', 'fill'],
+					// Default
+					circleColor
+				],
+		'circle-opacity': forceValue
+			? circleOpacity
+			: [
+					'case',
+					// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+					['has', '_fillOpacity'],
+					['get', '_fillOpacity'],
+					['has', '_opacity'],
+					['get', '_opacity'],
+					// mapbox/simplestyle-spec
+					['has', 'fill-opacity'],
+					['get', 'fill-opacity'],
+					// Default
+					circleOpacity
+				],
+		'circle-stroke-width': [
+			'case',
+			// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+			['has', '_weight'],
+			['get', '_weight'],
+			// mapbox/simplestyle-spec
+			['has', 'stroke-width'],
+			['get', 'stroke-width'],
+			// Default
+			3
+		],
+		'circle-stroke-color': [
+			'case',
+			// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+			['has', '_color'],
+			['get', '_color'],
+			// mapbox/simplestyle-spec
+			['has', 'stroke'],
+			['get', 'stroke'],
+			// Default
+			'rgba(0,0,0,0)'
+		],
+		'circle-stroke-opacity': [
+			'case',
+			// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+			['has', '_opacity'],
+			['get', '_opacity'],
+			// mapbox/simplestyle-spec
+			['has', 'stroke-opacity'],
+			['get', 'stroke-opacity'],
+			// Default
+			0
+		]
+	};
+}
+
+function getLayerParamsForIconImageSymbol(layer: Layer): {
+	layout: Required<maplibreglstyle.SymbolLayerSpecification>['layout'];
+	paint: Required<maplibreglstyle.SymbolLayerSpecification>['paint'];
+	filter: maplibreglstyle.FilterSpecification;
+} {
+	if (typeof layer.styleurl === 'string') {
+		return (
+			GSIMAP_STYLE_OVERRIDE[layer.styleurl]?.layoutAndPaintForIconImageSymbol ||
+			getDefaultLayerParamsForPointSymbolIconImage()
+		);
+	}
+	return (
+		GSIMAP_STYLE_OVERRIDE[layer.url]?.layoutAndPaintForIconImageSymbol ||
+		getDefaultLayerParamsForPointSymbolIconImage()
+	);
+}
+function getDefaultLayerParamsForPointSymbolIconImage(): {
+	layout: Required<maplibreglstyle.SymbolLayerSpecification>['layout'];
+	paint: Required<maplibreglstyle.SymbolLayerSpecification>['paint'];
+	filter: maplibreglstyle.FilterSpecification;
+} {
+	return {
+		layout: {
+			'icon-image': [
+				'case',
+				// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+				['has', '_iconUrl'],
+				['get', '_iconUrl'],
+				// Default
+				''
+			]
+		},
+		paint: {
+			'icon-opacity': [
+				'case',
+				// 地理院 スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+				['has', '_opacity'],
+				['get', '_opacity'],
+				// Default
+				1
+			]
+		},
+		filter: [
+			'all',
+			['==', '$type', 'Point'],
+			// 国土地理院スタイルつき GeoJSON 規約 (gsi-cyberjapan/geojson-with-style-spec)
+			['has', '_iconUrl']
+		]
+	};
+}
+
+export const GeoJsonLayerConverter = {
+	addToMap(layerFormat: LayerFormat, layer: Layer, map: maplibregl.Map) {
 		const id = layer.id;
 		let vectorSource: maplibregl.VectorSourceSpecification;
 		const source = `source-${id}-geojson`;
@@ -286,7 +280,7 @@ export namespace GeoJsonLayerConverter {
 				type: 'vector',
 				tiles: [
 					'geojson-tile://' +
-						(!!layer.maxNativeZoom ? `maxNativeZoom=${layer.maxNativeZoom};` : '') +
+						(layer.maxNativeZoom ? `maxNativeZoom=${layer.maxNativeZoom};` : '') +
 						layer.url
 				],
 				scheme: layer.scheme ?? 'xyz',
@@ -316,27 +310,27 @@ export namespace GeoJsonLayerConverter {
 			});
 		}
 
-		const iconImageSymbolParam = Styling.getLayerParamsForIconImageSymbol(layer);
+		const iconImageSymbolParam = getLayerParamsForIconImageSymbol(layer);
 		const addLayerObjects: Extract<maplibregl.LayerSpecification, { source: string }>[] = [
 			{
 				id: `layer-${id}-geojson-fill`,
 				type: 'fill',
 				source,
-				paint: Styling.getPaintForPolygonFill(layer),
+				paint: getPaintForPolygonFill(layer),
 				filter: ['==', '$type', 'Polygon']
 			},
 			{
 				id: `layer-${id}-geojson-line`,
 				type: 'line',
 				source,
-				paint: Styling.getPaintForLineLine(layer),
+				paint: getPaintForLineLine(layer),
 				filter: ['==', '$type', 'LineString']
 			},
 			{
 				id: `layer-${id}-geojson-circle`,
 				type: 'circle',
 				source,
-				paint: Styling.getPaintForPointCircle(layer),
+				paint: getPaintForPointCircle(layer),
 				filter: ['==', '$type', 'Point']
 			},
 			{
@@ -388,9 +382,9 @@ export namespace GeoJsonLayerConverter {
 				map.getCanvas().style.cursor = '';
 			});
 		}
-	}
+	},
 
-	export function removeFromMap(layer: LayerConfig.Layer, map: maplibregl.Map) {
+	removeFromMap(layer: Layer, map: maplibregl.Map) {
 		const id = layer.id;
 
 		map.removeLayer(`layer-${id}-geojson-fill`);
@@ -398,15 +392,15 @@ export namespace GeoJsonLayerConverter {
 		map.removeLayer(`layer-${id}-geojson-circle`);
 		map.removeLayer(`layer-${id}-geojson-symbol-icon-image`);
 		map.removeSource(`source-${id}-geojson`);
-	}
+	},
 
-	export function updateOpacity(layer: LayerConfig.Layer, map: maplibregl.Map, opacity?: number) {
+	updateOpacity(layer: Layer, map: maplibregl.Map, opacity?: number) {
 		const id = layer.id;
 		const defaultPaint = {
-			fill: Styling.getDefaultPaintForPolygonFill(false),
-			line: Styling.getDefaultPaintForLineLine(false),
-			circle: Styling.getDefaultPaintForPointCircle(false),
-			symbol: Styling.getDefaultLayerParamsForPointSymbolIconImage().paint
+			fill: getDefaultPaintForPolygonFill(false),
+			line: getDefaultPaintForLineLine(false),
+			circle: getDefaultPaintForPointCircle(false),
+			symbol: getDefaultLayerParamsForPointSymbolIconImage().paint
 		};
 
 		if (opacity !== undefined) {
@@ -437,14 +431,14 @@ export namespace GeoJsonLayerConverter {
 				defaultPaint.symbol['icon-opacity']
 			);
 		}
-	}
+	},
 
-	export function updateColor(layer: LayerConfig.Layer, map: maplibregl.Map, color?: string) {
+	updateColor(layer: Layer, map: maplibregl.Map, color?: string) {
 		const id = layer.id;
 		const defaultPaint = {
-			fill: Styling.getDefaultPaintForPolygonFill(false),
-			line: Styling.getDefaultPaintForLineLine(false),
-			circle: Styling.getDefaultPaintForPointCircle(false)
+			fill: getDefaultPaintForPolygonFill(false),
+			line: getDefaultPaintForLineLine(false),
+			circle: getDefaultPaintForPointCircle(false)
 		};
 
 		if (color !== undefined) {
@@ -469,4 +463,4 @@ export namespace GeoJsonLayerConverter {
 			);
 		}
 	}
-}
+};

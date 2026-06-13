@@ -1,6 +1,6 @@
-import { type LayerConfig } from '$lib/layer-config';
+import type { LayerConfigEntry } from '$lib/layer-config';
 
-export const WEATHER_OVERLAY_LAYERS: LayerConfig.LayerConfigEntry[] = [
+export const WEATHER_OVERLAY_LAYERS: LayerConfigEntry[] = [
 	{
 		type: 'LayerGroup',
 		title: 'Weather',

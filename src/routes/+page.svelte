@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import type { Component } from 'svelte';
 
-	let MapComponent: any;
+	let MapComponent: Component | undefined;
 
 	onMount(async () => {
 		const { default: Map } = await import('./Map.svelte');

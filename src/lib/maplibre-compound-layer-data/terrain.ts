@@ -1,8 +1,7 @@
-import type maplibregl from 'maplibre-gl';
-import type { LayerConfig } from '$lib/layer-config';
+import type { TerrainSource } from '$lib/layer-config';
 
 export type TerrainSources = {
-	[id: string]: LayerConfig.TerrainSource;
+	[id: string]: TerrainSource;
 };
 
 export type NonfreeKeys = {

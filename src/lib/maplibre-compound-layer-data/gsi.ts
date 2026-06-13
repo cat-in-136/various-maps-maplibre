@@ -1,4 +1,4 @@
-import { type LayerConfig } from '$lib/layer-config';
+import type { LayerConfigEntry } from '$lib/layer-config';
 
 import gsi_light from '$lib/static/assets/map-data/gsi-light.min.json?url';
 import gsi_ort_label from '$lib/static/assets/map-data/gsi-ort-label.min.json?url';
@@ -9,7 +9,7 @@ import gsi_railway from '$lib/static/assets/map-data/gsi-railway.min.json?url';
 import gsi_land from '$lib/static/assets/map-data/gsi-land.min.json?url';
 import gsi_river from '$lib/static/assets/map-data/gsi-river.min.json?url';
 
-export const GSI_VECTOR_BASE_LAYERS: LayerConfig.LayerConfigEntry[] = [
+export const GSI_VECTOR_BASE_LAYERS: LayerConfigEntry[] = [
 	{
 		type: 'LayerGroup',
 		title: '地理院地図Vector',

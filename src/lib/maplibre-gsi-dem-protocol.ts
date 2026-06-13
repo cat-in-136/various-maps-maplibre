@@ -32,9 +32,9 @@ async function convertGsiTerrainToTerrainRGB(origBlob: Blob): Promise<Blob> {
 		// 国土地理院標高タイル(PNG形式)
 		// https://maps.gsi.go.jp/development/demtile.html
 		// x = 2^16 R + 2^8 G + B
-		// x < 2^23の場合　h = x u
-		// x = 2^23の場合　h = NA
-		// x > 2^23の場合　h = (x-2^24) u
+		// x < 2^23の場合 h = x u
+		// x = 2^23の場合 h = NA
+		// x > 2^23の場合 h = (x-2^24) u
 		// uは標高分解能（0.01m）を表します。
 		const x = (R << 16) + (G << 8) + (B << 0);
 		const h = x < 1 << 23 ? x : x === 1 << 23 ? 0 /* NA */ : x - (1 << 24);

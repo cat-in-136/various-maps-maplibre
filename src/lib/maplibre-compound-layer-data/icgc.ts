@@ -1,6 +1,6 @@
-import { type LayerConfig } from '$lib/layer-config';
+import type { LayerConfigEntry } from '$lib/layer-config';
 
-export const ICGC_VECTOR_BASE_LAYERS: LayerConfig.LayerConfigEntry[] = [
+export const ICGC_VECTOR_BASE_LAYERS: LayerConfigEntry[] = [
 	{
 		type: 'LayerGroup',
 		title: 'ICGC Vector',

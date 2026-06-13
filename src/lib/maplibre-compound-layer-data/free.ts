@@ -1,4 +1,4 @@
-import { type LayerConfig } from '$lib/layer-config';
+import type { LayerConfigEntry } from '$lib/layer-config';
 import { Map } from 'maplibre-gl';
 import { DynamicAttributionControl } from '$lib/dynamic_attribution_control';
 
@@ -14,7 +14,7 @@ import { ICGC_VECTOR_BASE_LAYERS } from '$lib/maplibre-compound-layer-data/icgc'
 import { WEATHER_OVERLAY_LAYERS } from '$lib/maplibre-compound-layer-data/weather';
 import { MISC_BASE_LAYERS } from '$lib/maplibre-compound-layer-data/free-misc';
 
-export const BASE_LAYER_DEFAULT: LayerConfig.LayerConfigEntry[] = [
+export const BASE_LAYER_DEFAULT: LayerConfigEntry[] = [
 	...OSM_VECTOR_BASE_LAYERS,
 	...GSI_VECTOR_BASE_LAYERS,
 	...ARCGIS_VECTOR_BASE_LAYERS,
@@ -24,7 +24,7 @@ export const BASE_LAYER_DEFAULT: LayerConfig.LayerConfigEntry[] = [
 	...MISC_BASE_LAYERS
 ];
 
-export const OVERLAY_LAYER_DEFAULT: LayerConfig.LayerConfigEntry[] = [
+export const OVERLAY_LAYER_DEFAULT: LayerConfigEntry[] = [
 	...OSM_VECTOR_OVERLAY_LAYERS,
 	...ARCGIS_VECTOR_OVERLAY_LAYERS,
 	...OSM_RASTER_OVERLAY_LAYERS,

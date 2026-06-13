@@ -1,296 +1,308 @@
 import maplibregl from 'maplibre-gl';
-
+import { createStyleSwapOption } from '$lib/layer-config';
 import { GeoJsonLayerConverter } from '$lib/geojson-layer-converter';
+import type { Layer, LayerConfigEntry, LayerFormat, LayerGroup } from '$lib/layer-config';
 import { VectorOverlayLayerCreator } from '$lib/vector-overlay-layer-creater';
-import { LayerConfig } from '$lib/layer-config';
 import type { TerrainSources } from '$lib/maplibre-compound-layer-data/terrain';
 
 const ELEMENT_CLASS_PREFIX = 'maplibregl-ctrl-compound-layer';
 
-namespace LayerTreeView {
-	type LayerTreeEventType = {
-		LayerChanged: CustomEvent<{
-			type: 'LayerChanged';
-			layerEntry: LayerEntry;
-			sourceEvent: Event;
-		}>;
-		LayerModificationChanged: CustomEvent<{
-			type: 'LayerModificationChanged';
-			layerEntry: LayerEntry;
-			sourceEvent: Event;
-		}>;
-	};
-	type LayerTreeEventListener<T extends keyof LayerTreeEventType> = (
-		ev: LayerTreeEventType[T] & object
-	) => void;
+export function isRasterLayerFormat(layerFormat: LayerFormat): layerFormat is { tile: 'raster' } {
+	return (layerFormat as { tile?: 'raster' }).tile === 'raster';
+}
 
-	type LayerTreeViewEntry = LayerEntry | LayerGroupEntry;
+export function isGeoJsonTileLayerFormat(
+	layerFormat: LayerFormat
+): layerFormat is { tile: 'geojson' } {
+	return (layerFormat as { tile?: 'geojson' }).tile === 'geojson';
+}
 
-	interface LayerGroup {
-		entries(): Generator<LayerTreeViewEntry>;
-		layerEntriesAll(): Generator<LayerEntry>;
-		layerEntriesSelected(): Generator<LayerEntry>;
+export function isSingleGeoJsonLayerFormat(
+	layerFormat: LayerFormat
+): layerFormat is { single: 'geojson' } {
+	return (layerFormat as { single?: 'geojson' }).single === 'geojson';
+}
+
+export function isGeoJsonLayerFormat(
+	layerFormat: LayerFormat
+): layerFormat is { tile: 'geojson' } | { single: 'geojson' } {
+	return isGeoJsonTileLayerFormat(layerFormat) || isSingleGeoJsonLayerFormat(layerFormat);
+}
+
+export function isStyleLayerFormat(layerFormat: LayerFormat): layerFormat is 'style' {
+	return layerFormat === 'style';
+}
+
+export function isModifiableLayerFormat(layerFormat: LayerFormat): boolean {
+	return isRasterLayerFormat(layerFormat) || isGeoJsonLayerFormat(layerFormat);
+}
+
+type LayerTreeEventType = {
+	LayerChanged: CustomEvent<{
+		type: 'LayerChanged';
+		layerEntry: LayerEntry;
+		sourceEvent: Event;
+	}>;
+	LayerModificationChanged: CustomEvent<{
+		type: 'LayerModificationChanged';
+		layerEntry: LayerEntry;
+		sourceEvent: Event;
+	}>;
+};
+type LayerTreeEventListener<T extends keyof LayerTreeEventType> = (
+	ev: LayerTreeEventType[T] & object
+) => void;
+
+type LayerTreeViewEntry = LayerEntry | LayerGroupEntry;
+
+interface LayerTreeGroup {
+	element: HTMLElement;
+	entries(): Generator<LayerTreeViewEntry>;
+	layerEntriesAll(): Generator<LayerEntry>;
+	layerEntriesSelected(): Generator<LayerEntry>;
+}
+
+function* layerEntriesAll(lg: LayerTreeGroup): Generator<LayerEntry> {
+	for (const entry of lg.entries()) {
+		if ((entry as LayerEntry).type === 'LayerEntry') {
+			yield entry as LayerEntry;
+		} else if ((entry as LayerGroupEntry).type === 'LayerGroupEntry') {
+			yield* (entry as LayerGroupEntry).layerEntriesAll();
+		} else {
+			throw new Error(`Not implemented type`);
+		}
+	}
+}
+
+function* layerEntriesSelected(lg: LayerTreeGroup): Generator<LayerEntry> {
+	for (const entry of lg.entries()) {
+		if ((entry as LayerEntry).type === 'LayerEntry') {
+			if ((entry as LayerEntry).selected) {
+				yield entry as LayerEntry;
+			}
+		} else if ((entry as LayerGroupEntry).type === 'LayerGroupEntry') {
+			yield* (entry as LayerGroupEntry).layerEntriesSelected();
+		} else {
+			throw new Error(`Not implemented type`);
+		}
+	}
+}
+
+export class LayerTreeView implements LayerTreeGroup {
+	readonly #switchToggle: boolean;
+	#entries: LayerTreeViewEntry[];
+	#control?: MapLibreCompondLayerSwitcherControl;
+	readonly #element: HTMLElement;
+	#listeners: { [T in keyof LayerTreeEventType]: Set<LayerTreeEventListener<T>> };
+
+	constructor(control: MapLibreCompondLayerSwitcherControl, switchToggle: boolean = true) {
+		this.#switchToggle = switchToggle;
+		this.#entries = [];
+		this.#listeners = {
+			LayerChanged: new Set<LayerTreeEventListener<'LayerChanged'>>(),
+			LayerModificationChanged: new Set<LayerTreeEventListener<'LayerModificationChanged'>>()
+		};
+		this.#control = control;
+		this.#element = document.createElement('div');
+		this.#createElement();
 	}
 
-	namespace LayerGroupCommonProcedure {
-		export function* layerEntriesAll(lg: LayerGroup): Generator<LayerEntry> {
-			for (const entry of lg.entries()) {
-				if ((entry as LayerEntry).type === 'LayerEntry') {
-					yield entry as LayerEntry;
-				} else if ((entry as LayerGroupEntry).type === 'LayerGroupEntry') {
-					yield* (entry as LayerGroupEntry).layerEntriesAll();
-				} else {
-					throw new Error(`Not implemented type`);
-				}
+	#createElement() {
+		this.#element.innerHTML = '';
+		this.#element.className = `${ELEMENT_CLASS_PREFIX}-layer-tree-view`;
+		for (const v of this.#entries) {
+			if (v.element) {
+				this.#element.appendChild(v.element);
 			}
 		}
+	}
 
-		export function* layerEntriesSelected(lg: LayerGroup): Generator<LayerEntry> {
-			for (const entry of lg.entries()) {
-				if ((entry as LayerEntry).type === 'LayerEntry') {
-					if ((entry as LayerEntry).selected) {
-						yield entry as LayerEntry;
+	addConfig(config: LayerConfigEntry | LayerConfigEntry[]): this {
+		if (Array.isArray(config)) {
+			for (const v of config) {
+				this.addConfig(v);
+			}
+		} else {
+			let entry: LayerTreeViewEntry;
+			if ((config as Layer).type === 'Layer') {
+				entry = new LayerEntry(config as Layer, this);
+			} else if ((config as LayerGroup).type === 'LayerGroup') {
+				entry = new LayerGroupEntry(config as LayerGroup, this);
+			} else {
+				throw new Error(`unsupported config type`);
+			}
+			this.#entries.push(entry);
+			if (entry.element) {
+				this.#element.appendChild(entry.element);
+			}
+		}
+		return this;
+	}
+
+	get control(): maplibregl.IControl | undefined {
+		return this.#control;
+	}
+	set control(value: maplibregl.IControl | undefined) {
+		this.#control = value as MapLibreCompondLayerSwitcherControl;
+	}
+	get element(): HTMLElement {
+		return this.#element;
+	}
+
+	*entries(): Generator<LayerTreeViewEntry> {
+		yield* this.#entries;
+	}
+	*layerEntriesAll(): Generator<LayerEntry> {
+		yield* layerEntriesAll(this);
+	}
+	*layerEntriesSelected(): Generator<LayerEntry> {
+		yield* layerEntriesSelected(this);
+	}
+
+	on<T extends keyof LayerTreeEventType>(type: T, listener: LayerTreeEventListener<T>): this {
+		this.#listeners[type].add(listener);
+		return this;
+	}
+	off<T extends keyof LayerTreeEventType>(type: T, listener: LayerTreeEventListener<T>): this {
+		this.#listeners[type].delete(listener);
+		return this;
+	}
+
+	fireEvent<T extends keyof LayerTreeEventType>(e: LayerTreeEventType[T]) {
+		if (this.#switchToggle) {
+			for (const entry of this.layerEntriesAll()) {
+				entry.selected = entry === e.detail.layerEntry;
+				if (entry.selected) {
+					for (const listener of this.#listeners[e.type as T]) {
+						listener.call(this, e);
 					}
-				} else if ((entry as LayerGroupEntry).type === 'LayerGroupEntry') {
-					yield* (entry as LayerGroupEntry).layerEntriesSelected();
-				} else {
-					throw new Error(`Not implemented type`);
 				}
+			}
+		} else {
+			for (const listener of this.#listeners[e.type as T]) {
+				listener.call(this, e);
 			}
 		}
 	}
+}
 
-	export class LayerTreeView implements LayerGroup {
-		readonly #switchToggle: boolean;
-		#entries: LayerTreeViewEntry[];
-		#control?: MapLibreCompondLayerSwitcherControl;
-		readonly #element: HTMLElement;
-		#listeners: { [T in keyof LayerTreeEventType]: Set<LayerTreeEventListener<T>> };
+class LayerEntry {
+	readonly type: string = 'LayerEntry';
+	readonly #config: Layer;
+	readonly #owner: LayerTreeView;
+	readonly #layerFormat: LayerFormat;
+	#element: HTMLElement;
+	constructor(config: Layer, owner: LayerTreeView) {
+		this.#config = config;
+		this.#owner = owner;
 
-		constructor(control: MapLibreCompondLayerSwitcherControl, switchToggle: boolean = true) {
-			this.#switchToggle = switchToggle;
-			this.#entries = [];
-			this.#listeners = {
-				LayerChanged: new Set<LayerTreeEventListener<'LayerChanged'>>(),
-				LayerModificationChanged: new Set<LayerTreeEventListener<'LayerModificationChanged'>>()
+		if (config.layerFormat) {
+			this.#layerFormat = config.layerFormat;
+		} else if (
+			config.url.indexOf('{x}') >= 0 &&
+			config.url.indexOf('{y}') >= 0 &&
+			config.url.indexOf('{z}') >= 0
+		) {
+			this.#layerFormat = {
+				tile: /\.(jpg|png|webp|gif)$/i.test(config.url)
+					? 'raster'
+					: /\.(geojson|topojson)$/.test(config.url)
+						? 'geojson'
+						: 'vector'
 			};
-			this.#control = control;
-			this.#element = document.createElement('div');
-			this.#createElement();
+		} else if (/\.(geojson|topojson|kml|gpx)$/.test(config.url)) {
+			this.#layerFormat = { single: 'geojson' };
+		} else {
+			this.#layerFormat = 'style';
 		}
-
-		#createElement() {
-			this.#element.innerHTML = '';
-			this.#element.className = `${ELEMENT_CLASS_PREFIX}-layer-tree-view`;
-			for (const v of this.#entries) {
-				if (v.element) {
-					this.#element.appendChild(v.element);
-				}
-			}
-		}
-
-		addConfig(config: LayerConfig.LayerConfigEntry | LayerConfig.LayerConfigEntry[]): this {
-			if (Array.isArray(config)) {
-				for (const v of config) {
-					this.addConfig(v);
-				}
-			} else {
-				let entry: LayerTreeViewEntry;
-				if ((config as LayerConfig.Layer).type === 'Layer') {
-					entry = new LayerEntry(config as LayerConfig.Layer, this);
-				} else if ((config as LayerConfig.LayerGroup).type === 'LayerGroup') {
-					entry = new LayerGroupEntry(config as LayerConfig.LayerGroup, this);
-				} else {
-					throw new Error(`unsupported config type`);
-				}
-				this.#entries.push(entry);
-				if (entry.element) {
-					this.#element.appendChild(entry.element);
-				}
-			}
-			return this;
-		}
-
-		get control(): maplibregl.IControl | undefined {
-			return this.#control;
-		}
-		set control(value: maplibregl.IControl | undefined) {
-			this.#control = value as MapLibreCompondLayerSwitcherControl;
-		}
-		get element(): HTMLElement {
-			return this.#element;
-		}
-
-		*entries(): Generator<LayerTreeViewEntry> {
-			yield* this.#entries;
-		}
-		*layerEntriesAll(): Generator<LayerEntry> {
-			yield* LayerGroupCommonProcedure.layerEntriesAll(this);
-		}
-		*layerEntriesSelected(): Generator<LayerEntry> {
-			yield* LayerGroupCommonProcedure.layerEntriesSelected(this);
-		}
-
-		on<T extends keyof LayerTreeEventType>(type: T, listener: LayerTreeEventListener<T>): this {
-			this.#listeners[type].add(listener);
-			return this;
-		}
-		off<T extends keyof LayerTreeEventType>(type: T, listener: LayerTreeEventListener<T>): this {
-			this.#listeners[type].delete(listener);
-			return this;
-		}
-
-		fireEvent<T extends keyof LayerTreeEventType>(e: LayerTreeEventType[T]) {
-			if (this.#switchToggle) {
-				for (const entry of this.layerEntriesAll()) {
-					entry.selected = entry === e.detail.layerEntry;
-					if (entry.selected) {
-						for (const listener of this.#listeners[e.type as T]) {
-							listener.call(this, e);
-						}
-					}
-				}
-			} else {
-				for (const listener of this.#listeners[e.type as T]) {
-					listener.call(this, e);
-				}
-			}
-		}
+		this.#element = document.createElement('div');
+		this.#createElement();
 	}
+	get config(): Layer {
+		return this.#config;
+	}
+	get element(): HTMLElement {
+		return this.#element;
+	}
+	get layerFormat(): LayerFormat {
+		return this.#layerFormat;
+	}
+	get opacity(): number | undefined {
+		if (!isModifiableLayerFormat(this.#layerFormat)) {
+			return undefined;
+		}
+		const modifyEnabled = this.#element.querySelector(
+			`.${ELEMENT_CLASS_PREFIX}-layer-entry-modify-enabled input[type=checkbox]`
+		) as HTMLInputElement;
+		const opacity = this.#element.querySelector(
+			`.${ELEMENT_CLASS_PREFIX}-layer-entry-opacity input[type=range]`
+		) as HTMLInputElement;
 
-	class LayerEntry {
-		readonly type: string = 'LayerEntry';
-		readonly #config: LayerConfig.Layer;
-		readonly #owner: LayerTreeView;
-		readonly #layerFormat: LayerConfig.LayerFormat;
-		#element: HTMLElement;
-		constructor(config: LayerConfig.Layer, owner: LayerTreeView) {
-			this.#config = config;
-			this.#owner = owner;
+		return modifyEnabled && modifyEnabled.checked && opacity ? parseInt(opacity.value) : undefined;
+	}
+	get color(): string | undefined {
+		if (!isModifiableLayerFormat(this.#layerFormat)) {
+			return undefined;
+		}
+		const modifyEnabled = this.#element.querySelector(
+			`.${ELEMENT_CLASS_PREFIX}-layer-entry-modify-enabled input[type=checkbox]`
+		) as HTMLInputElement;
+		const color = this.#element.querySelector(
+			`.${ELEMENT_CLASS_PREFIX}-layer-entry-color input[type=color]`
+		) as HTMLInputElement;
 
-			if (config.layerFormat) {
-				this.#layerFormat = config.layerFormat;
-			} else if (
-				config.url.indexOf('{x}') >= 0 &&
-				config.url.indexOf('{y}') >= 0 &&
-				config.url.indexOf('{z}') >= 0
-			) {
-				this.#layerFormat = {
-					tile: /\.(jpg|png|webp|gif)$/i.test(config.url)
-						? 'raster'
-						: /\.(geojson|topojson)$/.test(config.url)
-							? 'geojson'
-							: 'vector'
-				};
-			} else if (/\.(geojson|topojson|kml|gpx)$/.test(config.url)) {
-				this.#layerFormat = { single: 'geojson' };
-			} else {
-				this.#layerFormat = 'style';
-			}
-			this.#element = document.createElement('div');
-			this.#createElement();
-		}
-		get config(): LayerConfig.Layer {
-			return this.#config;
-		}
-		get element(): HTMLElement {
-			return this.#element;
-		}
-		get layerFormat(): LayerConfig.LayerFormat {
-			return this.#layerFormat;
-		}
-		get opacity(): number | undefined {
-			if (
-				(this.#layerFormat as { tile: 'raster' }).tile === 'raster' ||
-				(this.#layerFormat as { tile: 'geojson' }).tile === 'geojson' ||
-				(this.#layerFormat as { single: 'geojson' }).single === 'geojson'
-			) {
-				const modifyEnabled = this.#element.querySelector(
-					`.${ELEMENT_CLASS_PREFIX}-layer-entry-modify-enabled input[type=checkbox]`
-				) as HTMLInputElement;
-				const opacity = this.#element.querySelector(
-					`.${ELEMENT_CLASS_PREFIX}-layer-entry-opacity input[type=range]`
-				) as HTMLInputElement;
+		return modifyEnabled && modifyEnabled.checked && color ? color.value : undefined;
+	}
+	#createElement() {
+		this.#element.innerHTML = '';
+		this.#element.className = `${ELEMENT_CLASS_PREFIX}-layer-entry`;
+		const labelcheck = document.createElement('label');
+		const checkbox = document.createElement('input');
+		const spancheck = document.createElement('span');
+		labelcheck.className = `${ELEMENT_CLASS_PREFIX}-layer-entry-visibility`;
+		checkbox.type = 'checkbox';
+		spancheck.textContent = this.#config.title;
+		labelcheck.appendChild(checkbox);
+		labelcheck.appendChild(spancheck);
+		this.#element.appendChild(labelcheck);
 
-				return modifyEnabled && modifyEnabled.checked && opacity
-					? parseInt(opacity.value)
-					: undefined;
-			} else {
-				return undefined;
-			}
-		}
-		get color(): string | undefined {
-			if (
-				(this.#layerFormat as { tile: 'raster' }).tile === 'raster' ||
-				(this.#layerFormat as { tile: 'geojson' }).tile === 'geojson' ||
-				(this.#layerFormat as { single: 'geojson' }).single === 'geojson'
-			) {
-				const modifyEnabled = this.#element.querySelector(
-					`.${ELEMENT_CLASS_PREFIX}-layer-entry-modify-enabled input[type=checkbox]`
-				) as HTMLInputElement;
-				const color = this.#element.querySelector(
-					`.${ELEMENT_CLASS_PREFIX}-layer-entry-color input[type=color]`
-				) as HTMLInputElement;
-
-				return modifyEnabled && modifyEnabled.checked && color ? color.value : undefined;
-			} else {
-				return undefined;
-			}
-		}
-		#createElement() {
-			this.#element.innerHTML = '';
-			this.#element.className = `${ELEMENT_CLASS_PREFIX}-layer-entry`;
-			const labelcheck = document.createElement('label');
-			const checkbox = document.createElement('input');
-			const spancheck = document.createElement('span');
-			labelcheck.className = `${ELEMENT_CLASS_PREFIX}-layer-entry-visibility`;
-			checkbox.type = 'checkbox';
-			spancheck.innerHTML = this.#config.title;
-			labelcheck.appendChild(checkbox);
-			labelcheck.appendChild(spancheck);
-			this.#element.appendChild(labelcheck);
-
-			if (this.#config.html) {
-				const popover = document.createElement('dialog');
-				popover.id = `popover-dialog-${this.#config.id}`;
-				popover.setAttribute('popover', 'popover');
-				popover.innerHTML = `<button popovertarget="${popover.id}" popovertargetaction="hide">
+		if (this.#config.html) {
+			const popover = document.createElement('dialog');
+			popover.id = `popover-dialog-${this.#config.id}`;
+			popover.setAttribute('popover', 'popover');
+			popover.innerHTML = `<button popovertarget="${popover.id}" popovertargetaction="hide">
           <span aria-hidden=”true”>❌</span>
           <span class="sr-only">Close</span>
         </button>
         <hr />
         ${this.#config.html}`;
-				this.#element.appendChild(popover);
+			this.#element.appendChild(popover);
 
-				const infoBtn = document.createElement('button');
-				infoBtn.innerHTML = 'ℹ️';
-				infoBtn.setAttribute('popovertarget', popover.id);
-				this.#element.appendChild(infoBtn);
-			}
+			const infoBtn = document.createElement('button');
+			infoBtn.innerHTML = 'ℹ️';
+			infoBtn.setAttribute('popovertarget', popover.id);
+			this.#element.appendChild(infoBtn);
+		}
 
-			checkbox.addEventListener(
-				'change',
-				(e: Event) => {
-					this.#owner.fireEvent(
-						new CustomEvent('LayerChanged', {
-							detail: {
-								type: 'LayerChanged',
-								layerEntry: this,
-								sourceEvent: e
-							}
-						})
-					);
-				},
-				false
-			);
-			if (
-				(this.#layerFormat as { tile: 'raster' }).tile === 'raster' ||
-				(this.#layerFormat as { tile: 'geojson' }).tile === 'geojson' ||
-				(this.#layerFormat as { single: 'geojson' }).single === 'geojson'
-			) {
-				const container = document.createElement('div');
-				container.className = `${ELEMENT_CLASS_PREFIX}-layer-entry-modify`;
-				container.innerHTML = `
+		checkbox.addEventListener(
+			'change',
+			(e: Event) => {
+				this.#owner.fireEvent(
+					new CustomEvent('LayerChanged', {
+						detail: {
+							type: 'LayerChanged',
+							layerEntry: this,
+							sourceEvent: e
+						}
+					})
+				);
+			},
+			false
+		);
+		if (isModifiableLayerFormat(this.#layerFormat)) {
+			const container = document.createElement('div');
+			container.className = `${ELEMENT_CLASS_PREFIX}-layer-entry-modify`;
+			container.innerHTML = `
           <label class="${ELEMENT_CLASS_PREFIX}-layer-entry-modify-enabled">
             <input type="checkbox" />
             <span>Enable Modification</span>
@@ -304,292 +316,305 @@ namespace LayerTreeView {
             <input type="color" value="#ff0000" />
           </label>`;
 
-				const modifyEnabledCheckbox = container.querySelector(
-					`.${ELEMENT_CLASS_PREFIX}-layer-entry-modify-enabled input[type=checkbox]`
-				) as HTMLInputElement;
-				const opacityRange = container.querySelector(
-					`.${ELEMENT_CLASS_PREFIX}-layer-entry-opacity input[type=range]`
-				) as HTMLInputElement;
-				const color = container.querySelector(
-					`.${ELEMENT_CLASS_PREFIX}-layer-entry-color input[type=color]`
-				) as HTMLInputElement;
-				if ((this.#layerFormat as { tile: 'raster' }).tile === 'raster') {
-					modifyEnabledCheckbox.checked = true;
-					modifyEnabledCheckbox.disabled = true;
-					color.disabled = true;
-					color.parentElement!.style.display = 'none';
-				} else if (
-					(this.#layerFormat as { tile: 'geojson' }).tile === 'geojson' ||
-					(this.#layerFormat as { single: 'geojson' }).single === 'geojson'
-				) {
-					modifyEnabledCheckbox.checked = false;
-					opacityRange.disabled = true;
-					color.disabled = true;
-				}
-				this.#element.appendChild(container);
-
-				const updateLayerModification = (e: Event) => {
-					const modifyEnabled = modifyEnabledCheckbox.checked;
-					const opacity = parseInt(opacityRange.value, 10);
-					const colorValue = color.value;
-
-					opacityRange.disabled = !modifyEnabled;
-					color.disabled = !modifyEnabled;
-
-					this.#owner.fireEvent(
-						new CustomEvent('LayerModificationChanged', {
-							detail: {
-								type: 'LayerModificationChanged',
-								modifyEnabled,
-								layerEntry: this,
-								sourceEvent: e
-							}
-						})
-					);
-				};
-				modifyEnabledCheckbox.addEventListener('change', updateLayerModification, false);
-				opacityRange.addEventListener('change', updateLayerModification, false);
-				color.addEventListener('change', updateLayerModification, false);
+			const modifyEnabledCheckbox = container.querySelector(
+				`.${ELEMENT_CLASS_PREFIX}-layer-entry-modify-enabled input[type=checkbox]`
+			) as HTMLInputElement;
+			const opacityRange = container.querySelector(
+				`.${ELEMENT_CLASS_PREFIX}-layer-entry-opacity input[type=range]`
+			) as HTMLInputElement;
+			const color = container.querySelector(
+				`.${ELEMENT_CLASS_PREFIX}-layer-entry-color input[type=color]`
+			) as HTMLInputElement;
+			if (isRasterLayerFormat(this.#layerFormat)) {
+				modifyEnabledCheckbox.checked = true;
+				modifyEnabledCheckbox.disabled = true;
+				color.disabled = true;
+				color.parentElement!.style.display = 'none';
+			} else if (isGeoJsonLayerFormat(this.#layerFormat)) {
+				modifyEnabledCheckbox.checked = false;
+				opacityRange.disabled = true;
+				color.disabled = true;
 			}
-		}
+			this.#element.appendChild(container);
 
-		set selected(value: boolean) {
-			(this.#element.querySelector('input[type=checkbox]') as HTMLInputElement).checked = value;
-		}
-		get selected() {
-			return (this.#element.querySelector('input[type=checkbox]') as HTMLInputElement).checked;
+			const updateLayerModification = (e: Event) => {
+				const modifyEnabled = modifyEnabledCheckbox.checked;
+
+				opacityRange.disabled = !modifyEnabled;
+				color.disabled = !modifyEnabled;
+
+				this.#owner.fireEvent(
+					new CustomEvent('LayerModificationChanged', {
+						detail: {
+							type: 'LayerModificationChanged',
+							modifyEnabled,
+							layerEntry: this,
+							sourceEvent: e
+						}
+					})
+				);
+			};
+			modifyEnabledCheckbox.addEventListener('change', updateLayerModification, false);
+			opacityRange.addEventListener('change', updateLayerModification, false);
+			color.addEventListener('change', updateLayerModification, false);
 		}
 	}
 
-	class LayerGroupEntry implements LayerGroup {
-		readonly type: string = 'LayerGroupEntry';
-		readonly #config: LayerConfig.LayerGroup;
-		readonly #owner: LayerTreeView;
-		readonly #entries: LayerTreeViewEntry[];
-		#element: HTMLElement;
-		constructor(config: LayerConfig.LayerGroup, owner: LayerTreeView) {
-			this.#config = config;
-			this.#owner = owner;
+	set selected(value: boolean) {
+		(this.#element.querySelector('input[type=checkbox]') as HTMLInputElement).checked = value;
+	}
+	get selected() {
+		return (this.#element.querySelector('input[type=checkbox]') as HTMLInputElement).checked;
+	}
+}
 
-			const entries: LayerTreeViewEntry[] = [];
-			for (const entry of config.entries || []) {
-				if (entry.type == 'Layer') {
-					entries.push(new LayerEntry(entry as LayerConfig.Layer, owner));
-				} else if (entry.type == 'LayerGroup') {
-					entries.push(new LayerGroupEntry(entry as LayerConfig.LayerGroup, owner));
-				} else {
-					console.error(`unknown config.type: ${entry.type}`, entry);
-				}
+class LayerGroupEntry implements LayerTreeGroup {
+	readonly type: string = 'LayerGroupEntry';
+	readonly #config: LayerGroup;
+	readonly #entries: LayerTreeViewEntry[];
+	#element: HTMLElement;
+	constructor(config: LayerGroup, owner: LayerTreeView) {
+		this.#config = config;
+
+		const entries: LayerTreeViewEntry[] = [];
+		for (const entry of config.entries || []) {
+			if (entry.type == 'Layer') {
+				entries.push(new LayerEntry(entry as Layer, owner));
+			} else if (entry.type == 'LayerGroup') {
+				entries.push(new LayerGroupEntry(entry as LayerGroup, owner));
+			} else {
+				console.error(`unknown config.type: ${entry.type}`, entry);
 			}
-			this.#entries = entries;
+		}
+		this.#entries = entries;
 
-			this.#element = document.createElement('details');
-			this.#createElement();
+		this.#element = document.createElement('details');
+		this.#createElement();
+	}
+	get config(): LayerGroup {
+		return this.#config;
+	}
+	get element(): HTMLElement {
+		return this.#element;
+	}
+	#createElement() {
+		this.#element.innerHTML = '';
+		this.#element.className = `${ELEMENT_CLASS_PREFIX}-layer-group-entry`;
+		const summary = document.createElement('summary');
+		summary.textContent = this.#config.title;
+		const entriesDiv = document.createElement('div');
+		entriesDiv.className = 'entries';
+		for (const entry of this.#entries) {
+			entriesDiv.appendChild(entry.element);
 		}
-		get config(): LayerConfig.LayerGroup {
-			return this.#config;
-		}
-		get element(): HTMLElement {
-			return this.#element;
-		}
-		#createElement() {
-			this.#element.innerHTML = '';
-			this.#element.className = `${ELEMENT_CLASS_PREFIX}-layer-group-entry`;
-			const summary = document.createElement('summary');
-			summary.innerHTML = this.#config.title;
-			const entriesDiv = document.createElement('div');
-			entriesDiv.className = 'entries';
-			for (const entry of this.#entries) {
-				entriesDiv.appendChild((entry as any).element);
+		this.#element.appendChild(summary);
+		this.#element.appendChild(entriesDiv);
+	}
+
+	*entries(): Generator<LayerTreeViewEntry> {
+		yield* this.#entries;
+	}
+	*layerEntriesAll(): Generator<LayerEntry> {
+		yield* layerEntriesAll(this);
+	}
+	*layerEntriesSelected(): Generator<LayerEntry> {
+		yield* layerEntriesSelected(this);
+	}
+}
+
+function createRasterBaseStyle(layer: Layer): maplibregl.StyleSpecification {
+	return {
+		version: 8,
+		sources: {
+			[`source-${layer.id}-raster`]: {
+				type: 'raster',
+				tiles: [layer.url],
+				tileSize: layer.tileSize ?? 256,
+				scheme: layer.scheme ?? 'xyz',
+				attribution: layer.attribution as string | undefined
 			}
-			this.#element.appendChild(summary);
-			this.#element.appendChild(entriesDiv);
-		}
+		},
+		layers: [
+			{
+				id: `layer-${layer.id}-raster`,
+				type: 'raster',
+				source: `source-${layer.id}-raster`,
+				minzoom: layer.minZoom ?? 0,
+				maxzoom: layer.maxZoom ?? 22
+			}
+		]
+	};
+}
 
-		*entries(): Generator<LayerTreeViewEntry> {
-			yield* this.#entries;
+function createRasterOverlaySource(layer: Layer): maplibregl.RasterSourceSpecification {
+	const source: maplibregl.RasterSourceSpecification = {
+		type: 'raster',
+		tiles: [layer.url],
+		tileSize: layer.tileSize ?? 256,
+		scheme: layer.scheme ?? 'xyz',
+		attribution: layer.attribution
+	};
+	if (layer.maxZoom) {
+		source.maxzoom = layer.maxZoom;
+	}
+	if (layer.minZoom) {
+		source.minzoom = layer.minZoom;
+	}
+	return source;
+}
+
+function createRasterOverlayLayer(layer: Layer): maplibregl.RasterLayerSpecification {
+	return {
+		id: `layer-${layer.id}-raster`,
+		type: 'raster',
+		source: `source-${layer.id}-raster`
+	};
+}
+
+function setRasterBaseOpacity(
+	map: maplibregl.Map,
+	layer: Layer,
+	opacity: number | undefined
+): void {
+	if (opacity !== undefined) {
+		const value = opacity;
+		window.setTimeout(() => {
+			map.setPaintProperty(`layer-${layer.id}-raster`, 'raster-opacity', value / 255.0);
+		}, 100);
+	}
+}
+
+function setRasterModificationOpacity(
+	map: maplibregl.Map,
+	layer: Layer,
+	opacity: number | undefined
+): void {
+	map.setPaintProperty(
+		`layer-${layer.id}-raster`,
+		'raster-opacity',
+		opacity !== undefined ? opacity / 255.0 : 1
+	);
+}
+
+function setMaxZoomFromLayer(map: maplibregl.Map, layer: Layer): void {
+	const maxZoom = layer.maxNativeZoom ?? layer.maxZoom;
+	if (maxZoom !== undefined) {
+		map.setMaxZoom(maxZoom);
+	}
+}
+
+function applyBaseLayerChange(map: maplibregl.Map, layerEntry: LayerEntry): void {
+	const layerFormat = layerEntry.layerFormat;
+	const layer = layerEntry.config;
+
+	if (isRasterLayerFormat(layerFormat)) {
+		map.setStyle(createRasterBaseStyle(layer), { diff: false });
+		setMaxZoomFromLayer(map, layer);
+		setRasterBaseOpacity(map, layer, layerEntry.opacity);
+	} else if (isStyleLayerFormat(layerFormat)) {
+		const setStyleOption = { ...createStyleSwapOption(layer), diff: false };
+		map.setStyle(layer.url, setStyleOption);
+		if (layer.maxNativeZoom !== undefined) {
+			map.setMaxZoom(layer.maxNativeZoom);
 		}
-		*layerEntriesAll(): Generator<LayerEntry> {
-			yield* LayerGroupCommonProcedure.layerEntriesAll(this);
+	} else {
+		console.error(`unsupported layerFormat ${JSON.stringify(layerFormat)} as base`, layer);
+	}
+}
+
+function applyBaseLayerModification(map: maplibregl.Map, layerEntry: LayerEntry): void {
+	const layerFormat = layerEntry.layerFormat;
+	const layer = layerEntry.config;
+
+	if (isRasterLayerFormat(layerFormat)) {
+		setRasterModificationOpacity(map, layer, layerEntry.opacity);
+	} else {
+		console.error(`unsupported layerFormat ${JSON.stringify(layerFormat)} for base overlay`, layer);
+	}
+}
+
+function applyOverlayLayerChange(map: maplibregl.Map, layerEntry: LayerEntry): void {
+	const layerFormat = layerEntry.layerFormat;
+	const layer = layerEntry.config;
+	const selected = layerEntry.selected;
+	const id = layer.id;
+
+	if (selected) {
+		if (isRasterLayerFormat(layerFormat)) {
+			map.addSource(`source-${id}-raster`, createRasterOverlaySource(layer));
+			map.addLayer(createRasterOverlayLayer(layer));
+			setRasterBaseOpacity(map, layer, layerEntry.opacity);
+			map.triggerRepaint();
+		} else if (isGeoJsonLayerFormat(layerFormat)) {
+			GeoJsonLayerConverter.addToMap(layerFormat, layer, map);
+
+			window.setTimeout(
+				(map: maplibregl.Map, opacity: number | undefined) => {
+					GeoJsonLayerConverter.updateOpacity(layer, map, opacity);
+				},
+				0,
+				map,
+				layerEntry.opacity
+			);
+		} else if (isStyleLayerFormat(layerFormat)) {
+			void VectorOverlayLayerCreator.addToMap(layer, map);
+		} else {
+			console.error(`Unsupported layerFormat ${JSON.stringify(layerFormat)}`, layerEntry);
 		}
-		*layerEntriesSelected(): Generator<LayerEntry> {
-			yield* LayerGroupCommonProcedure.layerEntriesSelected(this);
+	} else {
+		if (isRasterLayerFormat(layerFormat)) {
+			map.removeLayer(`layer-${id}-raster`);
+			map.removeSource(`source-${id}-raster`);
+		} else if (isGeoJsonLayerFormat(layerFormat)) {
+			GeoJsonLayerConverter.removeFromMap(layer, map);
+		} else if (isStyleLayerFormat(layerFormat)) {
+			VectorOverlayLayerCreator.removeFromMap(layer, map);
+		} else {
+			console.error(`Unsupported layerFormat ${JSON.stringify(layerFormat)}`, layerEntry);
 		}
+	}
+}
+
+function applyOverlayLayerModification(map: maplibregl.Map, layerEntry: LayerEntry): void {
+	const layerFormat = layerEntry.layerFormat;
+	const layer = layerEntry.config;
+
+	if (isRasterLayerFormat(layerFormat)) {
+		setRasterModificationOpacity(map, layer, layerEntry.opacity);
+	} else if (isGeoJsonLayerFormat(layerFormat)) {
+		GeoJsonLayerConverter.updateOpacity(layer, map, layerEntry.opacity);
+		GeoJsonLayerConverter.updateColor(layer, map, layerEntry.color);
 	}
 }
 
 export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl {
 	#map?: maplibregl.Map;
 	#element: HTMLElement;
-	#base: LayerTreeView.LayerTreeView;
-	#overlay: LayerTreeView.LayerTreeView;
+	#base: LayerTreeView;
+	#overlay: LayerTreeView;
 	#optional: HTMLElement;
 
 	constructor() {
-		this.#base = new LayerTreeView.LayerTreeView(this, true);
+		this.#base = new LayerTreeView(this, true);
 		this.#base.on('LayerChanged', (e) => {
 			if (this.#map) {
-				const layerFormat = e.detail.layerEntry.layerFormat;
-				const layer = e.detail.layerEntry.config;
-				const id = layer.id;
-				if ((layerFormat as { tile: 'raster' }).tile === 'raster') {
-					this.#map.setStyle(
-						{
-							version: 8,
-							sources: {
-								[`source-${id}-raster`]: {
-									type: 'raster',
-									tiles: [layer.url],
-									tileSize: layer.tileSize ?? 256,
-									scheme: layer.scheme ?? 'xyz',
-									attribution: layer.attribution as string | undefined
-								}
-							},
-							layers: [
-								{
-									id: `layer-${id}-raster`,
-									type: 'raster',
-									source: `source-${id}-raster`,
-									minzoom: layer.minZoom ?? 0,
-									maxzoom: layer.maxZoom ?? 22
-								}
-							]
-						},
-						{ diff: false }
-					);
-					if (layer.maxNativeZoom ?? layer.maxZoom) {
-						this.#map.setMaxZoom(layer.maxNativeZoom ?? layer.maxZoom);
-					}
-					if (e.detail.layerEntry.opacity !== undefined) {
-						const value = e.detail.layerEntry.opacity;
-						window.setTimeout(() => {
-							this.#map?.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
-						}, 100);
-					}
-				} else if (layerFormat === 'style') {
-					const setStyleOption = { ...LayerConfig.createStyleSwapOption(layer), diff: false };
-					this.#map.setStyle(layer.url, setStyleOption);
-					if (layer.maxNativeZoom) {
-						this.#map.setMaxZoom(layer.maxNativeZoom);
-					}
-				} else {
-					console.error(`unsupported layerFormat ${JSON.stringify(layerFormat)} as base`, layer);
-				}
+				applyBaseLayerChange(this.#map, e.detail.layerEntry);
 			}
 		});
 		this.#base.on('LayerModificationChanged', (e) => {
 			if (this.#map) {
-				const layerFormat = e.detail.layerEntry.layerFormat;
-				const layer = e.detail.layerEntry.config;
-				const id = layer.id;
-
-				if ((layerFormat as { tile: 'raster' }).tile === 'raster') {
-					if (e.detail.layerEntry.opacity !== undefined) {
-						const value = e.detail.layerEntry.opacity;
-						this.#map?.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
-					} else {
-						this.#map.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', 1);
-					}
-				} else {
-					console.error(
-						`unsupported layerFormat ${JSON.stringify(layerFormat)} for base overlay`,
-						layer
-					);
-				}
+				applyBaseLayerModification(this.#map, e.detail.layerEntry);
 			}
 		});
-		this.#overlay = new LayerTreeView.LayerTreeView(this, false);
+		this.#overlay = new LayerTreeView(this, false);
 		this.#overlay.on('LayerChanged', (e) => {
 			if (this.#map) {
-				const layerFormat = e.detail.layerEntry.layerFormat;
-				const layer = e.detail.layerEntry.config;
-				const selected = e.detail.layerEntry.selected;
-				const id = layer.id;
-
-				if (selected) {
-					if ((layerFormat as { tile: 'raster' }).tile === 'raster') {
-						const rasterSource: maplibregl.RasterSourceSpecification = {
-							type: 'raster',
-							tiles: [layer.url],
-							tileSize: layer.tileSize ?? 256,
-							scheme: layer.scheme ?? 'xyz',
-							attribution: layer.attribution
-						};
-						if (layer.maxZoom) {
-							rasterSource.maxzoom = layer.maxZoom;
-						}
-						if (layer.minZoom) {
-							rasterSource.minzoom = layer.minZoom;
-						}
-						this.#map.addSource(`source-${id}-raster`, rasterSource);
-						this.#map.addLayer({
-							id: `layer-${id}-raster`,
-							type: 'raster',
-							source: `source-${id}-raster`
-						} as maplibregl.RasterLayerSpecification);
-						if (e.detail.layerEntry.opacity !== undefined) {
-							const value = e.detail.layerEntry.opacity;
-							window.setTimeout(() => {
-								this.#map?.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
-							}, 100);
-						}
-						this.#map.triggerRepaint();
-					} else if (
-						(layerFormat as { tile: 'geojson' }).tile === 'geojson' ||
-						(layerFormat as { single: 'geojson' }).single === 'geojson'
-					) {
-						GeoJsonLayerConverter.addToMap(layerFormat, layer, this.#map);
-
-						window.setTimeout(
-							(map: maplibregl.Map, opacity: number | undefined) => {
-								GeoJsonLayerConverter.updateOpacity(layer, map, opacity);
-							},
-							0,
-							this.#map,
-							e.detail.layerEntry.opacity
-						);
-					} else if (layerFormat === 'style') {
-						VectorOverlayLayerCreator.addToMap(layer, this.#map);
-					} else {
-						console.error(`Unsupported layerFormat ${JSON.stringify(layerFormat)}`, e); // TODO
-					}
-				} else {
-					if ((layerFormat as { tile: 'raster' }).tile === 'raster') {
-						this.#map.removeLayer(`layer-${id}-raster`);
-						this.#map.removeSource(`source-${id}-raster`);
-					} else if (
-						(layerFormat as { tile: 'geojson' }).tile === 'geojson' ||
-						(layerFormat as { single: 'geojson' }).single === 'geojson'
-					) {
-						GeoJsonLayerConverter.removeFromMap(layer, this.#map);
-					} else if (layerFormat === 'style') {
-						VectorOverlayLayerCreator.removeFromMap(layer, this.#map);
-					} else {
-						console.error(`Unsupported layerFormat ${JSON.stringify(layerFormat)}`, e); // TODO
-					}
-				}
+				applyOverlayLayerChange(this.#map, e.detail.layerEntry);
 			}
 		});
 		this.#overlay.on('LayerModificationChanged', (e) => {
 			if (this.#map) {
-				const layerFormat = e.detail.layerEntry.layerFormat;
-				const layer = e.detail.layerEntry.config;
-				const id = layer.id;
-
-				if ((layerFormat as { tile: 'raster' }).tile === 'raster') {
-					if (e.detail.layerEntry.opacity !== undefined) {
-						const value = e.detail.layerEntry.opacity;
-						this.#map.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', value / 255.0);
-					} else {
-						this.#map.setPaintProperty(`layer-${id}-raster`, 'raster-opacity', 1);
-					}
-				} else if (
-					(layerFormat as { tile: 'geojson' }).tile === 'geojson' ||
-					(layerFormat as { single: 'geojson' }).single === 'geojson'
-				) {
-					GeoJsonLayerConverter.updateOpacity(layer, this.#map, e.detail.layerEntry.opacity);
-					GeoJsonLayerConverter.updateColor(layer, this.#map, e.detail.layerEntry.color);
-				}
+				applyOverlayLayerModification(this.#map, e.detail.layerEntry);
 			}
 		});
 
@@ -599,21 +624,21 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 		this.#createElement();
 	}
 
-	addBase(config: LayerConfig.LayerConfigEntry | LayerConfig.LayerConfigEntry[]): this {
+	addBase(config: LayerConfigEntry | LayerConfigEntry[]): this {
 		this.#base.addConfig(config);
 		return this;
 	}
-	*baseLayerEntriesAll(): Generator<LayerConfig.Layer> {
+	*baseLayerEntriesAll(): Generator<Layer> {
 		for (const entry of this.#base.layerEntriesAll()) {
 			yield entry.config;
 		}
 	}
-	*baseLayerEntriesSelected(): Generator<LayerConfig.Layer> {
+	*baseLayerEntriesSelected(): Generator<Layer> {
 		for (const entry of this.#base.layerEntriesSelected()) {
 			yield entry.config;
 		}
 	}
-	setBaseLayerEntriesSelected(layer: LayerConfig.Layer, selected: boolean) {
+	setBaseLayerEntriesSelected(layer: Layer, selected: boolean) {
 		for (const entry of this.#base.layerEntriesAll()) {
 			if (entry.config === layer) {
 				entry.selected = selected;
@@ -621,7 +646,7 @@ export class MapLibreCompondLayerSwitcherControl implements maplibregl.IControl 
 		}
 	}
 
-	addOverlay(config: LayerConfig.LayerConfigEntry | LayerConfig.LayerConfigEntry[]): this {
+	addOverlay(config: LayerConfigEntry | LayerConfigEntry[]): this {
 		this.#overlay.addConfig(config);
 		return this;
 	}

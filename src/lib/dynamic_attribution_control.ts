@@ -82,16 +82,19 @@ export class DynamicAttributionControl extends maplibregl.AttributionControl {
 	 * @see https://maplibre.org/maplibre-gl-js-docs/api/events/
 	 * @returns `this` to allow for method chaining, or a Promise if no listener is provided.
 	 */
-	once(type: string, listener?: maplibregl.Listener): this | Promise<any> {
+	once(type: string, listener?: maplibregl.Listener): this | Promise<unknown> {
 		const result = this.#_evented.once(type, listener);
-		return result === this.#_evented ? this : (result as Promise<any>);
+		return result === this.#_evented ? this : (result as Promise<unknown>);
 	}
 
 	/** Fire an event of the specified type.
 	 * @see https://maplibre.org/maplibre-gl-js-docs/api/events/
 	 * @returns `this` to allow for method chaining.
 	 */
-	fire(event: maplibregl.Event | string, properties?: any): this {
+	fire(
+		event: maplibregl.Event | string,
+		properties?: Parameters<maplibregl.Evented['fire']>[1]
+	): this {
 		this.#_evented.fire(event, properties);
 		return this;
 	}
@@ -108,7 +111,10 @@ export class DynamicAttributionControl extends maplibregl.AttributionControl {
 	 * @see https://maplibre.org/maplibre-gl-js-docs/api/events/
 	 * @returns `this` to allow for method chaining.
 	 */
-	setEventedParent(parent?: maplibregl.Evented | null, data?: any | (() => any)): this {
+	setEventedParent(
+		parent?: maplibregl.Evented | null,
+		data?: Parameters<maplibregl.Evented['setEventedParent']>[1]
+	): this {
 		this.#_evented.setEventedParent(parent, data);
 		return this;
 	}
