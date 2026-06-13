@@ -280,7 +280,7 @@ export const GeoJsonLayerConverter = {
 				type: 'vector',
 				tiles: [
 					'geojson-tile://' +
-						(layer.maxNativeZoom ? `maxNativeZoom=${layer.maxNativeZoom};` : '') +
+						(layer.maxNativeZoom !== undefined ? `maxNativeZoom=${layer.maxNativeZoom};` : '') +
 						layer.url
 				],
 				scheme: layer.scheme ?? 'xyz',

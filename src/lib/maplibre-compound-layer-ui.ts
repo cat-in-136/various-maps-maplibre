@@ -2,6 +2,7 @@ import maplibregl from 'maplibre-gl';
 import { createStyleSwapOption } from '$lib/layer-config';
 import { GeoJsonLayerConverter } from '$lib/geojson-layer-converter';
 import type { Layer, LayerConfigEntry, LayerFormat, LayerGroup } from '$lib/layer-config';
+import { isLayer, isLayerGroup } from '$lib/layer-config';
 import { VectorOverlayLayerCreator } from '$lib/vector-overlay-layer-creater';
 import type { TerrainSources } from '$lib/maplibre-compound-layer-data/terrain';
 
@@ -124,10 +125,10 @@ export class LayerTreeView implements LayerTreeGroup {
 			}
 		} else {
 			let entry: LayerTreeViewEntry;
-			if ((config as Layer).type === 'Layer') {
-				entry = new LayerEntry(config as Layer, this);
-			} else if ((config as LayerGroup).type === 'LayerGroup') {
-				entry = new LayerGroupEntry(config as LayerGroup, this);
+			if (isLayer(config)) {
+				entry = new LayerEntry(config, this);
+			} else if (isLayerGroup(config)) {
+				entry = new LayerGroupEntry(config, this);
 			} else {
 				throw new Error(`unsupported config type`);
 			}
@@ -378,12 +379,13 @@ class LayerGroupEntry implements LayerTreeGroup {
 
 		const entries: LayerTreeViewEntry[] = [];
 		for (const entry of config.entries || []) {
-			if (entry.type == 'Layer') {
-				entries.push(new LayerEntry(entry as Layer, owner));
-			} else if (entry.type == 'LayerGroup') {
-				entries.push(new LayerGroupEntry(entry as LayerGroup, owner));
+			const entryType = (entry as { type?: unknown }).type;
+			if (isLayer(entry)) {
+				entries.push(new LayerEntry(entry, owner));
+			} else if (isLayerGroup(entry)) {
+				entries.push(new LayerGroupEntry(entry, owner));
 			} else {
-				console.error(`unknown config.type: ${entry.type}`, entry);
+				console.error(`unknown config.type: ${entryType}`, entry);
 			}
 		}
 		this.#entries = entries;

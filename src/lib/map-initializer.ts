@@ -13,6 +13,7 @@ import { GSIMapLayers } from '$lib/gsimaplayers/gsimaplayers';
 import { AncientLayers, OthersLayers } from '$lib/gsimaplayers/variousmapslocallayerstxt';
 import * as MaplibreCompondLayerUI from '$lib/maplibre-compound-layer-ui';
 import type { LayerConfigEntry, LayerGroup } from '$lib/layer-config';
+import { isLayer, isLayerGroup, isLayerTextJson, isMapStyleJson } from '$lib/layer-config';
 import {
 	BASE_LAYER_DEFAULT,
 	OVERLAY_LAYER_DEFAULT,
@@ -38,27 +39,6 @@ type NominatimGeojson = {
 };
 
 const DARK_ID_REGEX = /(dark|black|hybrid|imagery|satellite|fiord-color|arcgis-Nova)/i;
-
-function isLayerGroup(entry: LayerConfigEntry | undefined): entry is LayerGroup {
-	return entry?.type === 'LayerGroup';
-}
-
-function isMapStyleJson(
-	value: unknown
-): value is { version: number; sources: object; layers: object } {
-	if (typeof value !== 'object' || value === null) return false;
-	const obj = value as { version?: unknown; sources?: unknown; layers?: unknown };
-	return obj.version === 8 && typeof obj.sources === 'object' && typeof obj.layers === 'object';
-}
-
-function isLayerTextJson(value: unknown): value is { layers: LayerConfigEntry[] } {
-	if (typeof value !== 'object' || value === null) return false;
-	const obj = value as { layers?: unknown };
-	return (
-		Array.isArray(obj.layers) &&
-		(obj.layers[0]?.type === 'Layer' || obj.layers[0]?.type === 'LayerGroup')
-	);
-}
 
 async function readJson(file: File): Promise<unknown> {
 	return JSON.parse(await file.text());
@@ -219,7 +199,7 @@ export function createMap(): maplibregl.Map {
 	}
 
 	const firstLayer = firstBaseGroup.entries[0];
-	if (firstLayer?.type !== 'Layer' || typeof firstLayer.url !== 'string') {
+	if (!isLayer(firstLayer) || typeof firstLayer.url !== 'string') {
 		throw new Error('First base layer entry must be a Layer');
 	}
 

@@ -38,6 +38,29 @@ export interface LayerGroup {
 
 export type LayerConfigEntry = LayerGroup | Layer;
 
+export function isLayer(entry: LayerConfigEntry | undefined): entry is Layer {
+	return entry?.type === 'Layer';
+}
+
+export function isLayerGroup(entry: LayerConfigEntry | undefined): entry is LayerGroup {
+	return entry?.type === 'LayerGroup';
+}
+
+export function isMapStyleJson(
+	value: unknown
+): value is { version: number; sources: object; layers: object } {
+	if (typeof value !== 'object' || value === null) return false;
+	const obj = value as { version?: unknown; sources?: unknown; layers?: unknown };
+	return obj.version === 8 && typeof obj.sources === 'object' && typeof obj.layers === 'object';
+}
+
+export function isLayerTextJson(value: unknown): value is { layers: LayerConfigEntry[] } {
+	if (typeof value !== 'object' || value === null) return false;
+	const obj = value as { layers?: unknown };
+	if (!Array.isArray(obj.layers)) return false;
+	return obj.layers.every((entry) => entry?.type === 'Layer' || entry?.type === 'LayerGroup');
+}
+
 export type TerrainSource = {
 	title: string;
 	source: maplibregl.RasterDEMSourceSpecification;
