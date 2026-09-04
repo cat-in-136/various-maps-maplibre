@@ -398,14 +398,59 @@ export function setupDarkMode(
 }
 
 export function setupExternalMapsPopup(map: maplibregl.Map): void {
-	map.on('contextmenu', (e: maplibregl.MapMouseEvent) => {
-		const { lng, lat } = e.lngLat;
+	let touchTimer: ReturnType<typeof setTimeout> | null = null;
+	let startPoint: { x: number; y: number } | null = null;
+
+	const clearTouchTimer = () => {
+		if (touchTimer !== null) {
+			clearTimeout(touchTimer);
+			touchTimer = null;
+		}
+		startPoint = null;
+	};
+
+	const showPopup = (lngLat: maplibregl.LngLat) => {
 		const zoom = map.getZoom();
 		new maplibregl.Popup()
-			.setLngLat(e.lngLat)
-			.setHTML(createExternalMapsHtml(lat, lng, zoom))
+			.setLngLat(lngLat)
+			.setHTML(createExternalMapsHtml(lngLat.lat, lngLat.lng, zoom))
 			.addTo(map);
+	};
+
+	map.on('contextmenu', (e: maplibregl.MapMouseEvent) => {
+		clearTouchTimer();
+		showPopup(e.lngLat);
 	});
+
+	map.on('touchstart', (e: maplibregl.MapTouchEvent) => {
+		if (e.points.length !== 1) {
+			clearTouchTimer();
+			return;
+		}
+
+		clearTouchTimer();
+
+		const touchLngLat = e.lngLat;
+		startPoint = e.point;
+
+		touchTimer = setTimeout(() => {
+			showPopup(touchLngLat);
+			clearTouchTimer();
+		}, 500);
+	});
+
+	map.on('touchmove', (e: maplibregl.MapTouchEvent) => {
+		if (!startPoint) return;
+
+		const moveDistance = Math.hypot(e.point.x - startPoint.x, e.point.y - startPoint.y);
+
+		if (moveDistance > 5) {
+			clearTouchTimer();
+		}
+	});
+
+	map.on('touchend', clearTouchTimer);
+	map.on('touchcancel', clearTouchTimer);
 }
 
 export function setupDragAndDrop(
