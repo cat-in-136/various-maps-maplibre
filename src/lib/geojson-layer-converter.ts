@@ -1,4 +1,4 @@
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 import type * as maplibreglstyle from '@maplibre/maplibre-gl-style-spec';
 import { GSIMAP_STYLE_OVERRIDE } from '$lib/gsivectorexperimentalstyle';
 import type { Layer, LayerFormat } from '$lib/layer-config';

@@ -1,4 +1,4 @@
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 import { createStyleSwapOption } from '$lib/layer-config';
 import { GeoJsonLayerConverter } from '$lib/geojson-layer-converter';
 import type { Layer, LayerConfigEntry, LayerFormat, LayerGroup } from '$lib/layer-config';

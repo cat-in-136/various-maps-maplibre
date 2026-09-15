@@ -1,4 +1,4 @@
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 import { createStyleSwapOption } from '$lib/layer-config';
 import type { Layer } from '$lib/layer-config';
 

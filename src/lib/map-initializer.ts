@@ -1,4 +1,6 @@
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
+import { setWorkerUrl } from 'maplibre-gl';
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import MaplibreGeocoder from '@maplibre/maplibre-gl-geocoder';
 import type {
 	CarmenGeojsonFeature,
@@ -28,6 +30,9 @@ import {
 	getJmaLayerProtocolAction
 } from '$lib/maplibre-live-satellite-layer-protocol';
 import { getPmtilesProtocol } from '$lib/maplibre-pmtiles-protocol';
+
+// MapLibre v6 is ESM-only: bundlers (Vite) need an explicit worker URL.
+setWorkerUrl(workerUrl);
 
 type SetDark = (isDark: boolean) => void;
 
@@ -358,24 +363,27 @@ export function setupLayerSwitcher(
 
 export function setupStyleImageLoader(map: maplibregl.Map): void {
 	const styleImageMissingImageLoader = new Map<string, Promise<void>>();
-	map.on('styleimagemissing', (e) => {
-		const id = String(e.id);
+	// MapLibre v6: styleimagemissing listeners can no longer supply images via
+	// addImage. Use setMissingStyleImageResolver instead (may be async).
+	map.setMissingStyleImageResolver((id: string) => {
 		const match = id.match(/(https?:)?\/\//);
-		if (match) {
-			const url = match[0] === '//' ? `https:${id}` : id;
-			if (!styleImageMissingImageLoader.has(id)) {
-				styleImageMissingImageLoader.set(
-					id,
-					map
-						.loadImage(url)
-						.then((image) => {
-							map.addImage(id, image.data);
-							styleImageMissingImageLoader.delete(id);
-						})
-						.catch((error) => console.error({ error }))
-				);
-			}
-		}
+		if (!match) return;
+		const url = match[0] === '//' ? `https:${id}` : id;
+		const inFlight = styleImageMissingImageLoader.get(id);
+		if (inFlight) return inFlight;
+		const promise = map
+			.loadImage(url)
+			.then((image) => {
+				if (!map.hasImage(id)) {
+					map.addImage(id, image.data);
+				}
+			})
+			.catch((error) => console.error({ error }))
+			.finally(() => {
+				styleImageMissingImageLoader.delete(id);
+			});
+		styleImageMissingImageLoader.set(id, promise);
+		return promise;
 	});
 }
 

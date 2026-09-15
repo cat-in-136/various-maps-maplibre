@@ -1,7 +1,7 @@
 // https://qiita.com/mg_kudo/items/832ee30ed39b6c25df60
 // https://github.com/mghs15/maplibre-geojson-tile/
 
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 //import Pbf from 'pbf';
 import geojsonvt from 'geojson-vt';
 import { fromGeojsonVt } from 'vt-pbf';

@@ -26,7 +26,7 @@
 		"eslint-plugin-svelte": "^3.13.0",
 		"geojson-vt": "^4.0.2",
 		"globals": "^17.4.0",
-		"maplibre-gl": "^5.11.0",
+		"maplibre-gl": "~6.9.0",
 		"maplibre-gl-vector-text-protocol": "^0.0.5",
 		"pmtiles": "^4.4.1",
 		"prettier": "^3.6.2",
