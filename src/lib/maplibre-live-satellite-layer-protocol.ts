@@ -153,12 +153,13 @@ async function getSatelliteImgTile(
 	abortController: Parameters<maplibregl.AddProtocolAction>[1]
 ): ReturnType<maplibregl.AddProtocolAction> {
 	const urlParts = params.url.split('/');
-	if (urlParts[0] !== '' || urlParts[1] !== 'satimg' || urlParts.length !== 8) {
+	if (urlParts[1] !== '' || urlParts[2] !== 'satimg' || urlParts.length !== 8) {
 		throw new Error(`Invalid URL format: ${params.url}`);
 	}
-	const [, , band, prod, z, x, yExt] = urlParts;
-	const [y, extName] = yExt.split('.');
-	const ext = extName === 'png' ? 'jpg.png' : extName;
+	const [, , , band, prod, z, x, yExt] = urlParts;
+	const isPng = yExt.endsWith('.png');
+	const [y] = yExt.split('.');
+	const ext = isPng ? 'jpg.png' : 'jpg';
 
 	const area = parseInt(z, 10) >= 6 ? 'jp' : 'fd';
 	const targetTimes = await (
