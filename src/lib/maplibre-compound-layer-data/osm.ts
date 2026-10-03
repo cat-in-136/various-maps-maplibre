@@ -4,15 +4,14 @@ import osm_liberty_style from '$lib/static/assets/map-data/osm-liberty-style.min
 import osm_liberty_en_style from '$lib/static/assets/map-data/osm-liberty-en-style.min.json?url';
 import osm_maptiler_3d_style from '$lib/static/assets/map-data/osm-maptiler-3d-gl-style.min.json?url';
 import osm_railways_catin136 from '$lib/static/assets/map-data/osm-railways-catin136.min.overlay.json?url';
-import openrailwaymap_standard_light from '$lib/static/assets/map-data/openrailwaymap-standard-light.min.overlay.json?url';
-import openrailwaymap_speed_light from '$lib/static/assets/map-data/openrailwaymap-speed-light.min.overlay.json?url';
-import openrailwaymap_signals_light from '$lib/static/assets/map-data/openrailwaymap-signals-light.min.overlay.json?url';
-import openrailwaymap_electrification_light from '$lib/static/assets/map-data/openrailwaymap-electrification-light.min.overlay.json?url';
-import openrailwaymap_gauge_light from '$lib/static/assets/map-data/openrailwaymap-gauge-light.min.overlay.json?url';
-import openrailwaymap_loading_gauge_light from '$lib/static/assets/map-data/openrailwaymap-loading_gauge-light.min.overlay.json?url';
-import openrailwaymap_track_class_light from '$lib/static/assets/map-data/openrailwaymap-track_class-light.min.overlay.json?url';
-import openrailwaymap_operator_light from '$lib/static/assets/map-data/openrailwaymap-operator-light.min.overlay.json?url';
-import openrailwaymap_standard_abandoned_light from '$lib/static/assets/map-data/openrailwaymap-standard+abandoned-light-catin136.min.overlay.json?url';
+import openrailwaymap_style_standard_light from '$lib/static/assets/map-data/openrailwaymap-style-standard-infrastructure.overlay.json?url';
+import openrailwaymap_style_standard_speed from '$lib/static/assets/map-data/openrailwaymap-style-standard-speed.overlay.json?url';
+import openrailwaymap_style_standard_train_protection from '$lib/static/assets/map-data/openrailwaymap-style-standard-train-protection.overlay.json?url';
+import openrailwaymap_style_standard_electrification from '$lib/static/assets/map-data/openrailwaymap-style-standard-electrification.overlay.json?url';
+import openrailwaymap_style_standard_tracks from '$lib/static/assets/map-data/openrailwaymap-style-standard-tracks.overlay.json?url';
+import openrailwaymap_style_standard_operator from '$lib/static/assets/map-data/openrailwaymap-style-standard-operator.overlay.json?url';
+import openrailwaymap_style_standard_routes from '$lib/static/assets/map-data/openrailwaymap-style-standard-routes.overlay.json?url';
+import openrailwaymap_style_standard_light_abandoned_razed from '$lib/static/assets/map-data/openrailwaymap-style-standard-infrastructure-abandoned-razed.overlay.json?url';
 
 export const OSM_VECTOR_BASE_LAYERS: LayerConfigEntry[] = [
 	{
@@ -556,57 +555,51 @@ export const OSM_VECTOR_OVERLAY_LAYERS: LayerConfigEntry[] = [
 				entries: [
 					{
 						type: 'Layer',
-						id: 'overlay-openrailwaymap-standard-light',
-						title: 'Standard',
-						url: openrailwaymap_standard_light
+						id: 'overlay-openrailwaymap-style-standard-infrastructure',
+						title: 'Infrastructure',
+						url: openrailwaymap_style_standard_light
 					},
 					{
 						type: 'Layer',
-						id: 'overlay-openrailwaymap-speed-light',
+						id: 'overlay-openrailwaymap-style-standard-speed',
 						title: 'Speed',
-						url: openrailwaymap_speed_light
+						url: openrailwaymap_style_standard_speed
 					},
 					{
 						type: 'Layer',
-						id: 'overlay-openrailwaymap-signals-light',
-						title: 'Signals',
-						url: openrailwaymap_signals_light
+						id: 'overlay-openrailwaymap-style-standard-train-protection',
+						title: 'Train Protection',
+						url: openrailwaymap_style_standard_train_protection
 					},
 					{
 						type: 'Layer',
-						id: 'overlay-openrailwaymap-electrification-light',
+						id: 'overlay-openrailwaymap-style-standard-electrification',
 						title: 'Electrification',
-						url: openrailwaymap_electrification_light
+						url: openrailwaymap_style_standard_electrification
 					},
 					{
 						type: 'Layer',
-						id: 'overlay-openrailwaymap-gauge-light',
-						title: 'Gauge',
-						url: openrailwaymap_gauge_light
+						id: 'overlay-openrailwaymap-style-standard-tracks',
+						title: 'Tracks',
+						url: openrailwaymap_style_standard_tracks
 					},
 					{
 						type: 'Layer',
-						id: 'overlay-openrailwaymap-loading_gauge-light',
-						title: 'Loading Gauge',
-						url: openrailwaymap_loading_gauge_light
-					},
-					{
-						type: 'Layer',
-						id: 'overlay-openrailwaymap-track_class-light',
-						title: 'Track Class',
-						url: openrailwaymap_track_class_light
-					},
-					{
-						type: 'Layer',
-						id: 'overlay-openrailwaymap-operator-light',
+						id: 'overlay-openrailwaymap-style-standard-operator',
 						title: 'Operator',
-						url: openrailwaymap_operator_light
+						url: openrailwaymap_style_standard_operator
 					},
 					{
 						type: 'Layer',
-						id: 'overlay-openrailwaymap-standard-abandoned-light',
-						title: 'Standard w/ Abandoned',
-						url: openrailwaymap_standard_abandoned_light
+						id: 'overlay-openrailwaymap-style-standard-routes',
+						title: 'Routes',
+						url: openrailwaymap_style_standard_routes
+					},
+					{
+						type: 'Layer',
+						id: 'overlay-openrailwaymap-style-standard-infrastructure-abandoned-razed',
+						title: 'Abandoned Razed',
+						url: openrailwaymap_style_standard_light_abandoned_razed
 					}
 				]
 			}
