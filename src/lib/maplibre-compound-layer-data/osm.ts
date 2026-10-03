@@ -95,14 +95,20 @@ export const OSM_VECTOR_BASE_LAYERS: LayerConfigEntry[] = [
 							{
 								type: 'Layer',
 								id: 'base-tris5572-dark',
-								title: 'dark',
+								title: 'Dark',
 								url: 'https://tris5572.github.io/map-style/dark/style.json'
 							},
 							{
 								type: 'Layer',
 								id: 'base-tris5572-light',
-								title: 'light',
+								title: 'Light',
 								url: 'https://tris5572.github.io/map-style/light/style.json'
+							},
+							{
+								type: 'Layer',
+								id: 'base-tris5572-porcelain',
+								title: 'Porcelain',
+								url: 'https://tris5572.github.io/map-style/porcelain/style.json'
 							}
 						]
 					},
